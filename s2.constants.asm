@@ -39,7 +39,7 @@ PLCID_S1FZBoss:		equ (PLCptr_S1FZBoss-ArtLoadCues)/2
 RAM_Start:			equ	$FFFF0000		; 4 bytes
 
 ; Level variables
-Chunk_Table:			equ	$FFFF0000		; $8000 bytes
+Chunk_Table:			equ	RAM_Start		; $8000 bytes
 Level_Layout:			equ	$FFFF8000		; $1000 bytes
 Block_Table:			equ	$FFFF9000		; $C00 bytes
 TempArray_LayerDef:		equ	$FFFFA800		; $200 bytes
@@ -101,7 +101,7 @@ Camera_Y_pos_diff:		equ	$FFFFEEB2		; 2 bytes
 Camera_X_pos_diff_P2:		equ	$FFFFEEB6		; 2 bytes
 Camera_Y_pos_diff_P2:		equ	$FFFFEEB8		; 2 bytes
 unk_EEC0:			equ	$FFFFEEC0		; 4 bytes ; only written to once
-unk_EEC4:			equ	$FFFFEEC4		; 2 bytes ; only written to once, but actually as a long-word (4 bytes) which also prevents the screen from scrolling up and killing Sonic
+unk_EEC4:			equ	$FFFFEEC4		; 2 bytes ; written to as a long-word (4 bytes) which also prevents the screen from scrolling up and killing Sonic
 Camera_Max_Y_pos:		equ	$FFFFEEC6		; 2 bytes
 Camera_Min_X_pos:		equ	$FFFFEEC8		; 2 bytes
 Camera_Max_X_pos:		equ	$FFFFEECA		; 2 bytes
@@ -127,7 +127,11 @@ RNG_seed:			equ	$FFFFF636		; 4 bytes
 Game_paused:			equ	$FFFFF63A		; 2 bytes
 DMA_data_thunk:			equ	$FFFFF640		; 2 bytes
 Hint_flag:			equ	$FFFFF644		; 2 bytes
+WaterHeight			equ	$FFFFF646		; 2 bytes
+AverageWtrHeight		equ	$FFFFF648               ; 2 bytes
+TargetWaterHeight		equ	$FFFFF64A		; 2 bytes
 Do_Updates_in_H_int:		equ	$FFFFF64F		; 1 byte
+unk_F662			equ	$FFFFF662		; 2 bytes ; unused but cleared on the SEGA screen
 Screen_redraw_flag:		equ	$FFFFF720		; 1 byte
 Water_flag:			equ	$FFFFF730		; 1 byte
 
@@ -195,3 +199,16 @@ SFXUnknownToPlay:		equ	$C	; when Genesis wants to play "unused" sound, it writes
 VDP_data_port:			equ	$C00000 ; (8=r/w, 16=r/w)
 VDP_control_port:		equ	$C00004 ; (8=r/w, 16=r/w)
 PSG_input:			equ	$C00011
+
+; ---------------------------------------------------------------------------
+; Z80 addresses
+Z80_RAM:	 		equ	$A00000 ; start of Z80 RAM
+Z80_RAM_End:	 		equ	$A02000 ; end of non-reserved Z80 RAM
+Z80_Version:	 		equ	$A10001
+Z80_Port_1_Data:	 	equ	$A10002
+Z80_Port_1_Control:	 	equ	$A10008
+Z80_Port_2_Control:	 	equ	$A1000A
+Z80_Expansion_Control:	 	equ	$A1000C
+Z80_Bus_Request:	 	equ	$A11100
+Z80_Reset:	 		equ	$A11200
+Security_Addr:	 		equ	$A14000
