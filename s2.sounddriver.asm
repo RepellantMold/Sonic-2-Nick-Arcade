@@ -957,11 +957,23 @@ loc_722C6:
 ; these tables by their channel assignment, where between Channel 3
 ; and Channel 4 there is a gap numerically.
 ; dword_722CC:
-MusicTrackOffs:	dc.l   $FFF0D0,	       0,  $FFF100,  $FFF130	; FM3, 0, FM4, FM5
-		dc.l   $FFF190,	 $FFF1C0,  $FFF1F0,  $FFF1F0	; PSG1, PSG2, PSG3, PSG3 (noise)
+MusicTrackOffs:	dc.l SoundDriver_RAM+$0D0	; FM3
+		dc.l 0		; dummy
+		dc.l SoundDriver_RAM+$100	; FM4
+		dc.l SoundDriver_RAM+$130	; FM5
+		dc.l SoundDriver_RAM+$190	; PSG1
+		dc.l SoundDriver_RAM+$1C0	; PSG2
+		dc.l SoundDriver_RAM+$1F0	; Plain PSG3
+		dc.l SoundDriver_RAM+$1F0	; Noise
 ; dword_722EC:
-SFXTrackOffs:	dc.l   $FFF220,	       0,  $FFF250,  $FFF280	; FM3, 0, FM4, FM5
-		dc.l   $FFF2B0,	 $FFF2E0,  $FFF310,  $FFF310	; PSG1, PSG2, PSG3, PSG3 (noise)
+SFXTrackOffs:	dc.l SoundDriver_RAM+$220	; SFX FM3
+		dc.l 0		; dummy
+		dc.l SoundDriver_RAM+$250	; SFX FM4
+		dc.l SoundDriver_RAM+$280	; SFX FM5
+		dc.l SoundDriver_RAM+$2B0	; SFX PSG1
+		dc.l SoundDriver_RAM+$2E0	; SFX PSG2
+		dc.l SoundDriver_RAM+$310	; Plain PSG3
+		dc.l SoundDriver_RAM+$310	; Noise
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Play GHZ waterfall sound
