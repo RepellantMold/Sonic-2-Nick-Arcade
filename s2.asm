@@ -478,29 +478,7 @@ Error_WaitForC:				; CODE XREF: ROM:ErrorMsg_Waitp
 ; End of function Error_WaitForC
 
 ; ===========================================================================
-Art_Text:	dc.l	     0,	       0,  $FFFF00, $FF00FF0,$FFF0FFF0,$FFFF0FF0,$FF00FF00, $FFFF000,	     0,	       0,   $FFF00,  $F0FF00,	 $FF00,	  $FF000,   $FF000, $FFFFF00; 0
-					; DATA XREF: ShowErrorMsg+10o
-					; ROM:000032BAo ...
-		dc.l	     0,	       0,  $FFF000, $F00FF00,	 $FF00,	  $FF000,  $FF0000, $FFFFF00,	     0,	       0, $FFFFF00,    $FF00,	$FF000,	   $FF00, $F00FF00, $FFFF000; 16
-		dc.l	     0,	       0,   $FFF00,  $F0FF00, $F00F000,$FFFFFFF0,   $FF000,  $FFF000,	     0,	       0,  $FFFF00,  $F00000,  $FFFF00,	    $FF0, $F00FFF0,  $FFFF00; 32
-		dc.l	     0,	       0,   $FFF00,  $FF0000, $FFFF000,$FF00FF00,$FF00FF00,$FFFFF000,	     0,	       0, $FFFFF00, $F00FF00,	$FF000,	 $FF0000, $FF00000,$FFF00000; 48
-		dc.l	     0,	       0,  $FFFF00, $FF00FF0,  $FFFF00,	$FFFF000,$FF00FF00, $FFFF000,	     0,	       0,  $FFFF00, $FF00FF0, $FF00FF0,	 $FFFF00,    $FF00, $FFFF000; 64
-		dc.l	     0,	  $F0000,  $FFFF00, $F0F0000,  $FFF000,	  $F0F00, $FFFF000,   $F0000,	     0,	       0,	 0,	   0, $FFFFFF0,	       0,	 0,	   0; 80
-		dc.l	     0,	       0,	 0, $FFFFFF0,	     0,	$FFFFFF0,	 0,	   0,	     0,	   $F000,    $FF00, $FFFFFF0, $FFFFFF0,	   $FF00,    $F000,	   0; 96
-		dc.l	     0,	   $F000,    $FF00, $FFFFFF0, $FFFFFF0,	   $FF00,    $F000,	   0,	     0,	       0, $FF00FF0, $FF00FF0,  $F0FF00,	 $FFF000, $FFF0000,$FFF00000; 112
-		dc.l	     0,	       0, $FFFFFF0,    $FF00,	$FF000,	 $FF0000, $FF00000,$FFFFFF00,	     0,	       0,    $FFF0,   $F0FF0,  $F00FF0,	 $FFFFF0, $FF00FF0,$FF000FF0; 128
-		dc.l	     0,	       0,  $FFFF00,  $F00FF0, $FFFFF00,	$FFFF000,$FF00FF00,$FFFFF000,	     0,	       0,  $FFFF00, $FF00FF0, $FF00000,$FF000000,$FF00FF00,$FFFFF000; 144
-		dc.l	     0,	       0,  $FFFF00,  $FF0FF0, $FF00FF0,	$FF00FF0,$FF00FF00,$FFFFF000,	     0,	       0,  $FFFFF0,  $FF0000, $FF00000,	$FFFF000,$FF000000,$FFFFFF00; 160
-		dc.l	     0,	       0,  $FFFFF0, $FFF0000, $FF00000,	$FFFFF00,$FFF00000,$FFF00000,	     0,	       0,  $FFFF00, $FFF00F0, $FF00000,$FF00FFF0,$FF00FF00,$FFFFFF00; 176
-		dc.l	     0,	       0,  $FF00F0,  $FF0FF0, $FF00FF0,	$FFFFF00,$FF00FF00,$FF00FF00,	     0,	       0,   $FF000,   $FF000,  $FF0000,	 $FF0000, $FF00000, $FF00000; 192
-		dc.l	     0,	       0,     $FF0,	$FF0, $F00FF00,$FF00FF00,$FFFFF000, $FFF0000,	     0,	       0,  $FF00F0,  $FF0FF0, $FF0FF00,	$FFFF000,$FF00FF00,$FF000FF0; 208
-		dc.l	     0,	       0,   $FF000,  $FF0000, $FF00000,	$FF00000,$FF000000,$FFFFFF00,	     0,	       0,  $FF00F0,  $FF0FF0,  $FFFFF0,	$F0F0FF0, $F000FF0,$FF000FF0; 224
-		dc.l	     0,	       0,  $FF00F0,  $FF00F0,  $FFF0F0,	$F0FFF00, $F00FF00,$FF00FF00,	     0,	       0,  $FFFF00, $FF00FF0,$FFF0FFF0,$FFF0FFF0,$FF00FF00, $FFFF000; 240
-		dc.l	     0,	       0,  $FFFF00,  $FF00F0, $FF00FF0,	$FFFFF00,$FFF00000,$FF000000,	     0,	       0,  $FFFF00, $FF00FF0,$FF000FF0,$FFFFFFF0,$FF00FF00,$FFFFFFF0; 256
-		dc.l	     0,	       0,  $FFFF00,  $FF00F0, $FF00FF0,	$FFFFF00,$FF00FF00,$FF00FFF0,	     0,	       0,  $FFFFF0, $FF00FF0, $FFF0000,	 $FFFF00,$FF00FFF0,$FFFFFF00; 272
-		dc.l	     0,	       0, $FFFFFF0,   $FF000,	$FF000,	 $FF0000,  $FF0000,  $FF0000,	     0,	       0,  $FF00F0,  $FF00F0, $FF00FF0,	$FF00F00,$FFFFFF00,$FFFFF000; 288
-		dc.l	     0,	       0, $FF000F0, $FF000F0, $FF00FF0,	$FF0FF00, $FFFF000,$FFFF0000,	     0,	       0,$FF0000F0,$FF0000F0,$FF0F0FF0,$FFFFFF00,$FF00FF00,$FF00FF00; 304
-		dc.l	     0,	       0, $FF000F0, $FFF0F00,  $FFF000,	  $FF000,  $FFFF00,$FF00FFF0; 320
+Art_Text:	incbin	"art/uncompressed/Main font.bin"
 ; ===========================================================================
 
 V_int:
@@ -3548,10 +3526,10 @@ loc_2456:				; CODE XREF: PalCycle_Sega+64j
 ; End of function PalCycle_Sega
 
 ; ===========================================================================
-Pal_Sega1:	dc.w  $EEE, $EEA, $EE4,	$EC0, $EE4, $EEA; 0 ; DATA XREF: PalCycle_Sega+Ao
-Pal_Sega2:	dc.w  $EEC, $EEA, $EEA,	$EEA, $EEA, $EEA, $EEC,	$EEA, $EE4, $EC0, $EC0,	$EC0, $EEC, $EEA, $EE4,	$EC0; 0
-					; DATA XREF: PalCycle_Sega+82o
-		dc.w  $EA0, $E60, $EEA,	$EE4, $EC0, $EA0, $E80,	$E00; 16
+Pal_Sega1:	incbin	"art/palettes/sega1.bin"
+		even
+Pal_Sega2:	incbin	"art/palettes/sega2.bin"
+		even
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -3690,59 +3668,32 @@ PalPointers:	dc.l Pal_SegaBG		; DATA XREF: PalLoad1o	PalLoad2o ...
 		dc.l Pal_S1Ending
 		dc.w $FB00
 		dc.w $1F
-Pal_SegaBG:	dc.w  $EEE, $EEE, $EEE,	$EEE, $EEE, $EEE, $EEE,	$EEE, $EEE, $EEE, $EEE,	$EEE, $EEE, $EEE, $EEE,	$EEE; 0
-					; DATA XREF: ROM:PalPointerso
-		dc.w  $EEE, $EEE, $EEE,	$EEE, $EEE, $EEE, $EEE,	$EEE, $EEE, $EEE, $EEE,	$EEE, $EEE, $EEE, $EEE,	$EEE; 16
-		dc.w  $EEE, $EEE, $EEE,	$EEE, $EEE, $EEE, $EEE,	$EEE, $EEE, $EEE, $EEE,	$EEE, $EEE, $EEE, $EEE,	$EEE; 32
-		dc.w  $EEE, $EEE, $EEE,	$EEE, $EEE, $EEE, $EEE,	$EEE, $EEE, $EEE, $EEE,	$EEE, $EEE, $EEE, $EEE,	$EEE; 48
-Pal_Title:	dc.w  $C00,    2, $800,	 $26,  $48,  $6C,  $8E,	 $AE, $4A0,  $40,  $60,	 $80,  $A0, $6A4,    0,	   0; 0
-					; DATA XREF: ROM:0000250Ao
-		dc.w  $C8C, $800,    0,	$A66, $EA8, $ECA, $EEE,	 $AE,  $8E,  $6C, $8CE,	$EEC,  $4A,    6,    0,	   0; 16
-		dc.w  $C00, $C00, $E22,	$E44, $E66, $E88, $EEE,	$AAA, $888, $666,  $24,	$248, $8AE, $68C,    0,	$ECA; 32
-		dc.w  $C00, $600, $C00,	$E44, $E66, $E88, $EEE,	 $AE,  $6A,  $26,  $EE,	$EAA,	$C,    6,    2,	   0; 48
-Pal_LevelSelect:dc.w	 0,    0,    0,	   0,	 0,    0,    0,	   0,	 0,    0,    0,	   0,	 0,    0,    0,	$EEE; 0
-					; DATA XREF: ROM:00002512o
-		dc.w  $C00,  $24, $246,	$468, $68A, $8AC, $ACE,	$8AC, $68A, $468, $ACE,	$ACE, $246,  $24,    0,	   0; 16
-		dc.w  $C00,  $24, $246,	$468, $68A, $8AC, $ACE,	$8AC, $68A, $468,  $24,	$246, $8AC, $68A,    0,	 $EE; 32
-		dc.w  $C00,  $24, $246,	$468, $68A, $8AC, $ACE,	$8AC, $68A, $468, $ACE,	$ACE, $468, $246,    2,	   0; 48
+Pal_SegaBG:	incbin	"art/palettes/SegaBG.bin"
+		even
+Pal_Title:	incbin	"art/palettes/TitleScreen.bin"
+		even
+Pal_LevelSelect:incbin	"art/palettes/LevelSelectMenu.bin"
+		even
 Pal_SonicTails:	incbin	"art/palettes/SonicAndTails.bin"
 		even
-Pal_GHZ:	dc.w  $800,    0, $242,	$464, $686, $8C8, $EEE,	$AAA, $888, $444, $8EA,	$46A,  $EE,  $88,  $44,	  $E; 0
-					; DATA XREF: ROM:00002522o
-		dc.w  $E80,    2, $EEE,	 $26,  $48,  $6C,  $8E,	 $CE, $A86, $E86, $EA8,	$ECA,  $40,  $60,  $A4,	 $E8; 16
-		dc.w  $C82, $A02, $C42,	$E86, $ECA, $EEC, $EEE,	$EAC, $E8A, $E68,  $E8,	 $A4,	 2,  $26,  $6C,	 $CE; 32
-Pal_HPZWater:	dc.w	 0, $402, $A20,	$B40, $B60, $B80, $ECA,	$CA8, $A84, $860, $AA8,	$884, $428, $424, $8AA,	$88A; 0
-					; DATA XREF: ROM:0000255Ao
-		dc.w	 0, $202, $242,	$464, $686, $442, $EAA,	$D88, $D66, $A22, $666,	$46A, $6CA, $484, $EEE,	  $E; 16
-		dc.w  $400, $A20, $C22,	$E26, $E28, $A22, $A40,	$C22, $A60, $E28, $E4A,	$E6A, $CAA, $E24, $E26,	$E8A; 32
-		dc.w  $400, $440, $660,	$880, $8A0, $8C0, $AE4,	$EEA, $A60, $E84, $EA6,	$EC6, $EE6, $E6A, $E8A,	$CAA; 48
-Pal_CPZ:	dc.w	 2,    0, $E64,	$A68, $E86,  $44, $EEE,	$AAA, $888, $444, $666,	   0,  $EE,  $88, $EA8,	$ECA; 0
-					; DATA XREF: ROM:0000252Ao
-					; ROM:00002532o
-		dc.w	 2,    0,    6,	$A0A, $C4C, $E6E, $EAE,	 $CE,  $8E,  $4E,  $2C,	 $2A,	 8,    4, $EEE,	  $E; 16
-		dc.w	 2,    0, $222,	$444, $888, $AAA, $EEE,	$E40, $C00, $800,  $CE,	$28E, $E40, $C00, $C00,	 $E0; 32
+Pal_GHZ:        incbin	"art/palettes/GHZ.bin"
+		even
+Pal_HPZWater:	incbin	"art/palettes/HPZWater.bin"
+		even
+Pal_CPZ:        incbin	"art/palettes/CPZ.bin"
+		even
 Pal_EHZ:	incbin	"art/palettes/EHZ.bin"
 		even
-Pal_HPZ:	dc.w  $800,    0, $242,	$464, $686,  $44, $EEE,	$AAA, $888, $444, $8EA,	$46A,  $EE,  $88,  $44,	  $E; 0
-					; DATA XREF: ROM:00002542o
-		dc.w  $200, $402, $604,	$806, $808, $602, $620,	$202, $640,  $26,  $68,	$28A, $6CE,  $24,  $46,	$4AC; 16
-		dc.w  $200,  $20,  $40,	 $60,  $80,  $C0, $4E6,	$EEE, $602, $E44, $E82,	$EA8, $EEE,  $24,  $46,	$4AC; 32
+Pal_HPZ:	incbin	"art/palettes/HPZ.bin"
+		even
 Pal_HTZ:	incbin	"art/palettes/HTZ.bin"
 		even
-Pal_SpecialStage:dc.w  $400,	0, $822, $A44, $C66, $E88, $EEE, $AAA, $888, $444, $8AE, $46A,	 $E,	8,    4,  $EE; 0
-					; DATA XREF: ROM:00002552o
-		dc.w  $400,    0,  $24,	 $68,  $AC, $2EE, $EEE,	$AAA, $888, $444, $AE4,	$6A2,  $EE,  $88,  $44,	   0; 16
-		dc.w  $400,    0, $204,	$628, $A4C, $C6E, $ECE,	$800, $C42, $E86, $ECA,	$EEC,	 0, $EE0, $AA0,	$440; 32
-		dc.w  $400,    0,  $60,	 $A0,  $C6,  $EA, $AEC,	$EEA, $EE0, $AA0, $880,	$660, $440, $EE0, $AA0,	$440; 48
-Pal_LZ:		dc.w  $800,    0, $626,	$A2A, $C4C, $E8E, $EEE,	$AAA, $888, $444, $8E0,	$260,  $EE,  $88,  $44,	  $E; 0
-					; DATA XREF: ROM:00002562o
-		dc.w	 0, $444, $666,	$888, $AAA, $CCC, $EEE,	   0, $C8C, $A6A, $848,	$ECE, $E8C, $A48, $826,	$EEE; 16
-		dc.w	 0,    0,  $20,	$240, $462, $882, $CC6,	$EEA, $282, $4A4, $8E8,	$AAA, $666, $222, $684,	$EEE; 32
-Pal_LZ4:	dc.w	 0,    0, $A26,	$C48, $E6A, $E8C, $ECE,	$CAC, $868, $646, $CAE,	$86C, $60C, $426,    4,	 $EE; 0
-					; DATA XREF: ROM:0000256Ao
-		dc.w  $800,    0, $226,	$22A, $44C, $88E, $EEE,	$AAA, $888, $444, $6C0,	$240,  $EA,  $84,  $40,	  $E; 16
-		dc.w	 0, $202, $404,	$626, $848, $A6A, $C8C,	   0, $848, $626, $404,	$ECE, $E8C, $A48, $826,	$EEE; 32
-		dc.w	 0,    0,    0,	$200, $402, $644, $866,	$A88, $264, $486, $6A8,	 $26,  $48,  $6A, $604,	$AAA; 48
+Pal_SpecialStage:incbin	"art/palettes/SpecialStage.bin"
+		even
+Pal_LZ:         incbin	"art/palettes/LZ.bin"
+		even
+Pal_LZ4:	incbin	"art/palettes/LZ4.bin"
+		even
 Pal_LZSonicWater:dc.w	  0,	0, $220, $442, $662, $884, $EEE, $AAA, $888, $444, $6AA, $266,	$48,  $24,    2,  $EE; 0
 					; DATA XREF: ROM:0000257Ao
 Pal_LZ4SonicWater:dc.w	   0,	 0, $A26, $C48,	$E6A, $E8C, $ECE, $CAC,	$868, $646, $CAE, $86C,	$60C, $426,    4,  $EE;	0
@@ -4302,14 +4253,14 @@ loc_3546:				; CODE XREF: ROM:0000353Ej
 ; ===========================================================================
 
 loc_354C:				; CODE XREF: ROM:00003532j
-		move.b	#$18,(Game_Mode).w	; Game mode array only goes up to $10...
+		move.b	#$18,(Game_Mode).w	; Game mode array only goes up to $10, triggers the checksum error
 		move.w	#$600,(Current_ZoneAndAct).w
 		rts
 ; ===========================================================================
 
 loc_355A:				; CODE XREF: ROM:00003538j
-		move.b	#$1C,(Game_Mode).w
-		move.b	#$91,d0
+		move.b	#$1C,(Game_Mode).w	; this one just makes the screen turn into a horizontal
+		move.b	#$91,d0			; strip of lines with the credits music playing on Fusion
 		bsr.w	PlaySound_Special
 		move.w	#0,($FFFFFFF4).w
 		rts
@@ -5319,7 +5270,7 @@ loc_41A6:				; CODE XREF: ROM:00004196j
 ; ===========================================================================
 
 DynWater_HPZ3:				; DATA XREF: ROM:DynWater_Indexo
-		move.w	(Camera_X_pos).w,d0 ; in fact, this is a leftover from Sonic 1's LZ3
+		move.w	(Camera_X_pos).w,d0 ; leftover from Sonic 1's LZ3
 		move.b	($FFFFF64D).w,d2
 		bne.s	loc_41F2
 		move.w	#$900,d1
@@ -5426,7 +5377,7 @@ locret_42AE:				; CODE XREF: ROM:000042A6j
 ; ===========================================================================
 
 DynWater_HPZ4:				; DATA XREF: ROM:DynWater_Indexo
-		move.w	#$228,d1	; in fact, this	is a leftover from Sonic 1's SBZ3
+		move.w	#$228,d1	; leftover from Sonic 1's SBZ3
 		cmpi.w	#$F00,(Camera_X_pos).w
 		bcs.s	loc_42C0
 		move.w	#$4C8,d1
@@ -5951,147 +5902,21 @@ locret_47E2:				; CODE XREF: SignpostArtLoad+4j
 ; End of function SignpostArtLoad
 
 ; ===========================================================================
-Demo_EHZ:	dc.b   0,$44,  8,  0,$28,  5,  8,$59,$28,  4,  8,$35,$28,  6,  8,$42; 0
-					; DATA XREF: ROM:00004586o
-		dc.b $28,  4,  8,$19,  0, $F,  8, $A,$28,  9,  8,$4A,$28,  9,  8,$10; 16
-		dc.b   0,  5,  4,$1B,  2,  0,  8,$4B,$28,$2D,  8,$55,$28,  9,  8,$26; 32
-		dc.b $28,$1C,  8,$19,$28,  8,  8,$FF,  8,$96,$28,$13,  8,$1D,$28,$19; 48
-		dc.b   8,$2A,$28,  7,  9,  0,  1,  0,  5,$20,  4,  2,  5,  1,  0,  0; 64
-		dc.b   8,$3A,  0,$25,  4, $A,$24,  9,  4,$1C,  0,  3,  8,$3A,$28,  6; 80
-		dc.b   8, $C,  0,$16,  8,  0,$28, $F,  8,$33,$28,  7,  8,  4,  0,$46; 96
-		dc.b   8,$6A,  0,$29,$80,  0,$C0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 112
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 128
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 144
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 160
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 176
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 192
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 208
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 224
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 240
-Demo_2P:	dc.b   0,$46,  8,$1E,$28, $A,  8,$5E,$28,$30,  8,$66,  0, $F,  8, $F; 0
-					; DATA XREF: ROM:00003E82o
-					; MoveSonicInDemo+DCo
-		dc.b $28,$2E,  8,  0,  0,$1F,  8,$12,  0,$13,  8, $A,  0,$16,  4, $D; 16
-		dc.b   0,  8,  4,$10,  0,$30,  8,$6B,$28,$14,  8,$80, $A,  2,  2,$23; 32
-		dc.b   0,  7,  8,$13,$28,$17,  8,  0,  0,  3,  4,  3,  5,  0,  1,  0; 48
-		dc.b   9,  1,  8,$3C,$28,  7,  0,$18,  8,$4D,$28,$12,  8,  1,  0,  4; 64
-		dc.b   8, $B,  0,  7,  8,$1B,  0,  9,$20,  5,$28,$13,  8,  4,  0,$21; 80
-		dc.b   8,$11,  0,$20,  8,$51,  0, $B,  4,$57,  0, $D,  2,$27, $A,  0; 96
-		dc.b   0,  2,  9,  1,  8,$2A,$28,$15,  8,  3,$28,$19,  8, $A,  0, $A; 112
-		dc.b   8,  2,$28,$1B,  8,$33,  0,$27,  8,$3A,  9,$12,  1,  7,  0,$13; 128
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 144
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 160
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 176
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 192
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 208
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 224
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 240
-Demo_HTZ:	dc.b   0,  5,  1,$1D,  9,  3,$29,  5,  9,$10,  1,  0,  0,$13,  4,  0; 0
-					; DATA XREF: ROM:0000458Eo
-		dc.b   5, $A,$25,  7,  5,$10,  4,  1,  0, $C,  8,  4,  9, $C,$29, $A; 16
-		dc.b   9,$10,  8,  3,  0,$1C,$20,  7,  0, $B,  4,  6,  0,$25,$20,  6; 32
-		dc.b   0,$22,  8,  5,  0,$25,  4, $E,  0,$33,  8,  7,  0,$39,  8, $A; 48
-		dc.b $28,  8,  8,$16,  0,$24,  8,$74,$28,  2,$29,  7,  9,  3,  0, $F; 64
-		dc.b   8, $D,  0,  5,  4, $C,  0,  1,$20,  2,$28,  0,$2A,  8,$28,  2; 80
-		dc.b   8,$1E,  0,  4,  4,$13,  0,$12,  8,$18,$28, $B,  8,$11,  0,$2C; 96
-		dc.b   8, $C,  0, $D,$20,  4,$28,  3,  8,  5,  0,$22,  4,$12,  0,  4; 112
-		dc.b   8,$1A,  0, $D,  4,  6,  0,$37,  8, $C,  0,$19,  8, $D,  0, $C; 128
-		dc.b   4,  9,  0,  3,  8,$20,  0,$1A,  4,  6,  0,$22,  8,  9,  0,  9; 144
-		dc.b   8,$16,  0,$2F,  8, $E,$28,  4,$20,  2,  0,  8,  4,$19,  0,  5; 160
-		dc.b   8,  6,$28,  8,  8,  8,  0,$24,  8,$72, $A,  9,  2, $E, $A,$6B; 176
-		dc.b $8A,  0,$40,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 192
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 208
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 224
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 240
-Demo_HPZ:	dc.b   0,$40,  8,$33,$28,  6,  8,$39,$28,  5,  8, $D,  0,$25,  8,$10; 0
-					; DATA XREF: ROM:0000458Ao
-		dc.b $28,$2A,  8,$1C,  2,  0,$26,  3,$22,  0,$2A,  0,$28,  6,  8,$22; 16
-		dc.b   2,  0,  6, $F,  4,  8,  6,  0,  2, $E,  6,$2F,  2,$79,  6,  1; 32
-		dc.b   4,$43,$24, $F,  4,$17,  0,  9,  8,$1C,$28,  3,  8,$45,  0,  5; 48
-		dc.b   8,$1A,$28,$33,  8,$72,  0, $F,  4,$15,$24,$10,  4, $B,  0,$24; 64
-		dc.b   4,  1,$24,  8,  4,  7,  0,  6,  4,  4,  0,$1E,$24, $E,  4,$15; 80
-		dc.b   0,$1E,$20,  3,$24, $F,  4,  0,  0,  7,  8,$12,  4,  9,$24, $F; 96
-		dc.b   4,  6,  0, $A,  4,$62,$24,$12,$20,  4,  0,$21,$28, $E,  8,$16; 112
-		dc.b   0,$19,  8,$29,  0,$63,  4,$15,$24,  9,  4,$39,  0,$31,  8,$25; 128
-		dc.b $28,  2,  8,$12,  0,$93,$80,  0,$C0,  0,  0,  0,  0,  0,  0,  0; 144
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 160
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 176
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 192
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 208
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 224
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 240
-Demo_CPZ:	dc.b   0,$1B,  1,$30,  0,$19,  8,$29,$28,$13,  8,  3,  0,$1D,$20,  3; 0
-					; DATA XREF: ROM:00004582o
-		dc.b $28,$1E,  8,  2,  0,  9,  4,  5,  0,$2E,  8,$1E,$28,  5,$20,  3; 16
-		dc.b   0, $B,  4,  1,  5,  7,  4,  0,  0,$2F,$28,  3,$2A,  4, $A,  0; 32
-		dc.b   8,  6,  0,$24,  8,  2,$28,  6,  8,  1,  0,$26,  8,$FF,  8,$14; 48
-		dc.b $28, $A,  8,  3,  0,$60,  8, $E,$28,  7,  8, $C,  0,  8,  4, $B; 64
-		dc.b   0,$23,  8,  5,  0,$93,  8,$19,$28,$11,  8,$78,$28, $F,  8,$FF; 80
-		dc.b   8,$83,$28, $D,  8,$82,  0,$1F,$80,  0,$40,  0,  0,  0,  0,  0; 96
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 112
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 128
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 144
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 160
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 176
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 192
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 208
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 224
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 240
-Demo_S1GHZ:	dc.b   0,$4A,  8,$61,$28, $B,  8,$47,$28,  7,  8,$3B,$28,  8,  8,$D1; 0
-					; DATA XREF: ROM:Demo_Indexo
-					; ROM:0000457Eo
-		dc.b $28,$10,  8, $A,  0, $E,$20,$12,$28,  4,  8,$1F,  0, $B,  6,  5; 16 ; leftover demo from Sonic 1 GHZ
-		dc.b   4,  5,  0,  4,$20, $B,$28, $E,  8,$20,  0,  5,$20,  2,$28,$12; 32
-		dc.b   8, $F,  0, $F,  8, $B,  0,  0,$20, $E,$28,  4,  8, $B,  0,$1A; 48
-		dc.b   8, $C,  0,  6,$20,$12,$28,  7,  8,$77,$28,  0,$20, $C,$24,  4; 64
-		dc.b $20,  7,$28,  6,  8,  4,  0, $F,  8,$39,  0,$11,  8, $D,$28, $A; 80
-		dc.b   8,$50,$28, $F,  8,  5,  0,$14,  8,$FF,  8,$56,  0,$FF,  0,$3F; 96
-		dc.b   8,  0,$28, $E,  8,$17,  0,$17,  8,  5,  0,  0,  0,  0,  0,  0; 112
-		dc.b   0,  9,  8,$78,  0,  6,  8,  6,  0,  3,$20,  5,$28,$11,  8, $D; 128
-		dc.b   0,$2B,  8,  2,$29,  7,  9,  2,  0,  7,  5, $F,  0,  8,  8, $D; 144
-		dc.b $28,  7,  8, $B,  0,$28,  8,  0,  9,  2,$29,  2,$28,  4,  8,$12; 160
-		dc.b   0,  9,  8,  0,$29,  2,$28,  4,  8,  9,  0, $F,  8, $C,  0, $E; 176
-		dc.b   9,  0,$29,  8,  9,  2,  8,$18,  0,  9,$28,  0,$29, $A,  9,$12; 192
-		dc.b   8,  0,  0,$18,$29,$10,  9,$10,  8,  3,  0,$2F,  5,  6,  0,  9; 208
-		dc.b   8,  0,  9,  1,$29,$12,  9,  0,  8,  5,  0,$24,  8,  0,  9,  0; 224
-		dc.b $29,  9,$28,  6,  8, $A,  0,$2A,  8,$1B,  0,$17,  4,  5,  0, $C; 240
-		dc.b   8,$20,  0,  4,$20,  3,  0, $E,  9,  4,  1,  0,  0,$1E,  8,  5; 256
-		dc.b   0,  1,$20,  6,$29,  1,  5,  7,  0,$13,  8,  5,  0,$15,$20,  1; 272
-		dc.b $28,  2,$29,  4,  9,  1,  8,  0,  0,  7,  8, $B,  0,$19,  8, $B; 288
-		dc.b $28,  6,  8,  5,  0,$12,  8,$11,  0, $C,$20,  2,$28,  4,  8,  4; 304
-		dc.b   0,$15,  8, $C,  0,$14,$20,  4,$28,  0,  8,  2,  0,$18,  8,  3; 320
-		dc.b   0,$2C,$20,  2,$28,  7,  8,  4,  0,$24,  6,$48,  4,$47,  0, $A; 336
-		dc.b   4,  7,  0,$14,  4,$44,  5,  0,  4,  0,  0,$15,  8,$15, $A,  1; 352
-		dc.b   0,  8,  4,  2,  5,$14,  0,  1,  5,  1,$25, $D,  5,$1B,  0,  7; 368
-		dc.b   8,$23,  9,  0,  0,  7,  5,$22,$25, $B,  5,$52,  0,  6,  8,$26; 384
-		dc.b   9,  1,  1,  0,  0,  0,  1,  0,  5,$17,$25,  8,  5,$1A,  0, $C; 400
-		dc.b   8,  6,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 416
-		dc.b   0,$11,  8,$37,$28,  4,  8, $A,  0,$12,  8, $B,  0,$1F,  8,$1B; 432
-		dc.b   0,  9,  8,$20,  0,$14,  4,$16,$24,  0,$20, $F,  0,$13,  4,$17; 448
-		dc.b   6,  4,  2,  0,  0,$24,  8, $D,  0,$46,  8,$77,  0,$60,  8,$17; 464
-		dc.b   0,$16,  4,  3,  0,$22,  8,$19,$28,  2,$20,  1,  0,$26,$20,  9; 480
-		dc.b   0,$3A,$20,$23,  0,  3,  8,  1,  0,$29,  4,$13,  0,$19,  4,$1B; 496
-		dc.b   0,$91,  8,$21,  0,$19,  4,  4,  0,$67,  4,$23,  0, $A,  8,  5; 512
-		dc.b   0,$87,  8,$21,  0,$2C,  8,$27,  0, $F,  8,$35,$28,  8,  8,$45; 528
-		dc.b $28,  9,  8,$31,  0,$99,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 544
-Demo_S1SS:	dc.b   0,$26,  4,  5,  0,$2A,  8,$1B,  0,  6,  4,  9,  0,  6,$20,  1; 0
-					; DATA XREF: ROM:00004592o
-					; ROM:00004596o
-		dc.b $28,  1,$29,  2,  9,  0,  8,  8,  0,  6,  8,  7,  0,$49,  8, $B; 16 ; leftover demo from Sonic 1 Special Stage
-		dc.b   0,  2,$20,  3,  0, $D,  8,$1D,  0,$13,  8,  6,  0,$21,  8,$21; 32
-		dc.b   0,  6,  8,$36,  0,$1E,  8,$1A,  0,  6,$20,  0,$28,  4,  8,$19; 48
-		dc.b   0,  4,  4,$11,  0,$1F,  4, $D,  0, $C,  4,$1E,  5,  1,  4,  0; 64
-		dc.b   0,  9,  8, $C,  0,  6,  4,  5,  5,  1,  4,$87,$24,  7,  4,  4; 80
-		dc.b   0,  4,  8, $D,  9,$14,  8,  4,  0,  3,  4,$17,$24,$13,  4, $A; 96
-		dc.b   0,  4,  9,  9,  8,  2,  0,  6,  4,$18,$24, $B,$20,  4,  0,  2; 112
-		dc.b   4,$2E,  5,  1,  4,  0,  0,$13,$20,$14,  0,  4,  8,$19,  0,$10; 128
-		dc.b $20,$1D,$24,  7,  4, $E,  0, $B,$20,$1B,$24,  5,  4,$17,$24,  0; 144
-		dc.b $20,$18,$24,  5,  4, $B,  0,  8,$20,$1F,$24,  1,  4,  8,  0, $B; 160
-		dc.b $20,$12,$28,  7,$29, $C,$20,  0,  4,$18,  0,$1A,  8,  0,  9,  7; 176
-		dc.b   8,  9,  9,$31,  8,  0,  0,  7,$20,  8,$24,$15,  4,  8,  0,$27; 192
-		dc.b $20,  9,$24,$12,  4, $E,$24, $E,  4, $A,  0,  9,  8,$16,$28,  0; 208
-		dc.b $20, $F,$28,  4,$29,$1B,  9,  5,$29, $C,  9,  0,  8,  7,  0,$A0; 224
-		dc.b   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0; 240
+Demo_EHZ:	incbin	"demoinputs/EHZ_1P.bin"
+		even
+Demo_2P:        incbin	"demoinputs/EHZ_2P.bin"
+		even
+Demo_HTZ:       incbin	"demoinputs/HTZ.bin"
+		even
+Demo_HPZ:       incbin	"demoinputs/HPZ.bin"
+		even
+Demo_CPZ:       incbin	"demoinputs/CPZ.bin"
+		even
+; This is identical to Sonic 1's demos.
+Demo_S1GHZ:     incbin	"demoinputs/GHZ.bin"
+		even
+Demo_S1SS:      incbin	"demoinputs/SS.bin"
+		even
 ; ===========================================================================
 ; j_DynamicArtCues:
 j_AniArt_Load:
@@ -16555,7 +16380,7 @@ loc_C70C:				; CODE XREF: ROM:0000C6E4j
 
 loc_C736:				; CODE XREF: ROM:0000C708j
 					; ROM:0000C72Cj
-		tst.b	($FFFFFE2D).w
+		tst.b	($FFFFFE2D).w   ; annoying spike bug....
 		bne.s	loc_C766
 		move.l	a0,-(sp)
 		movea.l	a0,a2
