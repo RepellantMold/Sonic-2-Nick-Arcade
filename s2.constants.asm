@@ -101,7 +101,7 @@ Camera_Y_pos_diff:		equ	$FFFFEEB2		; 2 bytes
 Camera_X_pos_diff_P2:		equ	$FFFFEEB6		; 2 bytes
 Camera_Y_pos_diff_P2:		equ	$FFFFEEB8		; 2 bytes
 unk_EEC0:			equ	$FFFFEEC0		; 4 bytes ; only written to once
-unk_EEC4:			equ	$FFFFEEC4		; 2 bytes ; written to as a long-word (4 bytes) which also prevents the screen from scrolling up and killing Sonic
+unk_EEC4:			equ	$FFFFEEC4		; 2 bytes ; written to once as a long-word (4 bytes) so it controls Camera_Max_Y_pos
 Camera_Max_Y_pos:		equ	$FFFFEEC6		; 2 bytes
 Camera_Min_X_pos:		equ	$FFFFEEC8		; 2 bytes
 Camera_Max_X_pos:		equ	$FFFFEECA		; 2 bytes
@@ -125,13 +125,15 @@ Game_Mode:			equ	$FFFFF600		; 1 byte
 Vint_routine:			equ	$FFFFF62A		; 1 byte
 RNG_seed:			equ	$FFFFF636		; 4 bytes
 Game_paused:			equ	$FFFFF63A		; 2 bytes
+Palette_Offset_Counter:		equ	$FFFFF632		; 2 bytes
+Palette_Wait_Counter:		equ	$FFFFF634		; 2 bytes
 DMA_data_thunk:			equ	$FFFFF640		; 2 bytes
 Hint_flag:			equ	$FFFFF644		; 2 bytes
-WaterHeight			equ	$FFFFF646		; 2 bytes
-AverageWtrHeight		equ	$FFFFF648               ; 2 bytes
-TargetWaterHeight		equ	$FFFFF64A		; 2 bytes
+WaterHeight:			equ	$FFFFF646		; 2 bytes
+AverageWtrHeight:		equ	$FFFFF648               ; 2 bytes
+TargetWaterHeight:		equ	$FFFFF64A		; 2 bytes
 Do_Updates_in_H_int:		equ	$FFFFF64F		; 1 byte
-unk_F662			equ	$FFFFF662		; 2 bytes ; unused but cleared on the SEGA screen
+unk_F662:			equ	$FFFFF662		; 2 bytes ; unused but cleared on the SEGA screen
 Screen_redraw_flag:		equ	$FFFFF720		; 1 byte
 Water_flag:			equ	$FFFFF730		; 1 byte
 
@@ -157,23 +159,43 @@ Demo_press_counter:		equ	$FFFFF792		; 1 byte
 PalChangeSpeed:			equ	$FFFFF794		; 2 bytes
 Collision_addr:			equ	$FFFFF796		; 4 bytes
 
-; Has something to do with the Special Stages...
+; Used in the palette cycles for the special stages
 unk_F79A:			equ	$FFFFF79A		; 2 bytes
 unk_F79C:			equ	$FFFFF79C		; 2 bytes
 unk_F79E:			equ	$FFFFF79E		; 2 bytes
-unk_F7A0:			equ	$FFFFF7A0		; 2 bytes
+SpecialStage_BGMode:		equ	$FFFFF7A0		; 2 bytes
 
 ; Misc variables
 Boss_defeated_flag:		equ	$FFFFF7A7		; 1 byte
 Current_Boss_ID:		equ	$FFFFF7AA		; 1 byte
 BigRingGraphics:		equ	$FFFFF7BE		; 2 bytes
 WindTunnel_flag:		equ	$FFFFF7C7		; 1 byte
-Object_control:			equ	$FFFFF7C8		; 1 byte
 WindTunnel_holding_flag:	equ	$FFFFF7C9		; 1 byte
 Sonic_sliding:			equ	$FFFFF7CA		; 1 byte
-Control_locked:			equ	$FFFFF7CC		; 1 byte
 Sonic_EnteredBigRing:		equ	$FFFFF7CD		; 1 byte
 Chain_Bonus_counter:		equ	$FFFFF7D0		; 2 bytes
+
+; Debug variables
+LevelSelCheat_Flag:		equ	$FFFFFFE0		; 1 byte
+SlowMoCheat_Flag:		equ	$FFFFFFE1		; 1 byte
+DebugCheat_Flag:		equ	$FFFFFFE2		; 1 byte
+S1JapaneseCredits_Flag:		equ	$FFFFFFE3		; 1 byte, somewhat unused
+CorrectBtnPresses:		equ	$FFFFFFE4		; 2 bytes, used to detect correct button presses
+TitleScreenCpresses:		equ	$FFFFFFE6		; 2 bytes, used to detect the C button (title screen only)
+Debug_mode_flag:		equ	$FFFFFFFA		; 2 bytes
+
+; Joypad variables
+Ctrl_1_Logical: 		equ 	$FFFFF602 ; 2 bytes
+Ctrl_1_Held_Logical: 		equ 	Ctrl_1_Logical ; 1 byte - $FFFFF602, listed like this in case of RAM shifting
+Ctrl_1_Press_Logical: 		equ 	Ctrl_1_Logical+1 ; 1 byte - $FFFFF603, listed like this in case of RAM shifting
+Ctrl_1: 			equ 	$FFFFF604 ; 2 bytes
+Ctrl_1_Held: 			equ 	Ctrl_1 ; 1 byte  - $FFFFF604, listed like this in case of RAM shifting
+Ctrl_1_Press: 			equ 	Ctrl_1+1 ; 1 byte  - $FFFFF605, listed like this in case of RAM shifting
+Ctrl_2: 			equ 	$FFFFF606 ; 2 bytes
+Ctrl_2_Held: 			equ 	Ctrl_2 	; 1 byte  - $FFFFF606, listed like this in case of RAM shifting
+Ctrl_2_Press: 			equ 	Ctrl_2+1 ; 1 byte  - $FFFFF607, listed like this in case of RAM shifting
+Control_locked:			equ	$FFFFF7CC		; 1 byte
+Object_control:			equ	$FFFFF7C8		; 1 byte
 
 ; Misc variables
 Sprite_Table:			equ	$FFFFF800		; $200 bytes
@@ -184,11 +206,11 @@ Current_Act:			equ	Current_ZoneAndAct+1	; $FFFFFE11, listed like this in case of
 Two_player_mode:		equ	$FFFFFFE8
 Demo_mode_flag:			equ	$FFFFFFF0
 Graphics_Flags:			equ	$FFFFFFF8
-Debug_mode_flag:		equ	$FFFFFFFA
-Checksum_fourcc:		equ	$FFFFFFFC		; writes "init" at this piece of RAM
+Checksum_fourcc:		equ	$FFFFFFFC		; writes "init" here
 
 ; ---------------------------------------------------------------------------
 ; Sound Driver RAM variables; starts at $FFFFF000 and ends at $FFFFF5BF.
+PauseSound:			equ	3
 QueueToPlay:			equ	9	; if NOT set to $80, means new index was requested by 68K
 SFXToPlay:			equ	$A	; when Genesis wants to play "normal" sound, it writes it here
 SFXSpecialToPlay:		equ	$B	; when Genesis wants to play "special" sound, it writes it here

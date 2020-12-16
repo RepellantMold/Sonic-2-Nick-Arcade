@@ -1233,7 +1233,7 @@ PlaySound_Special:
 ; End of function PlaySound_Special
 
 ; ===========================================================================
-; Normally unused and broken, search "SFXUnknownToPlay" in the sound driver
+; Normally unused and broken, search "PlaySound_Unk" in the sound driver
 ; file for a fix.
 PlaySound_Unk:
 		move.b	d0,(SoundDriver_RAM+SFXUnknownToPlay).w
@@ -1261,7 +1261,7 @@ loc_1424:
 Pause_Loop:				; CODE XREF: Pause+5Aj
 		move.b	#$10,(Vint_routine).w
 		bsr.w	DelayProgram
-		tst.b	($FFFFFFE1).w
+		tst.b	(SlowMoCheat_Flag).w
 		beq.s	Pause_CheckStart
 		btst	#6,($FFFFF605).w
 		beq.s	Pause_CheckBC
@@ -2948,11 +2948,11 @@ PalCycle_GHZ:				; DATA XREF: ROM:PalCycleo
 		lea	(Pal_GHZCyc).l,a0
 
 loc_1E7C:				; CODE XREF: ROM:00001E74j
-		subq.w	#1,($FFFFF634).w
+		subq.w	#1,(Palette_Wait_Counter).w
 		bpl.s	locret_1EA2
-		move.w	#5,($FFFFF634).w
-		move.w	($FFFFF632).w,d0
-		addq.w	#1,($FFFFF632).w
+		move.w	#5,(Palette_Wait_Counter).w
+		move.w	(Palette_Offset_Counter).w,d0
+		addq.w	#1,(Palette_Offset_Counter).w
 		andi.w	#3,d0
 		lsl.w	#3,d0
 		lea	($FFFFFB50).w,a1
@@ -2965,15 +2965,15 @@ locret_1EA2:				; CODE XREF: ROM:00001E80j
 
 PalCycle_CPZ:				; DATA XREF: ROM:00001E62o
 					; ROM:00001E64o
-		subq.w	#1,($FFFFF634).w
+		subq.w	#1,(Palette_Wait_Counter).w
 		bpl.s	locret_1F14
-		move.w	#7,($FFFFF634).w
+		move.w	#7,(Palette_Wait_Counter).w
 		lea	(Pal_CPZCyc1).l,a0
-		move.w	($FFFFF632).w,d0
-		addq.w	#6,($FFFFF632).w
-		cmpi.w	#$36,($FFFFF632).w ; '6'
+		move.w	(Palette_Offset_Counter).w,d0
+		addq.w	#6,(Palette_Offset_Counter).w
+		cmpi.w	#$36,(Palette_Offset_Counter).w ; '6'
 		bcs.s	loc_1ECC
-		move.w	#0,($FFFFF632).w
+		move.w	#0,(Palette_Offset_Counter).w
 
 loc_1ECC:				; CODE XREF: ROM:00001EC4j
 		lea	($FFFFFB78).w,a1
@@ -2999,14 +2999,14 @@ locret_1F14:				; CODE XREF: ROM:00001EA8j
 ; ===========================================================================
 
 PalCycle_HPZ:				; DATA XREF: ROM:00001E68o
-		subq.w	#1,($FFFFF634).w
+		subq.w	#1,(Palette_Wait_Counter).w
 		bpl.s	locret_1F56
-		move.w	#4,($FFFFF634).w
+		move.w	#4,(Palette_Wait_Counter).w
 		lea	(Pal_HPZCyc1).l,a0
-		move.w	($FFFFF632).w,d0
-		subq.w	#2,($FFFFF632).w
+		move.w	(Palette_Offset_Counter).w,d0
+		subq.w	#2,(Palette_Offset_Counter).w
 		bcc.s	loc_1F38
-		move.w	#6,($FFFFF632).w
+		move.w	#6,(Palette_Offset_Counter).w
 
 loc_1F38:				; CODE XREF: ROM:00001F30j
 		lea	($FFFFFB72).w,a1
@@ -3023,11 +3023,11 @@ locret_1F56:				; CODE XREF: ROM:00001F1Aj
 
 PalCycle_EHZ:				; DATA XREF: ROM:00001E66o
 		lea	(Pal_EHZCyc).l,a0
-		subq.w	#1,($FFFFF634).w
+		subq.w	#1,(Palette_Wait_Counter).w
 		bpl.s	locret_1F84
-		move.w	#7,($FFFFF634).w
-		move.w	($FFFFF632).w,d0
-		addq.w	#1,($FFFFF632).w
+		move.w	#7,(Palette_Wait_Counter).w
+		move.w	(Palette_Offset_Counter).w,d0
+		addq.w	#1,(Palette_Offset_Counter).w
 		andi.w	#3,d0
 		lsl.w	#3,d0
 		move.l	(a0,d0.w),($FFFFFB26).w
@@ -3039,11 +3039,11 @@ locret_1F84:				; CODE XREF: ROM:00001F62j
 
 PalCycle_HTZ:				; DATA XREF: ROM:00001E6Ao
 		lea	(Pal_HTZCyc1).l,a0
-		subq.w	#1,($FFFFF634).w
+		subq.w	#1,(Palette_Wait_Counter).w
 		bpl.s	locret_1FB8
-		move.w	#0,($FFFFF634).w
-		move.w	($FFFFF632).w,d0
-		addq.w	#1,($FFFFF632).w
+		move.w	#0,(Palette_Wait_Counter).w
+		move.w	(Palette_Offset_Counter).w,d0
+		addq.w	#1,(Palette_Offset_Counter).w
 		andi.w	#$F,d0
 		move.b	Pal_HTZCyc2(pc,d0.w),($FFFFF635).w
 		lsl.w	#3,d0
@@ -3463,7 +3463,7 @@ PalCycle_Sega:				; CODE XREF: ROM:000031A0p
 		lea	($FFFFFB20).w,a1
 		lea	(Pal_Sega1).l,a0
 		moveq	#5,d1
-		move.w	($FFFFF632).w,d0
+		move.w	(Palette_Offset_Counter).w,d0
 
 loc_23BA:				; CODE XREF: PalCycle_Sega+1Ej
 		bpl.s	loc_23C4
@@ -3488,7 +3488,7 @@ loc_23CE:				; CODE XREF: PalCycle_Sega+26j
 loc_23D8:				; CODE XREF: PalCycle_Sega+2Ej
 		addq.w	#2,d0
 		dbf	d1,loc_23C4
-		move.w	($FFFFF632).w,d0
+		move.w	(Palette_Offset_Counter).w,d0
 		addq.w	#2,d0
 		move.w	d0,d2
 		andi.w	#$1E,d2
@@ -3498,20 +3498,20 @@ loc_23D8:				; CODE XREF: PalCycle_Sega+2Ej
 loc_23EE:				; CODE XREF: PalCycle_Sega+46j
 		cmpi.w	#$64,d0	; 'd'
 		blt.s	loc_23FC
-		move.w	#$401,($FFFFF634).w
+		move.w	#$401,(Palette_Wait_Counter).w
 		moveq	#-$C,d0
 
 loc_23FC:				; CODE XREF: PalCycle_Sega+4Ej
-		move.w	d0,($FFFFF632).w
+		move.w	d0,(Palette_Offset_Counter).w
 		moveq	#1,d0
 		rts
 ; ===========================================================================
 
 loc_2404:				; CODE XREF: PalCycle_Sega+4j
-		subq.b	#1,($FFFFF634).w
+		subq.b	#1,(Palette_Wait_Counter).w
 		bpl.s	loc_2456
-		move.b	#4,($FFFFF634).w
-		move.w	($FFFFF632).w,d0
+		move.b	#4,(Palette_Wait_Counter).w
+		move.w	(Palette_Offset_Counter).w,d0
 		addi.w	#$C,d0
 		cmpi.w	#$30,d0	; '0'
 		bcs.s	loc_2422
@@ -3520,7 +3520,7 @@ loc_2404:				; CODE XREF: PalCycle_Sega+4j
 ; ===========================================================================
 
 loc_2422:				; CODE XREF: PalCycle_Sega+78j
-		move.w	d0,($FFFFF632).w
+		move.w	d0,(Palette_Offset_Counter).w
 		lea	(Pal_Sega2).l,a0
 		lea	(a0,d0.w),a0
 		lea	($FFFFFB04).w,a1
@@ -4001,8 +4001,8 @@ SegaScreen:				; CODE XREF: ROM:GameModeArrayj
 loc_316A:				; CODE XREF: ROM:00003154j
 		moveq	#0,d0
 		bsr.w	PalLoad2
-		move.w	#$FFF6,($FFFFF632).w
-		move.w	#0,($FFFFF634).w
+		move.w	#$FFF6,(Palette_Offset_Counter).w
+		move.w	#0,(Palette_Wait_Counter).w
 		move.w	#0,(unk_F662).w	; unused...
 		move.w	#0,($FFFFF660).w
 		move.w	($FFFFF60C).w,d0
@@ -4112,7 +4112,7 @@ loc_32C4:				; CODE XREF: ROM:000032C6j
 		move.w	#0,(Demo_mode_flag).w
 		move.w	#0,($FFFFFFEA).w
 		move.w	#0,(Current_ZoneAndAct).w
-		move.w	#0,($FFFFF634).w
+		move.w	#0,(Palette_Wait_Counter).w
 		bsr.w	Pal_FadeFrom
 		move	#$2700,sr
 		lea	(Chunk_Table).l,a1
@@ -4165,8 +4165,8 @@ loc_339A:				; CODE XREF: ROM:0000339Cj
 		jsr	BuildSprites
 		moveq	#PLCID_Std1,d0
 		bsr.w	LoadPLC2
-		move.w	#0,($FFFFFFE4).w
-		move.w	#0,($FFFFFFE6).w
+		move.w	#0,(CorrectBtnPresses).w
+		move.w	#0,(TitleScreenCpresses).w
 		move.w	#$300,(Current_ZoneAndAct).w
 		move.w	#4,(Sonic_Pos_Record_Index).w
 		move.w	#0,($FFFFE500).w
@@ -4192,17 +4192,17 @@ Title_RegionJ:				; CODE XREF: ROM:00003416j
 		lea	(LvlSelCode_J).l,a0
 
 LevelSelectCheat:			; CODE XREF: ROM:0000341Ej
-		move.w	($FFFFFFE4).w,d0
+		move.w	(CorrectBtnPresses).w,d0
 		adda.w	d0,a0
 		move.b	($FFFFF605).w,d0
 		andi.b	#$F,d0
 		cmp.b	(a0),d0
 		bne.s	Title_Cheat_NoMatch
-		addq.w	#1,($FFFFFFE4).w
+		addq.w	#1,(CorrectBtnPresses).w
 		tst.b	d0
 		bne.s	Title_Cheat_CountC
-		lea	($FFFFFFE0).w,a0
-		move.w	($FFFFFFE6).w,d1
+		lea	(LevelSelCheat_Flag).w,a0
+		move.w	(TitleScreenCpresses).w,d1
 		lsr.w	#1,d1
 		andi.w	#3,d1
 		beq.s	Title_Cheat_PlayRing
@@ -4222,16 +4222,16 @@ Title_Cheat_PlayRing:			; CODE XREF: ROM:0000344Ej
 Title_Cheat_NoMatch:			; CODE XREF: ROM:00003436j
 		tst.b	d0
 		beq.s	Title_Cheat_CountC
-		cmpi.w	#9,($FFFFFFE4).w
+		cmpi.w	#9,(CorrectBtnPresses).w
 		beq.s	Title_Cheat_CountC
-		move.w	#0,($FFFFFFE4).w
+		move.w	#0,(CorrectBtnPresses).w
 
 Title_Cheat_CountC:			; CODE XREF: ROM:0000343Ej
 					; ROM:0000346Aj ...
 		move.b	($FFFFF605).w,d0
 		andi.b	#$20,d0	; ' '
 		beq.s	Title_Cheat_NoC
-		addq.w	#1,($FFFFFFE6).w
+		addq.w	#1,(TitleScreenCpresses).w
 
 Title_Cheat_NoC:			; CODE XREF: ROM:00003486j
 		tst.w	($FFFFF614).w
@@ -4240,7 +4240,7 @@ Title_Cheat_NoC:			; CODE XREF: ROM:00003486j
 		beq.w	TitleScreen_Loop
 
 Title_CheckLvlSel:			; CODE XREF: ROM:0000365Cj
-		tst.b	($FFFFFFE0).w
+		tst.b	(LevelSelCheat_Flag).w
 		beq.w	PlayLevel
 		moveq	#2,d0
 		bsr.w	PalLoad2
@@ -4283,7 +4283,7 @@ loc_3516:				; CODE XREF: ROM:0000350Ej
 		bne.s	loc_3570
 		move.w	($FFFFFF84).w,d0
 		addi.w	#$80,d0	; '€'
-		tst.b	($FFFFFFE3).w	; Is the Japanese credits cheat on?
+		tst.b	(S1JapaneseCredits_Flag).w	; Is the Japanese credits cheat on?
 		beq.s	loc_353A        ; If not, branch.
 		cmpi.w	#$9F,d0	; 'Ÿ'   ; Sound 9F played?
 		beq.s	loc_354C	; Go to the ending
@@ -4933,14 +4933,14 @@ LevelInit_LoadTails:
 		subi.w	#$20,($FFFFB048).w ; ' '
 
 LevelInit_SkipTails:
-		tst.b	($FFFFFFE2).w
+		tst.b	(DebugCheat_Flag).w
 		beq.s	loc_3DA6
 		btst	#6,($FFFFF604).w
 		beq.s	loc_3DA6
 		move.b	#1,(Debug_mode_flag).w
 
 loc_3DA6:
-		move.w	#0,($FFFFF602).w
+		move.w	#0,(Ctrl_1_Logical).w
 		move.w	#0,($FFFFF604).w
 		tst.b	(Water_flag).w
 		beq.s	loc_3DD0
@@ -5224,7 +5224,7 @@ DynWater_Index:	dc.w DynWater_HPZ1-DynWater_Index; 0 ; DATA XREF: ROM:DynWater_I
 DynWater_HPZ1:				; You can control the water using P2's controller, rather interesting
 					; since you can't even do this in Simon Wai or any later builds
 
-		btst	#0,($FFFFF606).w; is P2 pressing up?
+		btst	#0,(Ctrl_2_Held).w; is P2 pressing up?
 		beq.s	loc_40E2	; if not, branch
 		tst.w	(TargetWaterHeight).w   ; is the water height at it's lowest?
 		beq.s	loc_40E2	; if so, don't keep decreasing the height and causing underflow
@@ -5232,7 +5232,7 @@ DynWater_HPZ1:				; You can control the water using P2's controller, rather inte
 
 loc_40E2:				; CODE XREF: ROM:000040D6j
 					; ROM:000040DCj
-		btst	#1,($FFFFF606).w; is P2 pressing down?
+		btst	#1,(Ctrl_2_Held).w; is P2 pressing down?
 		beq.s	locret_40F6	; if not, return
 		cmpi.w	#$700,(TargetWaterHeight).w; is the water height $700?
 		beq.s	locret_40F6	; if not, return
@@ -5622,7 +5622,7 @@ loc_44A4:				; CODE XREF: MoveSonicInDemo+28j
 		lea	($FEC000).l,a1
 		move.w	($FFFFF740).w,d0
 		adda.w	d0,a1
-		move.b	($FFFFF606).w,d0
+		move.b	(Ctrl_2).w,d0
 		cmp.b	(a1),d0
 		bne.s	loc_44CE
 		addq.b	#1,1(a1)
@@ -5684,7 +5684,7 @@ loc_453A:				; CODE XREF: MoveSonicInDemo+C8j
 		move.w	($FFFFF740).w,d0
 		adda.w	d0,a1
 		move.b	(a1),d0
-		lea	($FFFFF606).w,a0
+		lea	(Ctrl_2).w,a0
 		move.b	d0,d1
 		moveq	#0,d2
 		eor.b	d2,d0
@@ -5701,7 +5701,7 @@ locret_4570:				; CODE XREF: MoveSonicInDemo+FEj
 ; ===========================================================================
 
 loc_4572:				; CODE XREF: MoveSonicInDemo+DAj
-		move.w	#0,($FFFFF606).w
+		move.w	#0,(Ctrl_2).w
 		rts
 ; End of function MoveSonicInDemo
 
@@ -5897,8 +5897,8 @@ loc_4754:				; CODE XREF: ChangeRingFrame+4j
 		andi.b	#3,($FFFFFEC3).w
 
 loc_476A:				; CODE XREF: ChangeRingFrame+1Aj
-		subq.b	#1,($FFFFFEC4).w
-		bpl.s	loc_4788
+		subq.b	#1,($FFFFFEC4).w	; weirdly this was in stock sonic 1 and never used in sonic 2
+		bpl.s	loc_4788		; what was the purpose of this animation timer?
 		move.b	#7,($FFFFFEC4).w
 		addq.b	#1,($FFFFFEC5).w
 		cmpi.b	#6,($FFFFFEC5).w
@@ -6189,7 +6189,7 @@ SS_ClrNemRam:				; CODE XREF: ROM:000050CEj
 		clr.b	($FFFFFE1B).w
 		move.w	#0,($FFFFFE08).w
 		move.w	#$708,($FFFFF614).w
-		tst.b	($FFFFFFE2).w
+		tst.b	(DebugCheat_Flag).w
 		beq.s	loc_5158
 		btst	#6,($FFFFF604).w
 		beq.s	loc_5158
@@ -6207,7 +6207,7 @@ loc_516A:				; CODE XREF: ROM:000051ACj
 		move.b	#$A,(Vint_routine).w
 		bsr.w	DelayProgram
 		bsr.w	MoveSonicInDemo
-		move.w	($FFFFF604).w,($FFFFF602).w
+		move.w	($FFFFF604).w,(Ctrl_1_Logical).w
 		jsr	ObjectsLoad
 		jsr	BuildSprites
 		jsr	S1SS_ShowLayout	; leftover from	Sonic 1
@@ -6236,7 +6236,7 @@ loc_51DA:				; CODE XREF: ROM:00005218j
 		move.b	#$16,(Vint_routine).w
 		bsr.w	DelayProgram
 		bsr.w	MoveSonicInDemo
-		move.w	($FFFFF604).w,($FFFFF602).w
+		move.w	($FFFFF604).w,(Ctrl_1_Logical).w
 		jsr	ObjectsLoad
 		jsr	BuildSprites
 		jsr	S1SS_ShowLayout	; leftover from	Sonic 1
@@ -6405,7 +6405,7 @@ loc_53D0:				; CODE XREF: PalCycle_S1SS+2Aj
 		move.w	d0,(unk_F79C).w
 		moveq	#0,d0
 		move.b	(a0)+,d0
-		move.w	d0,(unk_F7A0).w
+		move.w	d0,(SpecialStage_BGMode).w
 		lea	(word_54FA).l,a1
 		lea	(a1,d0.w),a1
 		move.w	#$8200,d0
@@ -6494,7 +6494,7 @@ Pal_S1SSCyc2:	dc.w  $EEA, $EE0, $AA0,	$880, $660, $440, $EE0,	$AA0, $440, $AA0, 
 
 S1SS_BgAnimate:				; CODE XREF: ROM:00005194p
 					; ROM:00005200p
-		move.w	(unk_F7A0).w,d0
+		move.w	(SpecialStage_BGMode).w,d0
 		bne.s	loc_5634
 		move.w	#0,(Camera_BG_Y_pos).w
 		move.w	(Camera_BG_Y_pos).w,($FFFFF618).w
@@ -6624,8 +6624,7 @@ LevelSizeLoad:				; CODE XREF: ROM:00003D30p
 		move.l	(a0)+,d0
 		move.l	d0,(Camera_Min_Y_pos).w
 		; Warning: unk_EEC4 is only a word long, this line also writes to Camera_Max_Y_pos
-		; If you remove this instruction, the camera will have it's minimum position set
-		; to the top of the level, thus the screen will scroll up until Sonic dies.
+		; If you remove this instruction, the screen will scroll up until Sonic dies.
 		move.l	d0,(unk_EEC4).w			; unused besides this one write...
 		move.w	#$1010,(Horiz_block_crossed_flag).w
 		move.w	#$60,(Camera_Y_pos_bias).w ; '`'
@@ -20763,7 +20762,7 @@ loc_F0C4:				; DATA XREF: ROM:0000EFD2o
 		btst	#1,($FFFFB022).w
 		bne.s	loc_F0E0
 		move.b	#1,(Control_locked).w
-		move.w	#$800,($FFFFF602).w
+		move.w	#$800,(Ctrl_1_Held_Logical).w
 
 loc_F0E0:				; CODE XREF: ROM:0000F0D2j
 		tst.b	($FFFFB000).w
@@ -21823,7 +21822,7 @@ Obj01_Control:
 loc_FAB0:
 		tst.b	(Control_locked).w
 		bne.s	loc_FABC
-		move.w	($FFFFF604).w,($FFFFF602).w
+		move.w	($FFFFF604).w,(Ctrl_1_Logical).w
 
 loc_FABC:
 		btst	#0,(Object_control).w
@@ -22079,12 +22078,12 @@ Sonic_Move:				; CODE XREF: ROM:0000FCAEp
 		bne.w	loc_FE58
 		tst.w	$2E(a0)
 		bne.w	loc_FE2C
-		btst	#2,($FFFFF602).w
+		btst	#2,(Ctrl_1_Held_Logical).w
 		beq.s	loc_FD66
 		bsr.w	Sonic_MoveLeft
 
 loc_FD66:				; CODE XREF: Sonic_Move+22j
-		btst	#3,($FFFFF602).w
+		btst	#3,(Ctrl_1_Held_Logical).w
 		beq.s	loc_FD72
 		bsr.w	Sonic_MoveRight
 
@@ -22150,20 +22149,20 @@ loc_FE06:				; CODE XREF: Sonic_Move+B8j
 
 Sonic_LookUp:				; CODE XREF: Sonic_Move+7Cj
 					; Sonic_Move+9Cj ...
-		btst	#0,($FFFFF602).w
+		btst	#0,(Ctrl_1_Held_Logical).w
 		beq.s	Sonic_Duck
 		move.b	#7,$1C(a0)
 		bra.s	loc_FE2C
 ; ===========================================================================
 
 Sonic_Duck:				; CODE XREF: Sonic_Move+D6j
-		btst	#1,($FFFFF602).w
+		btst	#1,(Ctrl_1_Logical).w
 		beq.s	loc_FE2C
 		move.b	#8,$1C(a0)
 
 loc_FE2C:				; CODE XREF: Sonic_Move+18j
 					; Sonic_Move+40j ...
-		move.b	($FFFFF602).w,d0
+		move.b	(Ctrl_1_Logical).w,d0
 		andi.b	#$C,d0
 		bne.s	loc_FE58
 		move.w	$14(a0),d0
@@ -22392,12 +22391,12 @@ Sonic_RollSpeed:			; CODE XREF: ROM:0000FCFCp
 		bne.w	loc_1008A
 		tst.w	$2E(a0)
 		bne.s	loc_10046
-		btst	#2,($FFFFF602).w
+		btst	#2,(Ctrl_1_Logical).w
 		beq.s	loc_1003A
 		bsr.w	Sonic_RollLeft
 
 loc_1003A:				; CODE XREF: Sonic_RollSpeed+26j
-		btst	#3,($FFFFF602).w
+		btst	#3,(Ctrl_1_Logical).w
 		beq.s	loc_10046
 		bsr.w	Sonic_RollRight
 
@@ -22515,7 +22514,7 @@ Sonic_ChgJumpDir:			; CODE XREF: ROM:0000FCCEp
 		btst	#4,$22(a0)
 		bne.s	loc_10150
 		move.w	$10(a0),d0
-		btst	#2,($FFFFF602).w
+		btst	#2,(Ctrl_1_Logical).w
 		beq.s	loc_10136
 		bset	#0,$22(a0)
 		sub.w	d5,d0
@@ -22527,7 +22526,7 @@ Sonic_ChgJumpDir:			; CODE XREF: ROM:0000FCCEp
 
 loc_10136:				; CODE XREF: Sonic_ChgJumpDir+1Cj
 					; Sonic_ChgJumpDir+2Cj
-		btst	#3,($FFFFF602).w
+		btst	#3,(Ctrl_1_Logical).w
 		beq.s	loc_1014C
 		bclr	#0,$22(a0)
 		add.w	d5,d0
@@ -22649,10 +22648,10 @@ Sonic_Roll:				; CODE XREF: ROM:0000FCB2p
 loc_10220:				; CODE XREF: Sonic_Roll+Aj
 		cmpi.w	#$80,d0	; '€'
 		bcs.s	Obj01_NoRoll
-		move.b	($FFFFF602).w,d0
+		move.b	(Ctrl_1_Logical).w,d0
 		andi.b	#$C,d0
 		bne.s	Obj01_NoRoll
-		btst	#1,($FFFFF602).w
+		btst	#1,(Ctrl_1_Logical).w
 		bne.s	loc_1023A
 
 Obj01_NoRoll:				; CODE XREF: Sonic_Roll+4j
@@ -22756,7 +22755,7 @@ Sonic_JumpHeight:			; CODE XREF: ROM:Obj01_MdJumpp
 loc_1033C:				; CODE XREF: Sonic_JumpHeight+10j
 		cmp.w	$12(a0),d1
 		ble.s	locret_10350
-		move.b	($FFFFF602).w,d0
+		move.b	(Ctrl_1_Logical).w,d0
 		andi.b	#$70,d0	; 'p'
 		bne.s	locret_10350
 		move.w	d1,$12(a0)
@@ -22799,7 +22798,7 @@ locret_10394:				; CODE XREF: Sonic_Spindash+Cj
 ; ===========================================================================
 
 loc_10396:				; CODE XREF: Sonic_Spindash+4j
-		move.b	($FFFFF602).w,d0
+		move.b	(Ctrl_1_Logical).w,d0
 		btst	#1,d0
 		bne.s	loc_103DC
 		move.b	#$E,$16(a0)
@@ -23844,7 +23843,7 @@ locret_10D9C:				; CODE XREF: Tails_Display+5Cj
 
 
 Tails_Control:				; CODE XREF: ROM:Obj02_Controlp
-		move.b	($FFFFF606).w,d0
+		move.b	(Ctrl_2).w,d0
 		andi.b	#$7F,d0	; ''
 		beq.s	TailsC_NoKeysPressed
 		move.w	#0,($FFFFF700).w
@@ -23926,7 +23925,7 @@ loc_10E40:				; CODE XREF: ROM:00010E3Cj
 		move.w	(Sonic_Pos_Record_Index).w,d0
 		sub.b	d1,d0
 		lea	($FFFFE400).w,a1
-		move.w	(a1,d0.w),($FFFFF606).w
+		move.w	(a1,d0.w),(Ctrl_2).w
 		rts
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
@@ -24008,12 +24007,12 @@ Tails_Move:				; CODE XREF: ROM:00010E84p
 		bne.w	loc_11026
 		tst.w	$2E(a0)
 		bne.w	loc_10FFA
-		btst	#2,($FFFFF606).w
+		btst	#2,(Ctrl_2).w
 		beq.s	loc_10F3C
 		bsr.w	Tails_MoveLeft
 
 loc_10F3C:				; CODE XREF: Tails_Move+22j
-		btst	#3,($FFFFF606).w
+		btst	#3,(Ctrl_2).w
 		beq.s	loc_10F48
 		bsr.w	Tails_MoveRight
 
@@ -24075,20 +24074,20 @@ loc_10FD4:				; CODE XREF: Tails_Move+B0j
 
 Tails_LookUp:				; CODE XREF: Tails_Move+74j
 					; Tails_Move+94j ...
-		btst	#0,($FFFFF606).w
+		btst	#0,(Ctrl_2).w
 		beq.s	Tails_Duck
 		move.b	#7,$1C(a0)
 		bra.s	loc_10FFA
 ; ===========================================================================
 
 Tails_Duck:				; CODE XREF: Tails_Move+CEj
-		btst	#1,($FFFFF606).w
+		btst	#1,(Ctrl_2).w
 		beq.s	loc_10FFA
 		move.b	#8,$1C(a0)
 
 loc_10FFA:				; CODE XREF: Tails_Move+18j
 					; Tails_Move+40j ...
-		move.b	($FFFFF606).w,d0
+		move.b	(Ctrl_2).w,d0
 
 loc_10FFE:
 		andi.b	#$C,d0
@@ -24290,12 +24289,12 @@ Tails_RollSpeed:			; CODE XREF: ROM:00010ED2p
 		bne.w	loc_11204
 		tst.w	$2E(a0)
 		bne.s	loc_111C0
-		btst	#2,($FFFFF606).w
+		btst	#2,(Ctrl_2).w
 		beq.s	loc_111B4
 		bsr.w	Tails_RollLeft
 
 loc_111B4:				; CODE XREF: Tails_RollSpeed+26j
-		btst	#3,($FFFFF606).w
+		btst	#3,(Ctrl_2).w
 		beq.s	loc_111C0
 		bsr.w	Tails_RollRight
 
@@ -24413,7 +24412,7 @@ Tails_ChgJumpDir:			; CODE XREF: ROM:00010EA4p
 		btst	#4,$22(a0)
 		bne.s	loc_112CA
 		move.w	$10(a0),d0
-		btst	#2,($FFFFF606).w
+		btst	#2,(Ctrl_2).w
 		beq.s	loc_112B0
 		bset	#0,$22(a0)
 		sub.w	d5,d0
@@ -24425,7 +24424,7 @@ Tails_ChgJumpDir:			; CODE XREF: ROM:00010EA4p
 
 loc_112B0:				; CODE XREF: Tails_ChgJumpDir+1Cj
 					; Tails_ChgJumpDir+2Cj
-		btst	#3,($FFFFF606).w
+		btst	#3,(Ctrl_2).w
 		beq.s	loc_112C6
 		bclr	#0,$22(a0)
 		add.w	d5,d0
@@ -24547,10 +24546,10 @@ Tails_Roll:				; CODE XREF: ROM:00010E88p
 loc_1139A:				; CODE XREF: Tails_Roll+Aj
 		cmpi.w	#$80,d0	; '€'
 		bcs.s	locret_113B2
-		move.b	($FFFFF606).w,d0
+		move.b	(Ctrl_2).w,d0
 		andi.b	#$C,d0
 		bne.s	locret_113B2
-		btst	#1,($FFFFF606).w
+		btst	#1,(Ctrl_2).w
 		bne.s	loc_113B4
 
 locret_113B2:				; CODE XREF: Tails_Roll+4j
@@ -24658,7 +24657,7 @@ Tails_JumpHeight:			; CODE XREF: ROM:Obj02_MdJumpp
 loc_114B6:				; CODE XREF: Tails_JumpHeight+10j
 		cmp.w	$12(a0),d1
 		ble.s	locret_114CA
-		move.b	($FFFFF606).w,d0
+		move.b	(Ctrl_2).w,d0
 		andi.b	#$70,d0	; 'p'
 		bne.s	locret_114CA
 		move.w	d1,$12(a0)
@@ -24701,7 +24700,7 @@ locret_1150E:				; CODE XREF: Tails_Spindash+Cj
 ; ===========================================================================
 
 loc_11510:				; CODE XREF: Tails_Spindash+4j
-		move.b	($FFFFF606).w,d0
+		move.b	(Ctrl_2).w,d0
 		btst	#1,d0
 		bne.s	loc_11556
 		move.b	#$E,$16(a0)
@@ -34263,7 +34262,7 @@ loc_185F2:				; DATA XREF: ROM:off_185EEo
 		move.w	#$300,2(a0)
 		bsr.w	j_ModifySpriteAttr_2P_4
 		move.b	#$A,$1A(a0)
-		tst.b	($FFFFFFE3).w
+		tst.b	(S1JapaneseCredits_Flag).w
 		beq.s	loc_18660
 		cmpi.b	#$72,($FFFFF604).w ; 'r'
 		bne.s	loc_18660
@@ -35322,7 +35321,7 @@ Obj3E_Switched:				; DATA XREF: ROM:00019514o
 		clr.b	($FFFFFE1E).w
 		clr.b	(Current_Boss_ID).w
 		move.b	#1,(Control_locked).w
-		move.w	#$800,($FFFFF602).w
+		move.w	#$800,(Ctrl_1_Logical).w
 		clr.b	$25(a0)
 		bclr	#3,($FFFFB022).w
 		bset	#1,($FFFFB022).w
@@ -36732,17 +36731,17 @@ Obj09_Display:				; CODE XREF: ROM:0001A464j
 
 Obj09_Move:				; CODE XREF: ROM:0001A45Cp
 					; ROM:0001A46Ap
-		btst	#2,($FFFFF602).w
+		btst	#2,(Ctrl_1_Logical).w
 		beq.s	loc_1A4A4
 		bsr.w	Obj09_MoveLeft
 
 loc_1A4A4:				; CODE XREF: Obj09_Move+6j
-		btst	#3,($FFFFF602).w
+		btst	#3,(Ctrl_1_Logical).w
 		beq.s	loc_1A4B0
 		bsr.w	Obj09_MoveRight
 
 loc_1A4B0:				; CODE XREF: Obj09_Move+12j
-		move.b	($FFFFF602).w,d0
+		move.b	(Ctrl_1_Logical).w,d0
 		andi.b	#$C,d0
 		bne.s	loc_1A4E0
 		move.w	$14(a0),d0
@@ -36893,7 +36892,7 @@ nullsub_2:				; CODE XREF: ROM:Obj09_InAirp
 		move.w	#$FC00,d1
 		cmp.w	$12(a0),d1
 		ble.s	locret_1A5EC
-		move.b	($FFFFF602).w,d0
+		move.b	(Ctrl_1_Logical).w,d0
 		andi.b	#$70,d0	; 'p'
 		bne.s	locret_1A5EC
 		move.w	d1,$12(a0)
