@@ -52,6 +52,7 @@ Vectors:	dc.l System_Stack,EntryPoint,BusError,AddressError; 0 ; test Port A Ctr
 		dc.l ErrorTrap,ErrorTrap,ErrorTrap,ErrorTrap; 52
 		dc.l ErrorTrap,ErrorTrap,ErrorTrap,ErrorTrap; 56
 		dc.l ErrorTrap,ErrorTrap,ErrorTrap,ErrorTrap; 60
+; Header
 		dc.b "SEGA MEGA DRIVE " ; Console name
 		dc.b "(C)SEGA 1991.APR" ; Release date (same as Sonic 1)
 		dc.b "SONIC THE             HEDGEHOG 2                " ; Domestic name
@@ -64,7 +65,7 @@ ROMEnd:		dc.l $7FFFF		; ROM end location
 		dc.l RAM_Start		; RAM start location
 		dc.l $FFFFFF		; RAM end location
 		dc.l $20202020          ; SRAM stuff
-		dc.l $20202020
+		dc.l $20202020          ; (No SRAM)
 		dc.l $20202020
 		dc.l $20202020
 		dc.b "                                                "	; Notes
