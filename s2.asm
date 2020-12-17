@@ -965,38 +965,9 @@ PalToCRAM:
 		lea	(VDP_data_port).l,a1
 		lea	($FFFFFA80).w,a0
 		move.l	#$C0000000,4(a1)
+		rept 32
 		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
-		move.l	(a0)+,(a1)
+		endr
 		move.w	#$8ADF,4(a1)
 		movem.l	(sp)+,a0-a1
 		tst.b	(Do_Updates_in_H_int).w
@@ -12024,6 +11995,9 @@ loc_8D46:				; CODE XREF: ROM:00008D06j
 		bra.w	DisplaySprite
 ; ===========================================================================
 
+;----------------------------------------------------
+; Object 53 - Collapsing floor (MZ, SLZ, SBZ)
+;----------------------------------------------------
 S1Obj_53:				; leftover object from Sonic 1
 		moveq	#0,d0
 		move.b	$24(a0),d0
@@ -27793,7 +27767,9 @@ word_13868:	dc.w 1			; DATA XREF: ROM:00013850o
 		dc.w $F40E,  $18,   $C,$FFF0; 0
 ; ===========================================================================
 		nop
-
+;----------------------------------------------------
+; Object 47 - bumper (from Spring Yard)
+;----------------------------------------------------
 S1Obj47:
 		moveq	#0,d0
 		move.b	$24(a0),d0
@@ -27908,7 +27884,9 @@ word_139BC:	dc.w 2			; DATA XREF: ROM:00013996o
 		dc.w $F007, $80E, $807,	   0; 4
 ; ===========================================================================
 		nop
-
+;----------------------------------------------------
+; Object 64 - Bubbles from Labyrinth
+;----------------------------------------------------
 S1Obj64:
 		moveq	#0,d0
 		move.b	$24(a0),d0
@@ -37986,14 +37964,9 @@ loc_1B430:				; CODE XREF: HUDDebug_XY2+32j
 loc_1B442:				; CODE XREF: HUDDebug_XY2+14j
 		lsl.w	#5,d2
 		lea	(a1,d2.w),a3
+		rept 8
 		move.l	(a3)+,(a6)
-		move.l	(a3)+,(a6)
-		move.l	(a3)+,(a6)
-		move.l	(a3)+,(a6)
-		move.l	(a3)+,(a6)
-		move.l	(a3)+,(a6)
-		move.l	(a3)+,(a6)
-		move.l	(a3)+,(a6)
+		endr
 		swap	d1
 		dbf	d6,loc_1B430
 		rts
