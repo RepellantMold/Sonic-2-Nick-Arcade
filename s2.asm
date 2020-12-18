@@ -3,7 +3,7 @@
 ; Xerowhirl - The awesome 2007 Sonic 2 disassembly, which the Github disassembly is based on
 ; drx - For dumping and disassembling this in 2006
 ; ehw - Telling me that the leftover crap at the end are Toe Jam & Earl REV00 data
-; RepellantMold - Getting more rips of the levels and attempting to comment more on the code 
+; RepellantMold - Getting more rips of the levels and attempting to comment more on the code
 ; (using Hivebrain's Sonic 1/SuperEgg's Sonic 2 Simon Wai disassembly for hints)
 
 		include	"s2.constants.asm"
@@ -14935,136 +14935,17 @@ loc_B44C:				; CODE XREF: ROM:0000B440j
 locret_B458:				; CODE XREF: ROM:0000B450j
 		rts
 ; ===========================================================================
-Map_Obj0F:	dc.w word_B47A-Map_Obj0F ; DATA	XREF: ROM:0000B426o
-					; ROM:Map_Obj0Fo ...
-		dc.w word_B484-Map_Obj0F
-		dc.w word_B48E-Map_Obj0F
-		dc.w word_B498-Map_Obj0F
-		dc.w word_B4A2-Map_Obj0F
-		dc.w word_B4AC-Map_Obj0F
-		dc.w word_B4B6-Map_Obj0F
-		dc.w word_B4C0-Map_Obj0F
-		dc.w word_B4CA-Map_Obj0F
-		dc.w word_B4D4-Map_Obj0F
-		dc.w word_B4DE-Map_Obj0F
-		dc.w word_B4E8-Map_Obj0F
-		dc.w word_B4F2-Map_Obj0F
-		dc.w word_B4FC-Map_Obj0F
-		dc.w word_B506-Map_Obj0F
-		dc.w word_B510-Map_Obj0F
-word_B47A:	dc.w 1			; DATA XREF: ROM:Map_Obj0Fo
-		dc.w	 0,    0,    0,	   0; 0
-word_B484:	dc.w 1			; DATA XREF: ROM:0000B45Co
-		dc.w	 1,    0,    0,	   0; 0
-word_B48E:	dc.w 1			; DATA XREF: ROM:0000B45Eo
-		dc.w	 2,    0,    0,	   0; 0
-word_B498:	dc.w 1			; DATA XREF: ROM:0000B460o
-		dc.w	 3,    0,    0,	   0; 0
-word_B4A2:	dc.w 1			; DATA XREF: ROM:0000B462o
-		dc.w	 4,    0,    0,	   0; 0
-word_B4AC:	dc.w 1			; DATA XREF: ROM:0000B464o
-		dc.w	 5,    0,    0,	   0; 0
-word_B4B6:	dc.w 1			; DATA XREF: ROM:0000B466o
-		dc.w	 6,    0,    0,	   0; 0
-word_B4C0:	dc.w 1			; DATA XREF: ROM:0000B468o
-		dc.w	 7,    0,    0,	   0; 0
-word_B4CA:	dc.w 1			; DATA XREF: ROM:0000B46Ao
-		dc.w	 8,    0,    0,	   0; 0
-word_B4D4:	dc.w 1			; DATA XREF: ROM:0000B46Co
-		dc.w	 9,    0,    0,	   0; 0
-word_B4DE:	dc.w 1			; DATA XREF: ROM:0000B46Eo
-		dc.w	$A,    0,    0,	   0; 0
-word_B4E8:	dc.w 1			; DATA XREF: ROM:0000B470o
-		dc.w	$B,    0,    0,	   0; 0
-word_B4F2:	dc.w 1			; DATA XREF: ROM:0000B472o
-		dc.b   0, $C,  0,  0	; 0
-		dc.b   0,  0,  0,  0	; 4
-word_B4FC:	dc.w 1			; DATA XREF: ROM:0000B474o
-		dc.b   0, $D,  0,  0	; 0
-		dc.b   0,  0,  0,  0	; 4
-word_B506:	dc.w 1			; DATA XREF: ROM:0000B476o
-		dc.w	$E,    0,    0,	   0; 0
-word_B510:	dc.w 1			; DATA XREF: ROM:0000B478o
-		dc.w	$F,    0,    0,	   0; 0
+Map_Obj0F:	incbin	"mappings/sprite/obj0F.bin"
+		even
 off_B51A:	dc.w byte_B51C-off_B51A	; DATA XREF: ROM:off_B51Ao
 byte_B51C:	dc.b   7,  0,  1,  2,  3,  4,  5,  6; 0	; DATA XREF: ROM:off_B51Ao
 		dc.b   7,$FE,  2,  0	; 8
 off_B528:	dc.w byte_B52A-off_B528	; DATA XREF: ROM:off_B528o
 byte_B52A:	dc.b $1F,  0,  1,$FF	; 0 ; DATA XREF: ROM:off_B528o
-Map_S1Obj0F:	dc.w word_B536-Map_S1Obj0F ; DATA XREF:	ROM:Map_S1Obj0Fo
-					; ROM:0000B530o ...
-					; leftover from	Sonic 1
-		dc.w word_B538-Map_S1Obj0F ; leftover from Sonic 1
-		dc.w word_B56A-Map_S1Obj0F ; leftover from Sonic 1
-		dc.w word_B65C-Map_S1Obj0F ; leftover from Sonic 1
-word_B536:	dc.w 0			; DATA XREF: ROM:Map_S1Obj0Fo
-word_B538:	dc.w 6			; DATA XREF: ROM:0000B530o
-		dc.w	$C,  $F0,  $78,	   0; 0
-		dc.w	 0,  $F3,  $79,	 $20; 4
-		dc.w	 0,  $F3,  $79,	 $30; 8
-		dc.w	$C,  $F4,  $7A,	 $38; 12
-		dc.w	 8,  $F8,  $7C,	 $60; 16
-		dc.w	 8,  $FB,  $7D,	 $78; 20
-word_B56A:	dc.w $1E		; DATA XREF: ROM:0000B532o
-		dc.w $B80F,    0,    0,$FF80; 0
-		dc.w $B80F,    0,    0,$FF80; 4
-		dc.w $B80F,    0,    0,$FF80; 8
-		dc.w $B80F,    0,    0,$FF80; 12
-		dc.w $B80F,    0,    0,$FF80; 16
-		dc.w $B80F,    0,    0,$FF80; 20
-		dc.w $B80F,    0,    0,$FF80; 24
-		dc.w $B80F,    0,    0,$FF80; 28
-		dc.w $B80F,    0,    0,$FF80; 32
-		dc.w $B80F,    0,    0,$FF80; 36
-		dc.w $D80F,    0,    0,$FF80; 40
-		dc.w $D80F,    0,    0,$FF80; 44
-		dc.w $D80F,    0,    0,$FF80; 48
-		dc.w $D80F,    0,    0,$FF80; 52
-		dc.w $D80F,    0,    0,$FF80; 56
-		dc.w $D80F,    0,    0,$FF80; 60
-		dc.w $D80F,    0,    0,$FF80; 64
-		dc.w $D80F,    0,    0,$FF80; 68
-		dc.w $D80F,    0,    0,$FF80; 72
-		dc.w $D80F,    0,    0,$FF80; 76
-		dc.w $F80F,    0,    0,$FF80; 80
-		dc.w $F80F,    0,    0,$FF80; 84
-		dc.w $F80F,    0,    0,$FF80; 88
-		dc.w $F80F,    0,    0,$FF80; 92
-		dc.w $F80F,    0,    0,$FF80; 96
-		dc.w $F80F,    0,    0,$FF80; 100
-		dc.w $F80F,    0,    0,$FF80; 104
-		dc.w $F80F,    0,    0,$FF80; 108
-		dc.w $F80F,    0,    0,$FF80; 112
-		dc.w $F80F,    0,    0,$FF80; 116
-word_B65C:	dc.w 1			; DATA XREF: ROM:0000B534o
-		dc.w $FC04,    0,    0,$FFF8; 0
-Map_Obj0E:	dc.w word_B66A-Map_Obj0E ; DATA	XREF: ROM:0000B39Eo
-					; ROM:Map_Obj0Eo ...
-		dc.w word_B6C4-Map_Obj0E
-word_B66A:	dc.w $B			; DATA XREF: ROM:Map_Obj0Eo
-		dc.w $D40D,    0,    0,$FFD8; 0
-		dc.w $CC0E,    8,    4,$FFF8; 4
-		dc.w $CC07,  $14,   $A,	 $18; 8
-		dc.w $E40F,  $1C,   $E,$FFE0; 12
-		dc.w $E40B,  $2C,  $16,	   0; 16
-		dc.w $EC07,  $38,  $1C,	 $18; 20
-		dc.w  $40F,  $40,  $20,$FFD8; 24
-		dc.w  $40F,  $50,  $28,$FFF8; 28
-		dc.w  $C06,  $60,  $30,	 $18; 32
-		dc.w $2404,  $66,  $33,$FFE8; 36
-		dc.w $240D,  $68,  $34,$FFF8; 40
-word_B6C4:	dc.w $A			; DATA XREF: ROM:0000B668o
-		dc.w $DC06,  $70,  $38,$FFEC; 0
-		dc.w $F40F,  $76,  $3B,$FFD4; 4
-		dc.w $F40F,  $86,  $43,$FFF4; 8
-		dc.w $E409,  $96,  $4B,$FFFC; 12
-		dc.w $DC0B,  $9C,  $4E,	 $14; 16
-		dc.w $FC08,  $A8,  $54,	 $14; 20
-		dc.w  $405,  $AB,  $55,	 $14; 24
-		dc.w $1404,  $AF,  $57,$FFD4; 28
-		dc.w $140D,  $B1,  $58,$FFE4; 32
-		dc.w $140D,  $B9,  $5C,	   4; 36
-		dc.w $4E71		; 40
+Map_S1Obj0F:    incbin	"mappings/sprite/S1obj0F.bin"
+		even
+Map_Obj0E:	incbin	"mappings/sprite/obj0E.bin"
+		even
 ; ===========================================================================
 ;----------------------------------------------------
 ; Object 2B - GHZ Chopper Badnik
@@ -15126,13 +15007,8 @@ Ani_Obj2B:	dc.w byte_B7BA-Ani_Obj2B ; DATA	XREF: ROM:loc_B768o
 byte_B7BA:	dc.b   7,  0,  1,$FF	; 0 ; DATA XREF: ROM:Ani_Obj2Bo
 byte_B7BE:	dc.b   3,  0,  1,$FF	; 0 ; DATA XREF: ROM:0000B7B6o
 byte_B7C2:	dc.b   7,  0,$FF,  0	; 0 ; DATA XREF: ROM:0000B7B8o
-Map_Obj2B:	dc.w word_B7CA-Map_Obj2B ; DATA	XREF: ROM:0000B732o
-					; ROM:Map_Obj2Bo ...
-		dc.w word_B7D4-Map_Obj2B
-word_B7CA:	dc.w 1			; DATA XREF: ROM:Map_Obj2Bo
-		dc.w $F00F,    0,    0,$FFF0; 0
-word_B7D4:	dc.w 1			; DATA XREF: ROM:0000B7C8o
-		dc.w $F00F,  $10,    8,$FFF0; 0
+Map_Obj2B:	incbin	"mappings/sprite/obj2B.bin"
+		even
 ; ===========================================================================
 ;----------------------------------------------------
 ; Object 2C - LZ Jaws Badnik
@@ -15185,23 +15061,8 @@ loc_B85E:				; CODE XREF: ROM:0000B846j
 		bra.w	MarkObjGone
 ; ===========================================================================
 Ani_Obj2C:	dc.b   0,  2,  7,  0,  1,  2,  3,$FF; 0	; DATA XREF: ROM:loc_B85Eo
-Map_Obj2C:	dc.w word_B880-Map_Obj2C ; DATA	XREF: ROM:0000B7F4o
-					; ROM:Map_Obj2Co ...
-		dc.w word_B892-Map_Obj2C
-		dc.w word_B8A4-Map_Obj2C
-		dc.w word_B8B6-Map_Obj2C
-word_B880:	dc.w 2			; DATA XREF: ROM:Map_Obj2Co
-		dc.w $F40E,    0,    0,$FFF0; 0
-		dc.w $F505,  $18,   $C,	 $10; 4
-word_B892:	dc.w 2			; DATA XREF: ROM:0000B87Ao
-		dc.w $F40E,   $C,    6,$FFF0; 0
-		dc.w $F505,  $1C,   $E,	 $10; 4
-word_B8A4:	dc.w 2			; DATA XREF: ROM:0000B87Co
-		dc.w $F40E,    0,    0,$FFF0; 0
-		dc.w $F505,$1018,$100C,	 $10; 4
-word_B8B6:	dc.w 2			; DATA XREF: ROM:0000B87Eo
-		dc.w $F40E,   $C,    6,$FFF0; 0
-		dc.w $F505,$101C,$100E,	 $10; 4
+Map_Obj2C:	incbin	"mappings/sprite/obj2C.bin"
+		even
 ; ===========================================================================
 ;----------------------------------------------------
 ; Object 34 - Title card
@@ -16370,17 +16231,8 @@ locret_C828:				; CODE XREF: sub_C7C8+Aj sub_C7C8+10j	...
 ; End of function sub_C7C8
 
 ; ===========================================================================
-Map_Obj36:	dc.w word_C836-Map_Obj36 ; DATA	XREF: ROM:0000C686o
-					; ROM:Map_Obj36o ...
-		dc.w word_C836-Map_Obj36
-		dc.w word_C836-Map_Obj36
-		dc.w word_C836-Map_Obj36
-		dc.w word_C836-Map_Obj36
-		dc.w word_C836-Map_Obj36
-word_C836:	dc.w 2			; DATA XREF: ROM:Map_Obj36o
-					; ROM:0000C82Co ...
-		dc.w $F007,    0,    0,$FFF0; 0
-		dc.w $F007,    0,    0,	   0; 4
+Map_Obj36:	incbin	"mappings/sprite/obj36.bin"
+		even
 ; ===========================================================================
 ;----------------------------------------------------
 ; Object 3B - GHZ Purple Rock
@@ -16421,12 +16273,8 @@ loc_C882:				; DATA XREF: ROM:0000C858o
 		bhi.w	DeleteObject
 		bra.w	DisplaySprite
 ; ===========================================================================
-Map_Obj3B:	dc.w word_C8B0-Map_Obj3B ; DATA	XREF: ROM:0000C85Eo
-					; ROM:Map_Obj3Bo ...
-word_C8B0:	dc.w 2			; DATA XREF: ROM:Map_Obj3Bo
-		dc.w $F00B,    0,    0,$FFE8; 0
-		dc.w $F00B,   $C,    6,	   0; 4
-		dc.w 0
+Map_Obj3B:	incbin	"mappings/sprite/obj3B.bin"
+		even
 ; ===========================================================================
 ;----------------------------------------------------
 ; Object 3C - GHZ smashable wall
@@ -16573,37 +16421,8 @@ Obj3C_FragSpdLeft:dc.w $FA00,$FA00	  ; 0 ;	DATA XREF: ROM:0000C968o
 		dc.w $FA00,$FF00	; 10
 		dc.w $FA00, $100	; 12
 		dc.w $FC00, $500	; 14
-Map_Obj3C:	dc.w word_CA6C-Map_Obj3C ; DATA	XREF: ROM:0000C8E0o
-					; ROM:Map_Obj3Co ...
-		dc.w word_CAAE-Map_Obj3C
-		dc.w word_CAF0-Map_Obj3C
-word_CA6C:	dc.w 8			; DATA XREF: ROM:Map_Obj3Co
-		dc.w $E005,    0,    0,$FFF0; 0
-		dc.w $F005,    0,    0,$FFF0; 4
-		dc.w	 5,    0,    0,$FFF0; 8
-		dc.w $1005,    0,    0,$FFF0; 12
-		dc.w $E005,    4,    2,	   0; 16
-		dc.w $F005,    4,    2,	   0; 20
-		dc.w	 5,    4,    2,	   0; 24
-		dc.w $1005,    4,    2,	   0; 28
-word_CAAE:	dc.w 8			; DATA XREF: ROM:0000CA68o
-		dc.w $E005,    4,    2,$FFF0; 0
-		dc.w $F005,    4,    2,$FFF0; 4
-		dc.w	 5,    4,    2,$FFF0; 8
-		dc.w $1005,    4,    2,$FFF0; 12
-		dc.w $E005,    4,    2,	   0; 16
-		dc.w $F005,    4,    2,	   0; 20
-		dc.w	 5,    4,    2,	   0; 24
-		dc.w $1005,    4,    2,	   0; 28
-word_CAF0:	dc.w 8			; DATA XREF: ROM:0000CA6Ao
-		dc.w $E005,    4,    2,$FFF0; 0
-		dc.w $F005,    4,    2,$FFF0; 4
-		dc.w	 5,    4,    2,$FFF0; 8
-		dc.w $1005,    4,    2,$FFF0; 12
-		dc.w $E005,    8,    4,	   0; 16
-		dc.w $F005,    8,    4,	   0; 20
-		dc.w	 5,    8,    4,	   0; 24
-		dc.w $1005,    8,    4,	   0; 28
+Map_Obj3C:	incbin	"mappings/sprite/obj3C.bin"
+		even
 ; ===========================================================================
 		nop
 
@@ -20236,59 +20055,8 @@ byte_ED87:	dc.b   2,  6,  7,$FF	; 0 ; DATA XREF: ROM:0000ED76o
 byte_ED8B:	dc.b   2,  8,  9,$FF	; 0 ; DATA XREF: ROM:0000ED78o
 byte_ED8F:	dc.b $13,  0,  1,  1,  2,  1,  1,  0; 0	; DATA XREF: ROM:0000ED7Ao
 		dc.b $FC		; 8
-Map_Obj32:	dc.w word_EDAE-Map_Obj32 ; DATA	XREF: ROM:0000EBD0o
-					; ROM:Map_Obj32o ...
-		dc.w word_EDC8-Map_Obj32
-		dc.w word_EDE2-Map_Obj32
-		dc.w word_EDFC-Map_Obj32
-		dc.w word_EE1E-Map_Obj32
-		dc.w word_EE38-Map_Obj32
-		dc.w word_EE4A-Map_Obj32
-		dc.w word_EE64-Map_Obj32
-		dc.w word_EE7E-Map_Obj32
-		dc.w word_EE98-Map_Obj32
-		dc.w word_EEB2-Map_Obj32
-word_EDAE:	dc.w 3			; DATA XREF: ROM:Map_Obj32o
-		dc.w $EC0D,    0,    0,$FFEC; 0
-		dc.w $F400,    8,    4,	  $C; 4
-		dc.w $FC0E,    9,    4,$FFF4; 8
-word_EDC8:	dc.w 3			; DATA XREF: ROM:0000ED9Ao
-		dc.w $EC06,  $15,   $A,$FFEC; 0
-		dc.w $EC09,  $1B,   $D,$FFFC; 4
-		dc.w $FC0A,  $21,  $10,$FFFC; 8
-word_EDE2:	dc.w 3			; DATA XREF: ROM:0000ED9Co
-		dc.w $EC06,  $2A,  $15,$FFEC; 0
-		dc.w $EC09,  $1B,   $D,$FFFC; 4
-		dc.w $FC0A,  $21,  $10,$FFFC; 8
-word_EDFC:	dc.w 4			; DATA XREF: ROM:0000ED9Eo
-		dc.w $EC06,  $30,  $18,$FFEC; 0
-		dc.w $EC09,  $1B,   $D,$FFFC; 4
-		dc.w $FC09,  $36,  $1B,$FFFC; 8
-		dc.w  $C00,  $3C,  $1E,	  $C; 12
-word_EE1E:	dc.w 3			; DATA XREF: ROM:0000EDA0o
-		dc.w $F40D,  $3D,  $1E,$FFEC; 0
-		dc.w $FC00,  $20,  $10,	  $C; 4
-		dc.w  $408,  $45,  $22,$FFFC; 8
-word_EE38:	dc.w 2			; DATA XREF: ROM:0000EDA2o
-		dc.w $F80D,  $48,  $24,$FFEC; 0
-		dc.w $F801,  $50,  $28,	  $C; 4
-word_EE4A:	dc.w 3			; DATA XREF: ROM:0000EDA4o
-		dc.w $F80D,  $48,  $24,$FFEC; 0
-		dc.w $F801,  $50,  $28,	  $C; 4
-		dc.w $FE00,  $52,  $29,	 $14; 8
-word_EE64:	dc.w 3			; DATA XREF: ROM:0000EDA6o
-		dc.w $F80D,  $48,  $24,$FFEC; 0
-		dc.w $F801,  $50,  $28,	  $C; 4
-		dc.w $FE04,  $53,  $29,	 $14; 8
-word_EE7E:	dc.w 3			; DATA XREF: ROM:0000EDA8o
-		dc.w $F80D,  $48,  $24,$FFEC; 0
-		dc.w $F801,  $50,  $28,	  $C; 4
-		dc.w $FE00,$E052,$E029,	 $14; 8
-word_EE98:	dc.w 3			; DATA XREF: ROM:0000EDAAo
-		dc.w $F80D,  $48,  $24,$FFEC; 0
-		dc.w $F801,  $50,  $28,	  $C; 4
-		dc.w $FE04,$E053,$E029,	 $14; 8
-word_EEB2:	dc.w 0			; DATA XREF: ROM:0000EDACo
+Map_Obj32:	incbin	"mappings/sprite/obj32.bin"
+		even
 ; ===========================================================================
 ;----------------------------------------------------
 ; Object 44 - GHZ wall
@@ -20339,25 +20107,8 @@ loc_EF18:				; CODE XREF: ROM:0000EF02j
 		bhi.w	DeleteObject
 		bra.w	DisplaySprite
 ; ===========================================================================
-Map_Obj44:	dc.w word_EF36-Map_Obj44 ; DATA	XREF: ROM:0000EECCo
-					; ROM:Map_Obj44o ...
-		dc.w word_EF58-Map_Obj44
-		dc.w word_EF7A-Map_Obj44
-word_EF36:	dc.w 4			; DATA XREF: ROM:Map_Obj44o
-		dc.w $E005,    4,    2,$FFF8; 0
-		dc.w $F005,    8,    4,$FFF8; 4
-		dc.w	 5,    8,    4,$FFF8; 8
-		dc.w $1005,    8,    4,$FFF8; 12
-word_EF58:	dc.w 4			; DATA XREF: ROM:0000EF32o
-		dc.w $E005,    8,    4,$FFF8; 0
-		dc.w $F005,    8,    4,$FFF8; 4
-		dc.w	 5,    8,    4,$FFF8; 8
-		dc.w $1005,    8,    4,$FFF8; 12
-word_EF7A:	dc.w 4			; DATA XREF: ROM:0000EF34o
-		dc.w $E005,    0,    0,$FFF8; 0
-		dc.w $F005,    0,    0,$FFF8; 4
-		dc.w	 5,    0,    0,$FFF8; 8
-		dc.w $1005,    0,    0,$FFF8; 12
+Map_Obj44:	incbin	"mappings/sprite/obj44.bin"
+		even
 ; ===========================================================================
 ;----------------------------------------------------
 ; Object 0D - end of level signpost
@@ -20541,34 +20292,8 @@ byte_F197:	dc.b   1,  2,  3,  4,  5,  1,  3,  4; 0	; DATA XREF: ROM:0000F18Eo
 byte_F1A5:	dc.b   1,  2,  3,  4,  5,  1,  3,  4; 0	; DATA XREF: ROM:0000F190o
 		dc.b   5,  0,  3,  4,  5,$FF; 8
 byte_F1B3:	dc.b  $F,  0,$FF	; 0 ; DATA XREF: ROM:0000F192o
-Map_Obj0D:	dc.w word_F1C2-Map_Obj0D ; DATA	XREF: ROM:0000EFDAo
-					; ROM:Map_Obj0Do ...
-		dc.w word_F1DC-Map_Obj0D
-		dc.w word_F1F6-Map_Obj0D
-		dc.w word_F210-Map_Obj0D
-		dc.w word_F222-Map_Obj0D
-		dc.w word_F234-Map_Obj0D
-word_F1C2:	dc.w 3			; DATA XREF: ROM:Map_Obj0Do
-		dc.w $F00B,    0,    0,$FFE8; 0
-		dc.w $F00B, $800, $800,	   0; 4
-		dc.w $1001,  $38,  $1C,$FFFC; 8
-word_F1DC:	dc.w 3			; DATA XREF: ROM:0000F1B8o
-		dc.w $F00B,   $C,    6,$FFE8; 0
-		dc.w $F00B, $80C, $806,	   0; 4
-		dc.w $1001,  $38,  $1C,$FFFC; 8
-word_F1F6:	dc.w 3			; DATA XREF: ROM:0000F1BAo
-		dc.w $F00B,  $18,   $C,$FFE8; 0
-		dc.w $F00B, $818, $80C,	   0; 4
-		dc.w $1001,  $38,  $1C,$FFFC; 8
-word_F210:	dc.w 2			; DATA XREF: ROM:0000F1BCo
-		dc.w $F00F,  $24,  $12,$FFF0; 0
-		dc.w $1001,  $38,  $1C,$FFFC; 4
-word_F222:	dc.w 2			; DATA XREF: ROM:0000F1BEo
-		dc.w $F003,  $34,  $1A,$FFFC; 0
-		dc.w $1001,  $38,  $1C,$FFFC; 4
-word_F234:	dc.w 2			; DATA XREF: ROM:0000F1C0o
-		dc.w $F00F, $824, $812,$FFF0; 0
-		dc.w $1001,  $38,  $1C,$FFFC; 4
+Map_Obj0D:	incbin	"mappings/sprite/obj0D.bin"
+		even
 ; ===========================================================================
 		nop
 ;----------------------------------------------------
@@ -20698,37 +20423,8 @@ byte_F386:	dc.b  $F,  2,$FF	; 0 ; DATA XREF: ROM:Ani_Obj40o
 byte_F389:	dc.b   7,  0,  1,  0,  2,$FF; 0	; DATA XREF: ROM:0000F382o
 byte_F38F:	dc.b   1,  3,  6,  3,  6,  4,  6,  4; 0	; DATA XREF: ROM:0000F384o
 		dc.b   6,  4,  6,  5,$FC; 8
-Map_Obj40:	dc.w word_F3AA-Map_Obj40 ; DATA	XREF: ROM:loc_F25Eo
-					; ROM:Map_Obj40o ...
-		dc.w word_F3CC-Map_Obj40
-		dc.w word_F3EE-Map_Obj40
-		dc.w word_F418-Map_Obj40
-		dc.w word_F422-Map_Obj40
-		dc.w word_F42C-Map_Obj40
-		dc.w word_F436-Map_Obj40
-word_F3AA:	dc.w 4			; DATA XREF: ROM:Map_Obj40o
-		dc.w $F00D,    0,    0,$FFEC; 0
-		dc.w	$C,    8,    4,$FFEC; 4
-		dc.w $F801,   $C,    6,	  $C; 8
-		dc.w  $808,   $E,    7,$FFF4; 12
-word_F3CC:	dc.w 4			; DATA XREF: ROM:0000F39Eo
-		dc.w $F10D,    0,    0,$FFEC; 0
-		dc.w  $10C,    8,    4,$FFEC; 4
-		dc.w $F901,   $C,    6,	  $C; 8
-		dc.w  $908,  $11,    8,$FFF4; 12
-word_F3EE:	dc.w 5			; DATA XREF: ROM:0000F3A0o
-word_F3F0:	dc.w $F00D,    0,    0,$FFEC; 0
-		dc.w	$C,  $14,   $A,$FFEC; 4
-		dc.w $F801,   $C,    6,	  $C; 8
-		dc.w  $804,  $18,   $C,$FFEC; 12
-		dc.w  $804,  $12,    9,$FFFC; 16
-word_F418:	dc.w 1			; DATA XREF: ROM:0000F3A2o
-		dc.w $FA00,  $1A,   $D,	 $10; 0
-word_F422:	dc.w 1			; DATA XREF: ROM:0000F3A4o
-		dc.w $FA00,  $1B,   $D,	 $10; 0
-word_F42C:	dc.w 1			; DATA XREF: ROM:0000F3A6o
-		dc.w $FA00,  $1C,   $E,	 $10; 0
-word_F436:	dc.w 0			; DATA XREF: ROM:0000F3A8o
+Map_Obj40:	incbin	"mappings/sprite/obj40.bin"
+		even
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -25996,153 +25692,15 @@ byte_125EE:	dc.b   0,  4,  4,  0,  4,  0,  0,  5,  5,  0,  5,  0,  0,  6,  6,  0
 byte_12608:	dc.b   0,  4,  0,  0,  4,  0,  0,  5,  0,  0,  5,  0,  0,  6,  0,  0; 0
 					; DATA XREF: ROM:000125C0o
 		dc.b   6,  0,  0,  7,  0,  0,  7,  0,  0,$FF; 16
-Map_Obj38:	dc.w word_12636-Map_Obj38 ; DATA XREF: ROM:000123D2o
-					; ROM:Map_Obj38o ...
-		dc.w word_12658-Map_Obj38
-		dc.w word_1267A-Map_Obj38
-		dc.w word_1269C-Map_Obj38
-		dc.w word_126BE-Map_Obj38
-		dc.w word_126E0-Map_Obj38
-		dc.w word_12702-Map_Obj38
-		dc.w word_12724-Map_Obj38
-		dc.w word_12746-Map_Obj38
-		dc.w word_12768-Map_Obj38
-word_12636:	dc.w 4			; DATA XREF: ROM:Map_Obj38o
-		dc.w $F005,    0,    0,$FFF0; 0
-		dc.w $F005, $800, $800,	   0; 4
-		dc.w	 5,$1000,$1000,$FFF0; 8
-		dc.w	 5,$1800,$1800,	   0; 12
-word_12658:	dc.w 4			; DATA XREF: ROM:00012624o
-		dc.w $F005,    4,    2,$FFF0; 0
-		dc.w $F005, $804, $802,	   0; 4
-		dc.w	 5,$1004,$1002,$FFF0; 8
-		dc.w	 5,$1804,$1802,	   0; 12
-word_1267A:	dc.w 4			; DATA XREF: ROM:00012626o
-		dc.w $F005,    8,    4,$FFF0; 0
-		dc.w $F005, $808, $804,	   0; 4
-		dc.w	 5,$1008,$1004,$FFF0; 8
-		dc.w	 5,$1808,$1804,	   0; 12
-word_1269C:	dc.w 4			; DATA XREF: ROM:00012628o
-		dc.w $F005,   $C,    6,$FFF0; 0
-		dc.w $F005, $80C, $806,	   0; 4
-		dc.w	 5,$100C,$1006,$FFF0; 8
-		dc.w	 5,$180C,$1806,	   0; 12
-word_126BE:	dc.w 4			; DATA XREF: ROM:0001262Ao
-		dc.w $F005,  $10,    8,$FFF0; 0
-		dc.w $F005, $810, $808,	   0; 4
-		dc.w	 5,$1010,$1008,$FFF0; 8
-		dc.w	 5,$1810,$1808,	   0; 12
-word_126E0:	dc.w 4			; DATA XREF: ROM:0001262Co
-		dc.w $E00B,  $14,   $A,$FFE8; 0
-		dc.w $E00B, $814, $80A,	   0; 4
-		dc.w	$B,$1014,$100A,$FFE8; 8
-		dc.w	$B,$1814,$180A,	   0; 12
-word_12702:	dc.w 4			; DATA XREF: ROM:0001262Eo
-		dc.w $E80A,    0,    0,$FFE8; 0
-		dc.w $E80A,    9,    4,	   0; 4
-		dc.w	$A,$1809,$1804,$FFE8; 8
-		dc.w	$A,$1800,$1800,	   0; 12
-word_12724:	dc.w 4			; DATA XREF: ROM:00012630o
-		dc.w $E80A, $809, $804,$FFE8; 0
-		dc.w $E80A, $800, $800,	   0; 4
-		dc.w	$A,$1000,$1000,$FFE8; 8
-		dc.w	$A,$1009,$1004,	   0; 12
-word_12746:	dc.w 4			; DATA XREF: ROM:00012632o
-		dc.w $E80A,  $12,    9,$FFE8; 0
-		dc.w $E80A,  $1B,   $D,	   0; 4
-		dc.w	$A,$181B,$180D,$FFE8; 8
-		dc.w	$A,$1812,$1809,	   0; 12
-word_12768:	dc.w 4			; DATA XREF: ROM:00012634o
-		dc.w $E80A, $81B, $80D,$FFE8; 0
-		dc.w $E80A, $812, $809,	   0; 4
-		dc.w	$A,$1012,$1009,$FFE8; 8
-		dc.w	$A,$101B,$100D,	   0; 12
+Map_Obj38:	incbin	"mappings/sprite/obj38.bin"
+		even
 Ani_S1Obj4A:	dc.w byte_1278C-Ani_S1Obj4A ; DATA XREF: ROM:00012514o
 					; ROM:Ani_S1Obj4Ao
 byte_1278C:	dc.b   5,  0,  1,  0,  1,  0,  7,  1,  7,  2,  7,  3,  7,  4,  7,  5; 0
 					; DATA XREF: ROM:Ani_S1Obj4Ao
 		dc.b   7,  6,  7,$FC	; 16
-Map_S1Obj4A:	dc.w word_127B0-Map_S1Obj4A ; DATA XREF: ROM:000124D8o
-					; ROM:Map_S1Obj4Ao ...
-		dc.w word_127CA-Map_S1Obj4A
-		dc.w word_127E4-Map_S1Obj4A
-		dc.w word_1280E-Map_S1Obj4A
-		dc.w word_12858-Map_S1Obj4A
-		dc.w word_128EA-Map_S1Obj4A
-		dc.w word_12974-Map_S1Obj4A
-		dc.w word_129BE-Map_S1Obj4A
-word_127B0:	dc.w 3			; DATA XREF: ROM:Map_S1Obj4Ao
-		dc.w $F800,    0,    0,	   8; 0
-		dc.w	 4,    1,    0,	   0; 4
-		dc.w  $800,$1000,$1000,	   8; 8
-word_127CA:	dc.w 3			; DATA XREF: ROM:000127A2o
-		dc.w $F00D,    3,    1,$FFF0; 0
-		dc.w	$C,   $B,    5,$FFF0; 4
-		dc.w  $80D,$1003,$1001,$FFF0; 8
-word_127E4:	dc.w 5			; DATA XREF: ROM:000127A4o
-		dc.w $E40E,   $F,    7,$FFF4; 0
-		dc.w $EC02,  $1B,   $D,$FFEC; 4
-		dc.w $FC0C,  $1E,   $F,$FFF4; 8
-		dc.w  $40E,$100F,$1007,$FFF4; 12
-		dc.w  $401,$101B,$100D,$FFEC; 16
-word_1280E:	dc.w 9			; DATA XREF: ROM:000127A6o
-		dc.w $F008,  $22,  $11,$FFF8; 0
-		dc.w $F80E,  $25,  $12,$FFF0; 4
-		dc.w $1008,  $31,  $18,$FFF0; 8
-		dc.w	 5,  $34,  $1A,	 $10; 12
-		dc.w $F800, $825, $812,	 $10; 16
-		dc.w $F000,$1836,$181B,	 $18; 20
-		dc.w $F800,$1825,$1812,	 $20; 24
-		dc.w	 0, $825, $812,	 $28; 28
-		dc.w $F800,  $25,  $12,	 $30; 32
-word_12858:	dc.w $12		; DATA XREF: ROM:000127A8o
-		dc.w	 0,$1825,$1812,$FFF0; 0
-		dc.w $F804,  $38,  $1C,$FFF8; 4
-		dc.w $F000,  $26,  $13,	   8; 8
-		dc.w	 0,  $25,  $12,	   0; 12
-		dc.w  $800,$1825,$1812,$FFF8; 16
-		dc.w $1000,$1026,$1013,	   0; 20
-		dc.w  $800,$1038,$101C,	   8; 24
-		dc.w $F800,  $29,  $14,	 $10; 28
-		dc.w	 0,  $26,  $13,	 $10; 32
-		dc.w	 0,  $2D,  $16,	 $18; 36
-		dc.w  $800, $826, $813,	 $18; 40
-		dc.w  $800,  $29,  $14,	 $20; 44
-		dc.w $F800,  $26,  $13,	 $20; 48
-		dc.w $F800,  $2D,  $16,	 $28; 52
-		dc.w	 0,  $3A,  $1D,	 $28; 56
-		dc.w $F800,$1826,$1813,	 $30; 60
-		dc.w	 0,$1025,$1012,	 $38; 64
-		dc.w $F800,$1025,$1012,	 $40; 68
-word_128EA:	dc.w $11		; DATA XREF: ROM:000127AAo
-		dc.w $F800, $825, $812,	   0; 0
-		dc.w $F000,  $38,  $1C,	 $10; 4
-		dc.w $1000, $825, $812,	   0; 8
-		dc.w	 0,$1825,$1812,	 $10; 12
-		dc.w  $800,$1025,$1012,	 $18; 16
-		dc.w $F800,$1825,$1812,	 $20; 20
-		dc.w	 0,$1026,$1013,	 $28; 24
-		dc.w $F800,$1025,$1012,	 $30; 28
-		dc.w	 0,  $25,  $12,	 $30; 32
-		dc.w  $800, $825, $812,	 $30; 36
-		dc.w	 0, $826, $813,	 $38; 40
-		dc.w  $800,  $29,  $14,	 $38; 44
-		dc.w $F800, $826, $813,	 $40; 48
-		dc.w	 0,  $2D,  $16,	 $40; 52
-		dc.w $F800, $825, $812,	 $48; 56
-		dc.w	 0,  $25,  $12,	 $48; 60
-		dc.w	 0,$1025,$1012,	 $50; 64
-word_12974:	dc.w 9			; DATA XREF: ROM:000127ACo
-		dc.w $FC00, $826, $813,	 $30; 0
-		dc.w  $400, $825, $812,	 $28; 4
-		dc.w  $400,$1027,$1013,	 $38; 8
-		dc.w  $400, $826, $813,	 $40; 12
-		dc.w $FC00,$1025,$1012,	 $40; 16
-		dc.w $FC00,$1026,$1013,	 $48; 20
-		dc.w  $C00, $827, $813,	 $48; 24
-		dc.w  $400,$1826,$1813,	 $50; 28
-		dc.w  $400, $827, $813,	 $58; 32
-word_129BE:	dc.w 0			; DATA XREF: ROM:000127AEo
+Map_S1Obj4A:	incbin	"mappings/sprite/S1obj4A.bin"
+		even
 Ani_Obj08:	dc.w byte_129C2-Ani_Obj08 ; DATA XREF: ROM:000125A0o
 					; ROM:Ani_Obj08o
 byte_129C2:	dc.b   4,  0,  1,  2,$FC,  0; 0	; DATA XREF: ROM:Ani_Obj08o
