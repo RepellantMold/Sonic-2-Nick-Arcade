@@ -63,7 +63,7 @@ angle  = 			$26 ; angle about the z = 0 axis (360 degrees  =  256)
 ; conventions followed by many objects but NOT sonic/tails:
 collision_flags  = 	$20
 collision_property  = 	$21
-respawn_index  = 		$23
+respawn_index  = 	$23
 subtype  = 		$28
 ; ---------------------------------------------------------------------------
 ; conventions specific to sonic/tails (Obj01, Obj02, and ObjDB):
@@ -139,6 +139,7 @@ next_object  = 		$40 ; the size of an object
 ; RAM Variables
 RAM_Start:			equ	$FFFF0000		; 4 bytes
 
+; ---------------------------------------------------------------------------
 ; Level variables
 Chunk_Table:			equ	RAM_Start		; $8000 bytes
 Level_Layout:			equ	$FFFF8000		; $1000 bytes
@@ -146,10 +147,16 @@ Block_Table:			equ	$FFFF9000		; $C00 bytes
 TempArray_LayerDef:		equ	$FFFFA800		; $200 bytes
 Decomp_Buffer:			equ	$FFFFAA00		; $200 bytes
 
+; ---------------------------------------------------------------------------
 ; Object variables
 Sprite_Table_Input:		equ	$FFFFAC00		; $400 bytes
 Ring_Positions:			equ	$FFFFE800		; $600 bytes
+Object_RAM:			equ	$FFFFB000 		; through $FFFFD5FF, each object takes up $40 bytes
+MainCharacter:			equ	Object_RAM 		; Usually where the Sonic object is located - $FFFFB000, listed like this in case of RAM shifting
+Sidekick:			equ	Object_RAM+$40 		; Usually where the Tails object is located - $FFFFB040, listed like this in case of RAM shifting
+Tails_Tails:			equ	Sidekick+$40		; Usually where Tails' tail object is located - $FFFFB080, listed like this in case of RAM shifting
 
+; ---------------------------------------------------------------------------
 ; Camera variables
 Camera_RAM:			equ	$FFFFEE00		; 4 bytes
 Camera_X_pos:			equ	$FFFFEE00		; 4 bytes - same as Camera_RAM but with different meaning
@@ -220,11 +227,11 @@ unk_EEE0:			equ	$FFFFEEE0		; 2 bytes - referenced by an unused position recordin
 Camera_X_pos_copy:		equ	$FFFFEEF0		; 4 bytes
 Camera_X_pos_coarse:		equ 	$FFFFF7DA               ; 2 bytes - (Camera_X_pos - 128) / 256
 
+; ---------------------------------------------------------------------------
 ; Misc variables
 Block_cache:			equ	$FFFFEF00		; $80 bytes
 SoundDriver_RAM:		equ	$FFFFF000		; $5C0 bytes
 Game_Mode:			equ	$FFFFF600		; 1 byte
-Vint_routine:			equ	$FFFFF62A		; 1 byte
 RNG_seed:			equ	$FFFFF636		; 4 bytes
 Game_paused:			equ	$FFFFF63A		; 2 bytes
 Palette_Offset_Counter:		equ	$FFFFF632		; 2 bytes
@@ -234,17 +241,32 @@ Hint_flag:			equ	$FFFFF644		; 2 bytes
 WaterHeight:			equ	$FFFFF646		; 2 bytes
 AverageWtrHeight:		equ	$FFFFF648               ; 2 bytes
 TargetWaterHeight:		equ	$FFFFF64A		; 2 bytes
+Water_on:			equ	$FFFFF64C 		; 1 byte
+Water_routine:			equ	$FFFFF64D		; 1 byte
+Water_move:			equ 	$FFFFF64E               ; 1 byte
 Do_Updates_in_H_int:		equ	$FFFFF64F		; 1 byte
 unk_F662:			equ	$FFFFF662		; 2 bytes - unused but cleared on the SEGA screen
+Level_started_flag:		equ	$FFFFF711		; 1 byte - used to determine if the HUD should display or not
 Screen_redraw_flag:		equ	$FFFFF720		; 1 byte
 Water_flag:			equ	$FFFFF730		; 1 byte
 
+; ---------------------------------------------------------------------------
 ; Some of Sonic's variables
 Sonic_top_speed:		equ	$FFFFF760		; 2 bytes
 Sonic_acceleration:		equ	$FFFFF762		; 2 bytes
 Sonic_deceleration:		equ	$FFFFF764		; 2 bytes
 Sonic_LastLoadedDPLC:		equ	$FFFFF766		; 2 bytes
 
+; ---------------------------------------------------------------------------
+; Tails' CPU variables
+Tails_control_counter  = 		$FFFFF702 ; how long until the CPU takes control
+Tails_respawn_counter  = 		$FFFFF704
+Tails_CPU_routine  = 		$FFFFF708
+Tails_CPU_target_x  = 		$FFFFF70A
+Tails_CPU_target_y  = 		$FFFFF70C
+Tails_interact_ID  = 		$FFFFF70E ; object ID of last object stood on
+
+; ---------------------------------------------------------------------------
 ; Object placement variables
 Obj_placement_routine:		equ	$FFFFF76C		; 2 bytes
 Camera_X_pos_last:		equ	$FFFFF76E		; 2 bytes
@@ -253,20 +275,24 @@ Obj_load_addr_left:		equ	$FFFFF774		; 4 bytes
 Obj_load_addr_right_P2:		equ	$FFFFF778		; 4 bytes
 Obj_load_addr_left_P2:		equ	$FFFFF77C		; 4 bytes
 
+; ---------------------------------------------------------------------------
 ; Demo variables
 Demo_button_index:		equ	$FFFFF790		; 2 bytes
 Demo_press_counter:		equ	$FFFFF792		; 1 byte
 
+; ---------------------------------------------------------------------------
 ; Misc variables
 PalChangeSpeed:			equ	$FFFFF794		; 2 bytes
 Collision_addr:			equ	$FFFFF796		; 4 bytes
 
+; ---------------------------------------------------------------------------
 ; Used in the palette cycles for the special stages
 unk_F79A:			equ	$FFFFF79A		; 2 bytes
 unk_F79C:			equ	$FFFFF79C		; 2 bytes
 unk_F79E:			equ	$FFFFF79E		; 2 bytes
 SpecialStage_BGMode:		equ	$FFFFF7A0		; 2 bytes
 
+; ---------------------------------------------------------------------------
 ; Misc variables
 Boss_defeated_flag:		equ	$FFFFF7A7		; 1 byte
 Current_Boss_ID:		equ	$FFFFF7AA		; 1 byte
@@ -277,6 +303,7 @@ Sonic_sliding:			equ	$FFFFF7CA		; 1 byte
 Sonic_EnteredBigRing:		equ	$FFFFF7CD		; 1 byte
 Chain_Bonus_counter:		equ	$FFFFF7D0		; 2 bytes
 
+; ---------------------------------------------------------------------------
 ; Debug variables
 LevelSelCheat_Flag:		equ	$FFFFFFE0		; 1 byte
 SlowMoCheat_Flag:		equ	$FFFFFFE1		; 1 byte
@@ -285,22 +312,49 @@ S1JapaneseCredits_Flag:		equ	$FFFFFFE3		; 1 byte - somewhat unused
 CorrectBtnPresses:		equ	$FFFFFFE4		; 2 bytes - used to detect correct button presses
 TitleScreenCpresses:		equ	$FFFFFFE6		; 2 bytes - used to detect the C button (title screen only)
 Debug_mode_flag:		equ	$FFFFFFFA		; 2 bytes
+Debug_object:			equ	$FFFFFE06
+Debug_placement_mode:		equ	$FFFFFE08
 
+; ---------------------------------------------------------------------------
 ; Joypad variables
-Ctrl_1_Logical: 		equ 	$FFFFF602 ; 2 bytes
-Ctrl_1_Held_Logical: 		equ 	Ctrl_1_Logical ; 1 byte - $FFFFF602, listed like this in case of RAM shifting
-Ctrl_1_Press_Logical: 		equ 	Ctrl_1_Logical+1 ; 1 byte - $FFFFF603, listed like this in case of RAM shifting
-Ctrl_1: 			equ 	Ctrl_1_Press_Logical+1 ; 2 bytes - FFFFF604, listed like this in case of RAM shifting
-Ctrl_1_Held: 			equ 	Ctrl_1 ; 1 byte  - $FFFFF604, listed like this in case of RAM shifting
-Ctrl_1_Press: 			equ 	Ctrl_1+1 ; 1 byte  - $FFFFF605, listed like this in case of RAM shifting
-Ctrl_2: 			equ 	Ctrl_1_Press+1 ; 2 bytes - $FFFFF606, listed like this in case of RAM shifting
-Ctrl_2_Held: 			equ 	Ctrl_2 	; 1 byte  - $FFFFF606, listed like this in case of RAM shifting
-Ctrl_2_Press: 			equ 	Ctrl_2+1 ; 1 byte  - $FFFFF607, listed like this in case of RAM shifting
+Ctrl_1_Logical: 		equ 	$FFFFF602 		; 2 bytes
+Ctrl_1_Held_Logical: 		equ 	Ctrl_1_Logical 		; 1 byte - $FFFFF602, listed like this in case of RAM shifting
+Ctrl_1_Press_Logical: 		equ 	Ctrl_1_Logical+1 	; 1 byte - $FFFFF603, listed like this in case of RAM shifting
+Ctrl_1: 			equ 	Ctrl_1_Press_Logical+1 	; 2 bytes - FFFFF604, listed like this in case of RAM shifting
+Ctrl_1_Held: 			equ 	Ctrl_1 			; 1 byte - $FFFFF604, listed like this in case of RAM shifting
+Ctrl_1_Press: 			equ 	Ctrl_1+1 		; 1 byte - $FFFFF605, listed like this in case of RAM shifting
+Ctrl_2: 			equ 	Ctrl_1_Press+1 		; 2 bytes - $FFFFF606, listed like this in case of RAM shifting
+Ctrl_2_Held: 			equ 	Ctrl_2 			; 1 byte - $FFFFF606, listed like this in case of RAM shifting
+Ctrl_2_Press: 			equ 	Ctrl_2+1 		; 1 byte - $FFFFF607, listed like this in case of RAM shifting
 Control_locked:			equ	$FFFFF7CC		; 1 byte
 Object_control:			equ	$FFFFF7C8		; 1 byte
 
+; ---------------------------------------------------------------------------
+; Vertical/horizontal blanking variables
+VDP_Command_Buffer:		equ	$FFFFDC00 		; 2 bytes - stores VDP commands to issue the next time ProcessDMAQueue is called
+VDP_Reg0_Val:			equ	$FFFFF60C 		; 2 bytes
+VDP_Command_Buffer_Slot:	equ	$FFFFDCFC 		; 4 bytes - stores the address of the next open slot for a queued VDP command
+Horiz_Scroll_Buf:		equ	$FFFFE000               ; 2 bytes
+Vscroll_Factor:			equ	$FFFFF616               ; 4 bytes
+Hint_counter_reserve:		equ	$FFFFF624 		; 2 bytes - Must contain a VDP command word, preferably a write to register $0A. Executed every vertical blank.
+Vint_routine:			equ	$FFFFF62A		; 1 byte
+
+; ---------------------------------------------------------------------------
+; Palette variables
+Normal_palette:			equ	$FFFFFB00               ; 32 bytes
+Normal_palette_line2:		equ	Normal_palette+$20	; 32 bytes - $FFFFFB20, listed like this in case of RAM shifting
+Normal_palette_line3:		equ	Normal_palette_line2+$20; 32 bytes - $FFFFFB40, listed like this in case of RAM shifting
+Normal_palette_line4:		equ	Normal_palette_line3+$20; 32 bytes - $FFFFFB60, listed like this in case of RAM shifting
+Second_palette:			equ	Normal_palette_line4+$20; 32 bytes - $FFFFFB80, listed like this in case of RAM shifting
+Second_palette_line2:		equ	Second_palette+$20	; 32 bytes - $FFFFFBA0, listed like this in case of RAM shifting
+Second_palette_line3:		equ	Second_palette_line2+$20; 32 bytes - $FFFFFBC0, listed like this in case of RAM shifting
+Second_palette_line4:		equ	Second_palette_line3+$20; 32 bytes - $FFFFFBE0, listed like this in case of RAM shifting
+
+; ---------------------------------------------------------------------------
 ; Misc variables
+Object_Respawn_Table:		equ	$FFFFFC00
 Sprite_Table:			equ	$FFFFF800		; $200 bytes
+Sprite_Table_2:			equ	$FFFFDD00 		; Sprite attribute table buffer for the bottom split screen in 2-player mode
 System_Stack:			equ	$FFFFFE00
 Current_ZoneAndAct:		equ	$FFFFFE10		; covers Current_Zone and Current_Act, two bytes
 Current_Zone:			equ	Current_ZoneAndAct	; $FFFFFE10, listed like this in case of RAM shifting
@@ -312,6 +366,7 @@ Checksum_fourcc:		equ	$FFFFFFFC		; writes "init" here
 
 ; ---------------------------------------------------------------------------
 ; Sound Driver RAM variables; starts at $FFFFF000 and ends at $FFFFF5BF.
+Size_of_SegaPCM:		equ 	$6978   ; Change this if you change the SEGA PCM sample.
 PauseSound:			equ	3
 QueueToPlay:			equ	9	; if NOT set to $80, means new index was requested by 68K
 SFXToPlay:			equ	$A	; when Genesis wants to play "normal" sound, it writes it here
@@ -325,14 +380,50 @@ VDP_control_port:		equ	$C00004 ; (8=r/w, 16=r/w)
 PSG_input:			equ	$C00011
 
 ; ---------------------------------------------------------------------------
+; VRAM and tile art base addresses.
+; VRAM Reserved regions.
+VRAM_Plane_A_Name_Table                  = $C000	; Extends until $CFFF
+VRAM_Plane_B_Name_Table                  = $E000	; Extends until $EFFF
+VRAM_Plane_A_Name_Table_2P               = $A000	; Extends until $AFFF
+VRAM_Plane_B_Name_Table_2P               = $8000	; Extends until $8FFF
+VRAM_Plane_Table_Size                    = $1000	; 64 cells x 32 cells x 2 bytes per cell
+VRAM_Sprite_Attribute_Table              = $F800	; Extends until $FA7F
+VRAM_Sprite_Attribute_Table_Size         = $0280	; 640 bytes
+VRAM_Horiz_Scroll_Table                  = $FC00	; Extends until $FF7F
+VRAM_Horiz_Scroll_Table_Size             = $0380	; 224 lines * 2 bytes per entry * 2 PNTs
+
+; ---------------------------------------------------------------------------
+; Art tile stuff
+flip_x              =      (1<<11)
+flip_y              =      (1<<12)
+palette_bit_0       =      5
+palette_bit_1       =      6
+palette_line_0      =      (0<<13)
+palette_line_1      =      (1<<13)
+palette_line_2      =      (2<<13)
+palette_line_3      =      (3<<13)
+high_priority_bit   =      7
+high_priority       =      (1<<15)
+palette_mask        =      $6000
+tile_mask           =      $07FF
+nontile_mask        =      $F800
+drawing_mask        =      $7FFF
+
+; ---------------------------------------------------------------------------
 ; Z80 addresses
-Z80_RAM:	 		equ	$A00000 ; start of Z80 RAM
-Z80_RAM_End:	 		equ	$A02000 ; end of non-reserved Z80 RAM
-Z80_Version:	 		equ	$A10001
-Z80_Port_1_Data:	 	equ	$A10002
-Z80_Port_1_Control:	 	equ	$A10008
-Z80_Port_2_Control:	 	equ	$A1000A
-Z80_Expansion_Control:	 	equ	$A1000C
-Z80_Bus_Request:	 	equ	$A11100
-Z80_Reset:	 		equ	$A11200
-Security_Addr:	 		equ	$A14000
+Z80_RAM:		equ $A00000	; start of Z80 RAM
+Z80_DAC3_Pitch:		equ $A000EA	; !! change this if you modify the Z80 driver
+Z80_DAC_Status:		equ $A01FFD
+Z80_DAC_Sample:		equ $A01FFF
+Z80_RAM_end:		equ $A02000	; end of non-reserved Z80 RAM
+Z80_Version:		equ $A10001
+Z80_Port_1_Data:	equ $A10002
+Z80_Port_1_Control:	equ $A10008
+Z80_Port_2_Control:	equ $A1000A
+Z80_Expansion_Control:	equ $A1000C
+Z80_Bus_Request:	equ $A11100
+Z80_Reset:		equ $A11200
+YM2612_a0:		equ $A04000
+YM2612_d0:		equ $A04001
+YM2612_a1:		equ $A04002
+MY2612_d1:		equ $A04003
