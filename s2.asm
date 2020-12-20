@@ -37679,13 +37679,13 @@ TailsDynPLC:	incbin	"mappings/spriteDPLC/Tails.bin"
 		even
 Nem_SegaLogo:	incbin	"art/nemesis/Sega Logo.bin"
 		even
-Eni_SegaLogo:	incbin	"mappings/enigma/Sega Logo.bin"
+Eni_SegaLogo:	incbin	"mappings/misc/Sega Logo.bin"
 		even
-Eni_TitleMap:	incbin	"mappings/enigma/Title Screen (Main).bin"
+Eni_TitleMap:	incbin	"mappings/misc/Title Screen (Main).bin"
 		even
-Eni_TitleBg1:	incbin	"mappings/enigma/Title Screen (Background 1).bin"
+Eni_TitleBg1:	incbin	"mappings/misc/Title Screen (Background 1).bin"
 		even
-Eni_TitleBg2:	incbin	"mappings/enigma/Title Screen (Background 2).bin"
+Eni_TitleBg2:	incbin	"mappings/misc/Title Screen (Background 2).bin"
 		even
 Nem_Title:	incbin	"art/nemesis/Title Screen (Main).bin"
 		even
