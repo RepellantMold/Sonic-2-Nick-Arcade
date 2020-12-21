@@ -33,6 +33,12 @@ PLCID_S1Ending:		equ (PLCptr_S1Ending-ArtLoadCues)/2
 PLCID_S1TryAgain:	equ (PLCptr_S1TryAgain-ArtLoadCues)/2
 PLCID_S1EggmanSBZ2:	equ (PLCptr_S1EggmanSBZ2-ArtLoadCues)/2
 PLCID_S1FZBoss:		equ (PLCptr_S1FZBoss-ArtLoadCues)/2
+; Game modes
+GMid_SegaScrn:		equ ptr_SegaScrn-GameModeArray	; $00
+GMid_TS:		equ ptr_TS-GameModeArray	; $04
+GMid_Demo:		equ ptr_Demo-GameModeArray	; $08
+GMid_Level:		equ ptr_Level-GameModeArray	; $0C
+GMid_S1SpecStg:		equ ptr_S1SpecStg-GameModeArray	; $10
 
 ; ---------------------------------------------------------------------------
 ; Object Status Table offsets (for everything between Object_RAM and Primary_Collision)
@@ -42,7 +48,7 @@ art_tile =		  2 ; and 3 ; start of sprite's art
 mappings =		  4 ; and 5 and 6 and 7
 x_pos =			  8 ; and 9 ... some objects use $A and $B as well when extra precision is r=ired (see ObjectMove) ... for screen-space objects this is called x_pixel instead
 y_pos =			 $C ; and $D ... some objects use $E and $F as well when extra precision is r=ired ... screen-space objects use y_pixel instead
-priority =		$18 ; 0 = front
+priority =		$18 ; 0 - 7, then converted to a word by DisplaySprite/DisplayA1Sprite/DisplaySprite_Param
 width_pixels =		$19
 mapping_frame =		$1A
 ; ---------------------------------------------------------------------------
@@ -146,6 +152,9 @@ Level_Layout:			equ	$FFFF8000		; $1000 bytes
 Block_Table:			equ	$FFFF9000		; $C00 bytes
 TempArray_LayerDef:		equ	$FFFFA800		; $200 bytes
 Decomp_Buffer:			equ	$FFFFAA00		; $200 bytes
+Primary_Collision:		equ	$FFFFD000
+Secondary_Collision:		equ	$FFFFD600
+Collision_addr:			equ	$FFFFF796		; 4 bytes
 
 ; ---------------------------------------------------------------------------
 ; Object variables
@@ -234,8 +243,6 @@ SoundDriver_RAM:		equ	$FFFFF000		; $5C0 bytes
 Game_Mode:			equ	$FFFFF600		; 1 byte
 RNG_seed:			equ	$FFFFF636		; 4 bytes
 Game_paused:			equ	$FFFFF63A		; 2 bytes
-Palette_Offset_Counter:		equ	$FFFFF632		; 2 bytes
-Palette_Wait_Counter:		equ	$FFFFF634		; 2 bytes
 DMA_data_thunk:			equ	$FFFFF640		; 2 bytes
 Hint_flag:			equ	$FFFFF644		; 2 bytes
 WaterHeight:			equ	$FFFFF646		; 2 bytes
@@ -259,31 +266,27 @@ Sonic_LastLoadedDPLC:		equ	$FFFFF766		; 2 bytes
 
 ; ---------------------------------------------------------------------------
 ; Tails' CPU variables
-Tails_control_counter  = 		$FFFFF702 ; how long until the CPU takes control
-Tails_respawn_counter  = 		$FFFFF704
-Tails_CPU_routine  = 		$FFFFF708
-Tails_CPU_target_x  = 		$FFFFF70A
-Tails_CPU_target_y  = 		$FFFFF70C
-Tails_interact_ID  = 		$FFFFF70E ; object ID of last object stood on
+Tails_control_counter:		equ	$FFFFF702 ; 2 bytes - counter for how long until the CPU takes control
+unk_F706:			equ	$FFFFF706 ; 2 bytes - only referenced in unused lines
+Tails_CPU_routine:		equ	$FFFFF708 ; 2 bytes - used to determine what routine the CPU goes to
 
 ; ---------------------------------------------------------------------------
 ; Object placement variables
+Object_Respawn_Table:		equ	$FFFFFC00
+Sprite_Table:			equ	$FFFFF800		; $200 bytes
+Sprite_Table_2:			equ	$FFFFDD00 		; Sprite attribute table buffer for the bottom split screen in 2-player mode
 Obj_placement_routine:		equ	$FFFFF76C		; 2 bytes
 Camera_X_pos_last:		equ	$FFFFF76E		; 2 bytes
 Obj_load_addr_right:		equ	$FFFFF770		; 4 bytes
 Obj_load_addr_left:		equ	$FFFFF774		; 4 bytes
 Obj_load_addr_right_P2:		equ	$FFFFF778		; 4 bytes
 Obj_load_addr_left_P2:		equ	$FFFFF77C		; 4 bytes
+Object_State:			equ 	$FFFFFC00		; $200 bytes - object state list
 
 ; ---------------------------------------------------------------------------
 ; Demo variables
 Demo_button_index:		equ	$FFFFF790		; 2 bytes
 Demo_press_counter:		equ	$FFFFF792		; 1 byte
-
-; ---------------------------------------------------------------------------
-; Misc variables
-PalChangeSpeed:			equ	$FFFFF794		; 2 bytes
-Collision_addr:			equ	$FFFFF796		; 4 bytes
 
 ; ---------------------------------------------------------------------------
 ; Used in the palette cycles for the special stages
@@ -314,6 +317,9 @@ TitleScreenCpresses:		equ	$FFFFFFE6		; 2 bytes - used to detect the C button (ti
 Debug_mode_flag:		equ	$FFFFFFFA		; 2 bytes
 Debug_object:			equ	$FFFFFE06
 Debug_placement_mode:		equ	$FFFFFE08
+Register_Buffer:		equ 	$FFFFFC00		; $40 bytes - stores registers d0-a7 during an error event
+SP_Buffer:			equ 	$FFFFFC40		; 4 bytes - stores most recent sp address
+Error_Type:			equ 	$FFFFFC44		; 1 byte - error type
 
 ; ---------------------------------------------------------------------------
 ; Joypad variables
@@ -341,6 +347,8 @@ Vint_routine:			equ	$FFFFF62A		; 1 byte
 
 ; ---------------------------------------------------------------------------
 ; Palette variables
+Water_palette_duplicate:	equ 	$FFFFFA00 		; $80 bytes - duplicate underwater palette, used for transitions
+Water_palette:			equ 	Water_palette_dup+$80	; $80 bytes - main underwater palette ($FFFFFA80, listed like this in case of RAM shifting)
 Normal_palette:			equ	$FFFFFB00               ; 32 bytes
 Normal_palette_line2:		equ	Normal_palette+$20	; 32 bytes - $FFFFFB20, listed like this in case of RAM shifting
 Normal_palette_line3:		equ	Normal_palette_line2+$20; 32 bytes - $FFFFFB40, listed like this in case of RAM shifting
@@ -349,12 +357,14 @@ Second_palette:			equ	Normal_palette_line4+$20; 32 bytes - $FFFFFB80, listed lik
 Second_palette_line2:		equ	Second_palette+$20	; 32 bytes - $FFFFFBA0, listed like this in case of RAM shifting
 Second_palette_line3:		equ	Second_palette_line2+$20; 32 bytes - $FFFFFBC0, listed like this in case of RAM shifting
 Second_palette_line4:		equ	Second_palette_line3+$20; 32 bytes - $FFFFFBE0, listed like this in case of RAM shifting
+Palette_Offset_Counter:		equ	$FFFFF632		; 2 bytes
+Palette_Wait_Counter:		equ	$FFFFF634		; 2 bytes
+PalChangeSpeed:			equ	$FFFFF794		; 2 bytes
+Palette_fadestart:		equ 	$FFFFF626		; 1 byte - used for palette fading, with the start position in bytes
+Palette_fadesize:		equ 	Palette_fadestart+1	; 1 byte - the number of colors to fade in
 
 ; ---------------------------------------------------------------------------
 ; Misc variables
-Object_Respawn_Table:		equ	$FFFFFC00
-Sprite_Table:			equ	$FFFFF800		; $200 bytes
-Sprite_Table_2:			equ	$FFFFDD00 		; Sprite attribute table buffer for the bottom split screen in 2-player mode
 System_Stack:			equ	$FFFFFE00
 Current_ZoneAndAct:		equ	$FFFFFE10		; covers Current_Zone and Current_Act, two bytes
 Current_Zone:			equ	Current_ZoneAndAct	; $FFFFFE10, listed like this in case of RAM shifting
