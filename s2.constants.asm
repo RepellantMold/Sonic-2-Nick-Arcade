@@ -347,7 +347,7 @@ Vint_routine:			equ	$FFFFF62A		; 1 byte
 
 ; ---------------------------------------------------------------------------
 ; Palette variables
-Water_palette_duplicate:	equ 	$FFFFFA00 		; $80 bytes - duplicate underwater palette, used for transitions
+Water_palette_dup:		equ 	$FFFFFA00 		; $80 bytes - duplicate underwater palette, used for transitions
 Water_palette:			equ 	Water_palette_dup+$80	; $80 bytes - main underwater palette ($FFFFFA80, listed like this in case of RAM shifting)
 Normal_palette:			equ	$FFFFFB00               ; 32 bytes
 Normal_palette_line2:		equ	Normal_palette+$20	; 32 bytes - $FFFFFB20, listed like this in case of RAM shifting
