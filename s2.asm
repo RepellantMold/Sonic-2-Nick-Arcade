@@ -6,7 +6,7 @@
 ; drx - For dumping/disassembling this in 2006 (which this disassembly is based off of)
 ; ehw - Telling me that the leftover crap at the end are Toe Jam & Earl REV00 data
 ; RepellantMold - Getting more rips of everything in general and attempting to comment more on the code
-; (using Hivebrain's Sonic 1/SuperEgg's Sonic 2 Simon Wai disassembly for hints)
+; (using Hivebrain/Github's Sonic 1/SuperEgg's Sonic 2 Simon Wai disassembly for hints)
 
 		include	"s2.constants.asm"
 		include "macros.asm"
@@ -3525,66 +3525,36 @@ loc_24FA:				; CODE XREF: PalLoad4_Water+16j
 ; End of function PalLoad4_Water
 
 ; ===========================================================================
-PalPointers:	dc.l Pal_SegaBG		; DATA XREF: PalLoad1o	PalLoad2o ...
-		dc.w $FB00
-		dc.w $1F
-		dc.l Pal_Title
-		dc.w $FB00
-		dc.w $1F
-		dc.l Pal_LevelSelect
-		dc.w $FB00
-		dc.w $1F
-		dc.l Pal_SonicTails
-		dc.w $FB00
-		dc.w 7
-		dc.l Pal_GHZ
-		dc.w $FB20
-		dc.w $17
-		dc.l Pal_CPZ
-		dc.w $FB20
-		dc.w $17
-		dc.l Pal_CPZ
-		dc.w $FB20
-		dc.w $17
-		dc.l Pal_EHZ
-		dc.w $FB20
-		dc.w $17
-		dc.l Pal_HPZ
-		dc.w $FB20
-		dc.w $17
-		dc.l Pal_HTZ
-		dc.w $FB20
-		dc.w $17
-		dc.l Pal_SpecialStage
-		dc.w $FB00
-		dc.w $1F
-		dc.l Pal_HPZWater
-		dc.w $FB00
-		dc.w $1F
-		dc.l Pal_LZ
-		dc.w $FB20
-		dc.w $17
-		dc.l Pal_LZ4
-		dc.w $FB00
-		dc.w $1F
-		dc.l Pal_HTZ
-		dc.w $FB20
-		dc.w $17
-		dc.l Pal_LZSonicWater
-		dc.w $FB00
-		dc.w 7
-		dc.l Pal_LZ4SonicWater
-		dc.w $FB00
-		dc.w 7
-		dc.l Pal_S1SpecialStageTC
-		dc.w $FB00
-		dc.w $1F
-		dc.l Pal_S1Continue
-		dc.w $FB00
-		dc.w $F
-		dc.l Pal_S1Ending
-		dc.w $FB00
-		dc.w $1F
+; ---------------------------------------------------------------------------
+; Palette pointers
+; ---------------------------------------------------------------------------
+; Macro to define the pointer
+palp:	macro paladdress,ramaddress,colors
+	dc.l paladdress
+	dc.w ramaddress, (colors>>1)-1
+	endm
+PalPointers:
+ptr_Pal_SegaBG:		palp	Pal_SegaBG,Normal_palette,$40		; 0 - Sega screen (background)
+ptr_Pal_Title:		palp	Pal_Title,Normal_palette,$40		; 1 - title screen
+ptr_Pal_LevelSel:	palp	Pal_LevelSelect,Normal_palette,$40	; 2 - level select
+ptr_Pal_Sonic:		palp	Pal_SonicTails,Normal_palette,$10	; 3 - Sonic/Tails
+ptr_Pal_GHZ:		palp	Pal_GHZ,Normal_palette_line2, $30	; 4 - GHZ
+ptr_Pal_CPZ:		palp	Pal_CPZ,Normal_palette_line2,$30	; 5 - LZ (CPZ)
+ptr_Pal_CPZ2:		palp	Pal_CPZ,Normal_palette_line2,$30	; 6 - CPZ
+ptr_Pal_EHZ:		palp	Pal_EHZ,Normal_palette_line2,$30	; 7 - EHZ
+ptr_Pal_HPZ:		palp	Pal_HPZ,Normal_palette_line2,$30	; 8 - HPZ
+ptr_Pal_HTZ:		palp	Pal_HTZ,Normal_palette_line2,$30	; 9 - HTZ
+ptr_Pal_Special:	palp	Pal_SpecialStage,Normal_palette,$40	; $A (10) - Sonic 1 special stage
+ptr_Pal_HPZWater:	palp	Pal_HPZWater,Normal_palette,$40		; $B (11) - HPZ underwater
+ptr_Pal_LZ:		palp	Pal_LZ,Normal_palette_line2,$30		; $C (12) - LZ
+ptr_Pal_LZ4:		palp	Pal_LZ4,Normal_palette,$40		; $D (13) - LZ4
+ptr_Pal_HTZ2:		palp	Pal_HTZ,Normal_palette_line2,$30	; $E (14) - HTZ (same as 9)
+ptr_Pal_LZSonWater:	palp	Pal_LZSonicWater,Normal_palette,$10	; $F (15) - LZ Sonic underwater
+ptr_Pal_LZ4SonWat:	palp	Pal_LZ4SonicWater,Normal_palette,$10	; $10 (16) - LZ4 Sonic underwater
+ptr_Pal_SSResult:	palp	Pal_S1SpecialStageTC,Normal_palette,$40	; $11 (17) - special stage results
+ptr_Pal_Continue:	palp	Pal_S1Continue,Normal_palette,$20	; $12 (18) - special stage results continue
+ptr_Pal_Ending:		palp	Pal_S1Ending,Normal_palette,$40		; $13 (19) - ending sequence
+			even
 Pal_SegaBG:	incbin	"art/palettes/SegaBG.bin"
 		even
 Pal_Title:	incbin	"art/palettes/TitleScreen.bin"
@@ -3792,9 +3762,9 @@ SegaScreen:				; CODE XREF: ROM:GameModeArrayj
 		bsr.w	ShowVDPGraphics
 
 loc_316A:				; CODE XREF: ROM:00003154j
-		moveq	#0,d0
+		moveq	#palid_SegaBG,d0
 		bsr.w	PalLoad2
-		move.w	#$FFF6,(Palette_Offset_Counter).w
+		move.w	#-$A,(Palette_Offset_Counter).w
 		move.w	#0,(Palette_Wait_Counter).w
 		move.w	#0,(unk_F662).w	; unused...
 		move.w	#0,($FFFFF660).w
@@ -3881,7 +3851,7 @@ loc_3260:				; CODE XREF: ROM:00003262j
 loc_3270:				; CODE XREF: ROM:00003272j
 		move.l	d0,(a1)+
 		dbf	d1,loc_3270
-		moveq	#3,d0
+		moveq	#palid_Sonic,d0
 		bsr.w	PalLoad1
 		bsr.w	Pal_FadeTo
 		disable_ints
@@ -3937,7 +3907,7 @@ loc_3330:
 		moveq	#$1F,d1
 		moveq	#$1B,d2
 		bsr.w	ShowVDPGraphics
-		moveq	#1,d0
+		moveq	#palid_Title,d0
 		bsr.w	PalLoad1
 		move.b	#$8A,d0
 		bsr.w	PlaySound_Special
@@ -4035,7 +4005,7 @@ Title_Cheat_NoC:			; CODE XREF: ROM:00003486j
 Title_CheckLvlSel:			; CODE XREF: ROM:0000365Cj
 		tst.b	(LevelSelCheat_Flag).w
 		beq.w	PlayLevel
-		moveq	#2,d0
+		moveq	#palid_LevelSel,d0
 		bsr.w	PalLoad2
 		lea	(Horiz_Scroll_Buf).w,a1
 		moveq	#0,d0
@@ -4630,14 +4600,14 @@ loc_3C56:
 
 LevelInit_NoWater:
 		move.w	#$1E,($FFFFFE14).w
-		moveq	#3,d0
+		moveq	#palid_Sonic,d0
 		bsr.w	PalLoad2
 		tst.b	(Water_flag).w
 		beq.s	loc_3CC6
-		moveq	#$F,d0
+		moveq	#palid_LZSonWater,d0
 		cmpi.b	#3,(Current_Act).w
 		bne.s	loc_3CB6
-		moveq	#$10,d0
+		moveq	#palid_LZ4SonWat,d0
 
 loc_3CB6:
 		bsr.w	PalLoad3_Water
@@ -4680,7 +4650,7 @@ LevelInit_TitleCard:
 		jsr	HUD_Base
 
 loc_3D2A:
-		moveq	#3,d0
+		moveq	#palid_Sonic,d0
 		bsr.w	PalLoad1
 		bsr.w	LevelSizeLoad
 		bsr.w	DeformBGLayer
@@ -4785,10 +4755,10 @@ loc_3E78:
 loc_3EB2:
 		tst.b	(Water_flag).w
 		beq.s	loc_3EC8
-		moveq	#$B,d0
+		moveq	#palid_HPZWater,d0
 		cmpi.b	#3,(Current_Act).w
 		bne.s	loc_3EC4
-		moveq	#$D,d0
+		moveq	#palid_LZ4,d0
 
 loc_3EC4:
 		bsr.w	PalLoad4_Water
@@ -5817,7 +5787,7 @@ SS_ClrNemRam:				; CODE XREF: ROM:000050CEj
 		dbf	d1,SS_ClrNemRam	; clear Nemesis art buffer
 		clr.b	(Water_move).w
 		clr.w	($FFFFFE02).w
-		moveq	#$A,d0
+		moveq	#palid_Special,d0
 		bsr.w	PalLoad1
 		jsr	S1SS_Load
 		move.l	#0,(Camera_X_pos).w
@@ -5910,7 +5880,7 @@ loc_5214:				; CODE XREF: ROM:00005208j
 		bsr.w	NemesisDec
 		jsr	HUD_Base
 		enable_ints
-		moveq	#$11,d0
+		moveq	#palid_SSResult,d0
 		bsr.w	PalLoad2
 		moveq	#PLCID_Std1,d0
 		bsr.w	LoadPLC2
@@ -9258,17 +9228,17 @@ loc_7348:
 		move.w	(a2),d0
 		andi.w	#$FF,d0
 		cmpi.w	#$103,(Current_ZoneAndAct).w	; is it Labyrinth Zone Act 4?
-		bne.s	loc_735E		; if not, branch
-		moveq	#$C,d0			; load the SBZ3/LZ4 palette
+		bne.s	loc_735E			; if not, branch
+		moveq	#palid_LZ,d0			; load the SBZ3/LZ4 palette
 
 loc_735E:
 		cmpi.w	#$501,(Current_ZoneAndAct).w	; is it Hill Top Zone Act 2?
-		beq.s	loc_736E		; if yes, branch
+		beq.s	loc_736E			; if yes, branch
 		cmpi.w	#$502,(Current_ZoneAndAct).w	; is it Hill Top Zone Act 4?
-		bne.s	loc_7370		; if not, branch
+		bne.s	loc_7370			; if not, branch
 
 loc_736E:
-		moveq	#$E,d0			; load the SBZ2 palette (same as Act 1's, just with different pointers)
+		moveq	#palid_HTZ2,d0			; load the SBZ2 palette (same as Act 1's, just with different pointers)
 
 loc_7370:
 		bsr.w	PalLoad1

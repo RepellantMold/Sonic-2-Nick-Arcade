@@ -39,6 +39,27 @@ GMid_TS:		equ ptr_TS-GameModeArray	; $04
 GMid_Demo:		equ ptr_Demo-GameModeArray	; $08
 GMid_Level:		equ ptr_Level-GameModeArray	; $0C
 GMid_S1SpecStg:		equ ptr_S1SpecStg-GameModeArray	; $10
+; Palette id's
+palid_SegaBG:		equ (ptr_Pal_SegaBG-PalPointers)/8	; 0
+palid_Title:		equ (ptr_Pal_Title-PalPointers)/8	; 1
+palid_LevelSel:		equ (ptr_Pal_LevelSel-PalPointers)/8	; 2
+palid_Sonic:		equ (ptr_Pal_Sonic-PalPointers)/8	; 3
+palid_GHZ:		equ (ptr_Pal_GHZ-PalPointers)/8		; 4
+palid_CPZ:		equ (ptr_Pal_CPZ-PalPointers)/8		; 5
+palid_CPZ2:		equ (ptr_Pal_CPZ2-PalPointers)/8	; 6
+palid_EHZ:		equ (ptr_Pal_EHZ-PalPointers)/8		; 7
+palid_HPZ:		equ (ptr_Pal_HPZ-PalPointers)/8		; 8
+palid_HTZ:		equ (ptr_Pal_HTZ-PalPointers)/8		; 9
+palid_Special:		equ (ptr_Pal_Special-PalPointers)/8	; $A
+palid_HPZWater:		equ (ptr_Pal_HPZWater-PalPointers)/8	; $B
+palid_LZ:		equ (ptr_Pal_LZ-PalPointers)/8		; $C
+palid_LZ4:		equ (ptr_Pal_LZ4-PalPointers)/8		; $D
+palid_HTZ2:		equ (ptr_Pal_HTZ2-PalPointers)/8	; $E
+palid_LZSonWater:	equ (ptr_Pal_LZSonWater-PalPointers)/8	; $F
+palid_LZ4SonWat:	equ (ptr_Pal_LZ4SonWat-PalPointers)/8	; $10
+palid_SSResult:		equ (ptr_Pal_SSResult-PalPointers)/8	; $11
+palid_Continue:		equ (ptr_Pal_Continue-PalPointers)/8	; $12
+palid_Ending:		equ (ptr_Pal_Ending-PalPointers)/8	; $13
 
 ; ---------------------------------------------------------------------------
 ; Object Status Table offsets (for everything between Object_RAM and Primary_Collision)
