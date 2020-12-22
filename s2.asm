@@ -4,9 +4,9 @@
 ; Special Thanks:
 ; Xerowhirl - The awesome 2007 Sonic 2 disassembly, which the Github disassembly is based on
 ; drx - For dumping/disassembling this in 2006 (which this disassembly is based off of)
-; ehw - Telling me that the leftover crap at the end are Toe Jam & Earl REV00 data
+; ehw - Noting that the leftover crap at the end are Toe Jam & Earl REV00 data
 ; RepellantMold - Getting more rips of everything in general and attempting to comment more on the code
-; (using Hivebrain/Github's Sonic 1/SuperEgg's Sonic 2 Simon Wai disassembly for hints)
+; (using Hivebrain/Github's Sonic 1/SuperEgg's Sonic 2 Simon Wai disassembly for labels/constants)
 
 		include	"s2.constants.asm"
 		include "macros.asm"
@@ -4052,7 +4052,7 @@ loc_3570:				; CODE XREF: ROM:0000351Ej
 		moveq	#0,d0
 		move.w	d0,(Ring_amount).w
 		move.l	d0,(Time).w
-		move.l	d0,($FFFFFE26).w
+		move.l	d0,(Score).w
 		move.l	#$1388,($FFFFFFC0).w
 		rts
 ; ===========================================================================
@@ -4075,7 +4075,7 @@ PlayLevel:				; CODE XREF: ROM:000034A2j
 		moveq	#0,d0
 		move.w	d0,(Ring_amount).w
 		move.l	d0,(Time).w
-		move.l	d0,($FFFFFE26).w
+		move.l	d0,(Score).w
 		move.b	d0,($FFFFFE16).w
 		move.b	d0,($FFFFFE57).w
 		move.l	d0,($FFFFFE58).w
@@ -4143,7 +4143,7 @@ loc_36C0:				; CODE XREF: ROM:000036B0j
 		moveq	#0,d0
 		move.w	d0,(Ring_amount).w
 		move.l	d0,(Time).w
-		move.l	d0,($FFFFFE26).w
+		move.l	d0,(Score).w
 		move.l	#$1388,($FFFFFFC0).w
 		rts
 ; ===========================================================================
@@ -35634,7 +35634,7 @@ word_1B1AA:	dc.w $A			; DATA XREF: ROM:0001B0B2o
 AddPoints:				; CODE XREF: ROM:loc_BC66p
 					; ROM:0000BE82p ...
 		move.b	#1,($FFFFFE1F).w
-		lea	($FFFFFE26).w,a3
+		lea	(Score).w,a3
 		add.l	d0,(a3)
 		move.l	#999999,d1
 		cmp.l	(a3),d1
@@ -35673,7 +35673,7 @@ HudUpdate:				; CODE XREF: Do_Updates:loc_DEAp
 		beq.s	loc_1B266
 		clr.b	($FFFFFE1F).w
 		move.l	#$5C800003,d0
-		move.l	($FFFFFE26).w,d1
+		move.l	(Score).w,d1
 		bsr.w	HUD_Score
 
 loc_1B266:				; CODE XREF: HudUpdate+14j
@@ -36183,7 +36183,7 @@ Debug_Init:				; DATA XREF: ROM:DebugIndexo
 		andi.w	#$3FF,(Camera_BG_Y_pos).w
 		move.b	#0,mapping_frame(a0)
 		move.b	#0,anim(a0)
-		cmpi.b	#GMid_S1SpecStg,(Game_Mode).w	; is this the special stage? (weirdly this was left in later builds)
+		cmpi.b	#GMid_S1SpecStg,(Game_Mode).w	; is this the special stage? (weirdly this was leftover in later builds)
 		bne.s	loc_1BB04		; if not, branch
 		moveq	#6,d0			; force it to use the 6th object list (ending/special stage)
 		bra.s	loc_1BB0A		; skip attempting to get the current zone ID
@@ -36623,13 +36623,13 @@ levartptrs macro tiles,plc1,blocks,plc2,chunks,music,palette
 
 ; MainLoadBlocks:
 LevelArtPointers:
-	levartptrs Nem_GHZ, PLCID_GHZ, Map16_GHZ, PLCID_GHZ2, Chameleon_Map128_GHZ, $81, 4	; GHZ - GREEN HILL ZONE
-	levartptrs Nem_CPZ, PLCID_LZ,  Map16_CPZ, PLCID_LZ2,  Map128_CPZ, $82, 5		; LZ - LABYRINTH ZONE
-	levartptrs Nem_CPZ, PLCID_CPZ, Map16_CPZ, PLCID_CPZ2, Map128_CPZ, $83, 6		; CPZ - CHEMICAL PLANT ZONE
-	levartptrs Nem_EHZ, PLCID_EHZ, Map16_EHZ, PLCID_EHZ2, Map128_EHZ, $84, 7		; EHZ - EMERALD HILL ZONE
-	levartptrs Nem_HPZ, PLCID_HPZ, Map16_HPZ, PLCID_HPZ2, Map128_HPZ, $85, 8		; HPZ - HIDDEN PALACE ZONE
-	levartptrs Nem_EHZ, PLCID_HTZ, Map16_EHZ, PLCID_HTZ2, Map128_EHZ, $86, 9		; HTZ - HILL TOP ZONE
-	levartptrs Nem_GHZ, 0,         Map16_GHZ, 0,          Chameleon_Map128_GHZ, $86, $13	; S1E - SONIC 1 ENDING (CRASHES)
+	levartptrs Nem_GHZ, PLCID_GHZ, Map16_GHZ, PLCID_GHZ2, Chameleon_Map128_GHZ, $81, 4	; GHZ - GREEN HILL ZONE (0)
+	levartptrs Nem_CPZ, PLCID_LZ,  Map16_CPZ, PLCID_LZ2,  Map128_CPZ, $82, 5		; LZ - LABYRINTH ZONE (1)
+	levartptrs Nem_CPZ, PLCID_CPZ, Map16_CPZ, PLCID_CPZ2, Map128_CPZ, $83, 6		; CPZ - CHEMICAL PLANT ZONE (2)
+	levartptrs Nem_EHZ, PLCID_EHZ, Map16_EHZ, PLCID_EHZ2, Map128_EHZ, $84, 7		; EHZ - EMERALD HILL ZONE (3)
+	levartptrs Nem_HPZ, PLCID_HPZ, Map16_HPZ, PLCID_HPZ2, Map128_HPZ, $85, 8		; HPZ - HIDDEN PALACE ZONE (4)
+	levartptrs Nem_EHZ, PLCID_HTZ, Map16_EHZ, PLCID_HTZ2, Map128_EHZ, $86, 9		; HTZ - HILL TOP ZONE (5)
+	levartptrs Nem_GHZ, 0,         Map16_GHZ, 0,          Chameleon_Map128_GHZ, $86, $13	; S1E - SONIC 1 ENDING (6)
 	even
 ; ===========================================================================
 
@@ -36795,7 +36795,7 @@ PLC_HPZ2:	dc.w 1
 		dc.l Nem_Dinobot
 		dc.w $A000
 		dc.l Nem_Bat
-word_1C1E4:	dc.w $A600	; They basically cut off half of this list, weird...
+word_1C1E4:	dc.w $A600	; They almost completely cut off this list, this explains the objects with broken previews in debug mode
 		dc.l Nem_Crocobot
 		dc.w $6000
 		dc.l Nem_Buzzbomber
@@ -36881,7 +36881,7 @@ PLC_Signpost:	dc.w 2
 		dc.w $8C40
 ; ===========================================================================
 
-PLC_Invalid:	dc.w $10	; 16 entries, yet no art pointers....
+PLC_Invalid:	dc.w $10	; 16 "entries", and no art pointers.
 ; ===========================================================================
 
 PLC_GHZAnimals:	dc.w 1
@@ -37615,8 +37615,11 @@ Chameleon_Map128_GHZ:incbin	"mappings/128x128/GHZ.bin"
 Leftover_E0178: incbin	"leftovers/E0178.bin"
 		even
 S1Nem_EndingGraphics:	incbin "art/nemesis/Sonic 1 Ending graphics (leftover).bin"
+			even
 S1Nem_CreditsFont:	incbin "art/nemesis/Credits font - Sonic 1.bin"
+			even
 S1Nem_EndingSONICText:	incbin "art/nemesis/Sonic 1 Ending - StH Logo (leftover).bin"
+			even
 ; ---------------------------------------------------------------------------
 ; Leftovers from Toe Jam & Earl REV00, likely a result of EPROM reusage
 ; ---------------------------------------------------------------------------

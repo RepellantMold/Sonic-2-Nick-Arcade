@@ -183,7 +183,7 @@ Time:				equ 	$FFFFFE22		; 4 bytes - time
 Time_minute:			equ 	Time+1			; time - minutes ($FFFFFE23, listed like this in case of RAM shifting)
 Time_seconds:			equ 	Time_minute+1		; time - seconds ($FFFFFE24, listed like this in case of RAM shifting)
 Time_centisecond:		equ 	Time_seconds+1		; time - centiseconds ($FFFFFE25, listed like this in case of RAM shifting)
-v_score:		equ $FFFFFE26	; score (4 bytes)
+Score:				equ 	Time_centisecond+1	; 4 bytes - score ($FFFFFE26, listed like this in case of RAM shifting)
 
 ; ---------------------------------------------------------------------------
 ; Object variables
