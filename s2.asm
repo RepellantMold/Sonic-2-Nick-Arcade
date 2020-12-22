@@ -3832,7 +3832,7 @@ loc_32C4:				; CODE XREF: ROM:000032C6j
 		move.w	(a5)+,(a6)
 		dbf	d1,loc_32C4
 		nop
-		move.b	#0,($FFFFFE30).w
+		move.b	#0,(Last_lamp).w
 		move.w	#0,(Debug_placement_mode).w
 		move.w	#0,(Demo_mode_flag).w
 		move.w	#0,($FFFFFFEA).w
@@ -4050,8 +4050,8 @@ loc_3570:				; CODE XREF: ROM:0000351Ej
 		clr.w	(Current_ZoneAndAct).w
 		move.b	#3,($FFFFFE12).w
 		moveq	#0,d0
-		move.w	d0,($FFFFFE20).w
-		move.l	d0,($FFFFFE22).w
+		move.w	d0,(Ring_amount).w
+		move.l	d0,(Time).w
 		move.l	d0,($FFFFFE26).w
 		move.l	#$1388,($FFFFFFC0).w
 		rts
@@ -4073,8 +4073,8 @@ PlayLevel:				; CODE XREF: ROM:000034A2j
 		move.b	#GMid_Level,(Game_Mode).w
 		move.b	#3,($FFFFFE12).w
 		moveq	#0,d0
-		move.w	d0,($FFFFFE20).w
-		move.l	d0,($FFFFFE22).w
+		move.w	d0,(Ring_amount).w
+		move.l	d0,(Time).w
 		move.l	d0,($FFFFFE26).w
 		move.b	d0,($FFFFFE16).w
 		move.b	d0,($FFFFFE57).w
@@ -4141,8 +4141,8 @@ loc_36AC:				; CODE XREF: ROM:000036A4j
 loc_36C0:				; CODE XREF: ROM:000036B0j
 		move.b	#3,($FFFFFE12).w
 		moveq	#0,d0
-		move.w	d0,($FFFFFE20).w
-		move.l	d0,($FFFFFE22).w
+		move.w	d0,(Ring_amount).w
+		move.l	d0,(Time).w
 		move.l	d0,($FFFFFE26).w
 		move.l	#$1388,($FFFFFFC0).w
 		rts
@@ -4561,7 +4561,7 @@ loc_3C56:
 		move.b	#1,($FFFFF64C).w
 
 LevelInit_NoWater:
-		move.w	#$1E,($FFFFFE14).w
+		move.w	#$1E,(AmountOfAir).w
 		moveq	#palid_Sonic,d0
 		bsr.w	PalLoad2
 		tst.b	(Water_flag).w
@@ -4573,7 +4573,7 @@ LevelInit_NoWater:
 
 loc_3CB6:
 		bsr.w	PalLoad3_Water
-		tst.b	($FFFFFE30).w
+		tst.b	(Last_lamp).w
 		beq.s	loc_3CC6
 		move.b	($FFFFFE53).w,(Water_move).w
 
@@ -4596,7 +4596,7 @@ loc_3CE6:
 		nop
 		move.b	(a1,d0.w),d0
 		bsr.w	PlaySound
-		move.b	#$34,($FFFFB080).w
+		move.b	#$34,(Tails_Tails).w
 
 LevelInit_TitleCard:
 		move.b	#$C,(Vint_routine).w
@@ -4629,33 +4629,33 @@ loc_3D2A:
 		move.b	#$21,($FFFFB380).w ; '!'
 
 loc_3D6C:
-		tst.w	(Two_player_mode).w ; Is 2 player mode on?
+		tst.w	(Two_player_mode).w ; is 2 player mode on?
 		bne.s	LevelInit_LoadTails ; if so, skip this condition
-		cmpi.b	#3,(Current_Zone).w ; Is this Emerald Hill?
-		beq.s	LevelInit_SkipTails ; If so, skip loading Tails
+		cmpi.b	#3,(Current_Zone).w ; is this Emerald Hill?
+		beq.s	LevelInit_SkipTails ; if so, skip loading Tails
 
 LevelInit_LoadTails:
-		move.b	#2,(Sidekick).w
-		move.w	(MainCharacter+x_pos).w,($FFFFB048).w
-		move.w	(MainCharacter+y_pos).w,($FFFFB04C).w
-		subi.w	#$20,($FFFFB048).w ; ' '
+		move.b	#2,(Sidekick).w					; load Tails
+		move.w	(MainCharacter+x_pos).w,(Sidekick+x_pos).w	; teleport Tails to Sonic
+		move.w	(MainCharacter+y_pos).w,(Sidekick+y_pos).w
+		subi.w	#$20,(Sidekick+x_pos).w ; ' '			; move Tails back a bit
 
 LevelInit_SkipTails:
-		tst.b	(DebugCheat_Flag).w
-		beq.s	loc_3DA6
-		btst	#6,(Ctrl_1_Held).w
-		beq.s	loc_3DA6
-		move.b	#1,(Debug_mode_flag).w
+		tst.b	(DebugCheat_Flag).w				; is debug mode on?
+		beq.s	loc_3DA6					; if not, branch
+		btst	#6,(Ctrl_1_Held).w				; are you holding the A button?
+		beq.s	loc_3DA6					; if not, branch
+		move.b	#1,(Debug_mode_flag).w                          ; turn debug mode on
 
 loc_3DA6:
 		move.w	#0,(Ctrl_1_Logical).w
 		move.w	#0,(Ctrl_1).w
 		tst.b	(Water_flag).w
 		beq.s	loc_3DD0
-		move.b	#4,($FFFFB780).w
-		move.w	#$60,($FFFFB788).w ; '`'
-		move.b	#4,($FFFFB7C0).w
-		move.w	#$120,($FFFFB7C8).w
+		move.b	#4,(Object_RAM+$780).w
+		move.w	#$60,(Object_RAM+$780+x_pos).w ; '`'
+		move.b	#4,(Object_RAM+$7C0).w
+		move.w	#$120,(Object_RAM+$7C0+x_pos).w
 
 loc_3DD0:
 		jsr	ObjPosLoad
@@ -4664,17 +4664,17 @@ loc_3DD0:
 		jsr	BuildSprites
 		bsr.w	j_AniArt_Load
 		moveq	#0,d0
-		tst.b	($FFFFFE30).w
+		tst.b	(Last_lamp).w
 		bne.s	loc_3E00
-		move.w	d0,($FFFFFE20).w
-		move.l	d0,($FFFFFE22).w
+		move.w	d0,(Ring_amount).w
+		move.l	d0,(Time).w
 		move.b	d0,($FFFFFE1B).w
 
 loc_3E00:
 		move.b	d0,($FFFFFE1A).w
-		move.b	d0,($FFFFFE2C).w
-		move.b	d0,($FFFFFE2D).w
-		move.b	d0,($FFFFFE2E).w
+		move.b	d0,(Shield_flag).w
+		move.b	d0,(Invinc_flag).w
+		move.b	d0,(Shoes_flag).w
 		move.b	d0,($FFFFFE2F).w
 		move.w	d0,(Debug_placement_mode).w
 		move.w	d0,($FFFFFE02).w
@@ -5764,7 +5764,7 @@ SS_ClrNemRam:				; CODE XREF: ROM:000050CEj
 		movea.l	(a1,d0.w),a1
 		move.b	1(a1),(Demo_press_counter).w
 		subq.b	#1,(Demo_press_counter).w
-		clr.w	($FFFFFE20).w
+		clr.w	(Ring_amount).w
 		clr.b	($FFFFFE1B).w
 		move.w	#0,(Debug_placement_mode).w
 		move.w	#$708,($FFFFF614).w
@@ -5847,7 +5847,7 @@ loc_5214:				; CODE XREF: ROM:00005208j
 		bsr.w	LoadPLC                 ; (invalid pointer, again)
 		move.b	#1,($FFFFFE1F).w
 		move.b	#1,($FFFFF7D6).w
-		move.w	($FFFFFE20).w,d0
+		move.w	(Ring_amount).w,d0
 		mulu.w	#$A,d0
 		move.w	d0,($FFFFF7D4).w
 		move.w	#$8E,d0
@@ -6223,7 +6223,7 @@ S1EndingStartLoc:dc.w	$50, $3B0, $EA0, $46C,$1750,  $BD, $A00, $62C; 0
 ; ===========================================================================
 
 LevelSize_CheckLamp:			; CODE XREF: LevelSizeLoad+76j
-		tst.b	($FFFFFE30).w
+		tst.b	(Last_lamp).w
 		beq.s	LevelSize_StartLoc
 		jsr	Lamppost_LoadInfo
 		move.w	(MainCharacter+x_pos).w,d1
@@ -6289,7 +6289,7 @@ StartLocArray:	incbin	"level/Startpos array.bin"
 
 
 BgScrollSpeed:				; CODE XREF: LevelSizeLoad+1F2p
-		tst.b	($FFFFFE30).w
+		tst.b	(Last_lamp).w
 		bne.s	loc_59B6
 		move.w	d0,(Camera_BG_Y_pos).w
 		move.w	d0,(Camera_BG2_Y_pos).w
@@ -9650,7 +9650,7 @@ DynResize_LZ4:
 		bcs.s	locret_774E
 		cmpi.w	#$18,(MainCharacter+y_pos).w
 		bcc.s	locret_774E
-		clr.b	($FFFFFE30).w
+		clr.b	(Last_lamp).w
 		move.w	#1,($FFFFFE02).w
 		move.w	#$502,(Current_ZoneAndAct).w
 		move.b	#1,(Object_control).w
@@ -10509,7 +10509,7 @@ loc_7E72:				; CODE XREF: sub_7E60+6j
 		swap	d2
 		move.b	byte_7E9E(pc,d0.w),d2
 		moveq	#0,d0
-		tst.w	($FFFFB050).w
+		tst.w	(Sidekick+x_vel).w
 		bne.s	loc_7E90
 		move.b	($FFFFFE0F).w,d0
 		andi.w	#$1C,d0
@@ -13715,14 +13715,14 @@ loc_A8DA:				; CODE XREF: ROM:0000A8A0j
 
 ; sub_A8DE:
 Touch_ConsumeRing:
-		addq.w	#1,($FFFFFE20).w
+		addq.w	#1,(Ring_amount).w
 		ori.b	#1,($FFFFFE1D).w
 		move.w	#$B5,d0
-		cmpi.w	#$64,($FFFFFE20).w
+		cmpi.w	#$64,(Ring_amount).w
 		bcs.s	loc_A918
 		bset	#1,($FFFFFE1B).w
 		beq.s	loc_A90C
-		cmpi.w	#$C8,($FFFFFE20).w
+		cmpi.w	#$C8,(Ring_amount).w
 		bcs.s	loc_A918
 		bset	#2,($FFFFFE1B).w
 		bne.s	loc_A918
@@ -13758,7 +13758,7 @@ Obj37_Index:	dc.w loc_A936-Obj37_Index ; DATA XREF: ROM:Obj37_Indexo
 loc_A936:				; DATA XREF: ROM:Obj37_Indexo
 		movea.l	a0,a1
 		moveq	#0,d5
-		move.w	($FFFFFE20).w,d5
+		move.w	(Ring_amount).w,d5
 		moveq	#$20,d0	; ' '
 		cmp.w	d0,d5
 		bcs.s	loc_A946
@@ -13814,7 +13814,7 @@ loc_A9CE:				; CODE XREF: ROM:0000A9AAj
 		dbf	d5,loc_A94E
 
 loc_A9DE:				; CODE XREF: ROM:0000A952j
-		move.w	#0,($FFFFFE20).w
+		move.w	#0,(Ring_amount).w
 		move.b	#$80,($FFFFFE1D).w
 		move.b	#0,($FFFFFE1B).w
 		move.w	#$C6,d0	; 'Æ'
@@ -13893,7 +13893,7 @@ loc_AA88:				; DATA XREF: ROM:S1Obj4B_Indexo
 		bpl.s	loc_AAD6
 		cmpi.b	#6,($FFFFFE57).w
 		beq.w	loc_AB38
-		cmpi.w	#$32,($FFFFFE20).w ; '2'
+		cmpi.w	#$32,(Ring_amount).w ; '2'
 		bcc.s	loc_AAC0
 		rts
 ; ===========================================================================
@@ -13993,8 +13993,8 @@ sub_AB98:				; CODE XREF: ROM:loc_AB7Ep
 		move.b	#6,routine(a1)
 		move.b	#$1C,(MainCharacter+anim).w
 		move.b	#1,(Sonic_EnteredBigRing).w
-		clr.b	($FFFFFE2D).w
-		clr.b	($FFFFFE2C).w
+		clr.b	(Invinc_flag).w
+		clr.b	(Shield_flag).w
 
 locret_ABD6:				; CODE XREF: sub_AB98+4j sub_AB98+1Ej
 		rts
@@ -14369,13 +14369,13 @@ Monitor_TailsLife:			; DATA XREF: ROM:0000B0CAo
 ; ===========================================================================
 
 Monitor_Rings:				; DATA XREF: ROM:0000B0CEo
-		addi.w	#$A,($FFFFFE20).w
+		addi.w	#$A,(Ring_amount).w
 		ori.b	#1,($FFFFFE1D).w
-		cmpi.w	#$64,($FFFFFE20).w ; 'd'
+		cmpi.w	#$64,(Ring_amount).w ; 'd'
 		bcs.s	loc_B130
 		bset	#1,($FFFFFE1B).w
 		beq.w	Monitor_SonicLife
-		cmpi.w	#$C8,($FFFFFE20).w ; 'È'
+		cmpi.w	#$C8,(Ring_amount).w ; 'È'
 		bcs.s	loc_B130
 		bset	#2,($FFFFFE1B).w
 		beq.w	Monitor_SonicLife
@@ -14387,7 +14387,7 @@ loc_B130:				; CODE XREF: ROM:0000B112j
 ; ===========================================================================
 
 Monitor_Shoes:				; DATA XREF: ROM:0000B0D0o
-		move.b	#1,($FFFFFE2E).w
+		move.b	#1,(Shoes_flag).w
 		move.w	#$4B0,(MainCharacter+speedshoes_time).w
 		move.w	#$C00,(Sonic_top_speed).w
 		move.w	#$18,(Sonic_acceleration).w
@@ -14397,20 +14397,20 @@ Monitor_Shoes:				; DATA XREF: ROM:0000B0D0o
 ; ===========================================================================
 
 Monitor_Shield:				; DATA XREF: ROM:0000B0D2o
-		move.b	#1,($FFFFFE2C).w
+		move.b	#1,(Shield_flag).w
 		move.b	#$38,($FFFFB180).w ; '8'
 		move.w	#$AF,d0	; '¯'
 		jmp	(PlaySound).l
 ; ===========================================================================
 
 Monitor_Invincibility:			; DATA XREF: ROM:0000B0D4o
-		move.b	#1,($FFFFFE2D).w
+		move.b	#1,(Invinc_flag).w
 		move.w	#$4B0,(MainCharacter+invincibility_time).w
 		move.b	#$38,($FFFFB200).w ; '8'
 		move.b	#1,($FFFFB21C).w
 		tst.b	(Current_Boss_ID).w
 		bne.s	locret_B1A8
-		cmpi.w	#$C,($FFFFFE14).w
+		cmpi.w	#$C,(AmountOfAir).w
 		bls.s	locret_B1A8
 		move.w	#$87,d0	; '‡'
 		jmp	(PlaySound).l
@@ -15185,7 +15185,7 @@ loc_BC80:				; DATA XREF: ROM:0000BB5Ao
 ; ===========================================================================
 
 loc_BCAA:				; CODE XREF: ROM:0000BCA0j
-		clr.b	($FFFFFE30).w
+		clr.b	(Last_lamp).w
 		tst.b	(Sonic_EnteredBigRing).w
 		beq.s	loc_BCBC
 		move.b	#GMid_S1SpecStg,(Game_Mode).w
@@ -15286,7 +15286,7 @@ loc_BDAE:				; CODE XREF: ROM:0000BDAAj
 		movea.l	a0,a1
 		lea	(S1Obj7E_Conf).l,a2
 		moveq	#3,d1
-		cmpi.w	#$32,($FFFFFE20).w ; '2'
+		cmpi.w	#$32,(Ring_amount).w ; '2'
 		bcs.s	loc_BDC2
 		addq.w	#1,d1
 
@@ -15379,7 +15379,7 @@ loc_BE9C:				; CODE XREF: ROM:0000BE78j
 		jsr	(PlaySound_Special).l
 		addq.b	#2,routine(a0)
 		move.w	#$B4,anim_frame_duration(a0) ; '´'
-		cmpi.w	#$32,($FFFFFE20).w ; '2'
+		cmpi.w	#$32,(Ring_amount).w ; '2'
 		bcs.s	locret_BEC2
 		move.w	#$3C,anim_frame_duration(a0) ; '<'
 		addq.b	#4,routine(a0)
@@ -15836,7 +15836,7 @@ loc_C70C:				; CODE XREF: ROM:0000C6E4j
 
 loc_C736:				; CODE XREF: ROM:0000C708j
 					; ROM:0000C72Cj
-		tst.b	($FFFFFE2D).w   ; annoying spike bug....
+		tst.b	(Invinc_flag).w   ; annoying spike bug....
 		bne.s	loc_C766
 		move.l	a0,-(sp)
 		movea.l	a0,a2
@@ -19956,14 +19956,14 @@ GotThroughAct:				; CODE XREF: ROM:0001971Ep
 		tst.b	($FFFFB5C0).w
 		bne.s	locret_F15E
 		move.w	(Camera_Max_X_pos).w,(Camera_Min_X_pos).w
-		clr.b	($FFFFFE2D).w
+		clr.b	(Invinc_flag).w
 		clr.b	($FFFFFE1E).w
 		move.b	#$3A,($FFFFB5C0).w ; ':'
 		moveq	#PLCID_S1TitleCard,d0
 		jsr	(LoadPLC2).l
 		move.b	#1,($FFFFF7D6).w
 		moveq	#0,d0
-		move.b	($FFFFFE23).w,d0
+		move.b	(Time_minute).w,d0
 		mulu.w	#$3C,d0	; '<'
 		moveq	#0,d1
 		move.b	($FFFFFE24).w,d1
@@ -19977,7 +19977,7 @@ GotThroughAct:				; CODE XREF: ROM:0001971Ep
 loc_F140:				; CODE XREF: GotThroughAct+42j
 		add.w	d0,d0
 		move.w	TimeBonuses(pc,d0.w),($FFFFF7D2).w
-		move.w	($FFFFFE20).w,d0
+		move.w	(Ring_amount).w,d0
 		mulu.w	#$A,d0
 		move.w	d0,($FFFFF7D4).w
 		move.w	#$8E,d0	; 'Ž'
@@ -20985,9 +20985,9 @@ MusicList_Sonic:incbin "misc/Music playlist 2.bin"
 
 
 Sonic_Display:
-		move.w	invulnerable_time(a0),d0
-		beq.s	loc_FB2E
-		subq.w	#1,invulnerable_time(a0)
+		move.w	invulnerable_time(a0),d0	; is the invulnerable 0?
+		beq.s	loc_FB2E			; if so, branch
+		subq.w	#1,invulnerable_time(a0)	; subtract 1 from the time
 		lsr.w	#3,d0
 		bcc.s	loc_FB34
 
@@ -20995,45 +20995,45 @@ loc_FB2E:
 		jsr	DisplaySprite
 
 loc_FB34:
-		tst.b	($FFFFFE2D).w
-		beq.s	loc_FB7A
-		tst.w	invincibility_time(a0)
-		beq.s	loc_FB7A
-		bra.s	loc_FB7A
+		tst.b	(Invinc_flag).w			; is invincibility on?
+		beq.s	loc_FB7A			; if not, branch
+		tst.w	invincibility_time(a0)		; is the timer 0?
+		beq.s	loc_FB7A			; if not, branch
+		bra.s	loc_FB7A                	; skip everything below
 ; ===========================================================================
-; Leftover code from Sonic 1, without it, the invincibility/shoes never ends.
-		subq.w	#1,invincibility_time(a0)
-		bne.s	loc_FB7A
-		tst.b	(Current_Boss_ID).w
-		bne.s	loc_FB74
-		cmpi.w	#$C,($FFFFFE14).w
-		bcs.s	loc_FB74
-		moveq	#0,d0
-		move.b	(Current_Zone).w,d0
-		cmpi.w	#$103,(Current_ZoneAndAct).w
-		bne.s	loc_FB66
-		moveq	#5,d0
+; Leftover code from Sonic 1, without it, the invincibility/shoes never end.
+		subq.w	#1,invincibility_time(a0)	; subtract 1 from invincibility time
+		bne.s	loc_FB7A			; if it's 0, stop counting
+		tst.b	(Current_Boss_ID).w		; are you at a boss?
+		bne.s	loc_FB74			; if not, branch
+		cmpi.w	#$C,(AmountOfAir).w		; do you have over 12 seconds of air?
+		bcs.s	loc_FB74			; if not, branch
+		moveq	#0,d0				; clear d0
+		move.b	(Current_Zone).w,d0		; move current zone into d0
+		cmpi.w	#$103,(Current_ZoneAndAct).w	; are you at Labyrinth Zone Act 4?
+		bne.s	loc_FB66			; if not, branch
+		moveq	#5,d0				; use Scrap Brain's music
 
 loc_FB66:
-		lea	MusicList_Sonic(pc),a1
-		move.b	(a1,d0.w),d0
-		jsr	(PlaySound).l
+		lea	MusicList_Sonic(pc),a1		; load the playlist
+		move.b	(a1,d0.w),d0			; choose the appropiate entry
+		jsr	(PlaySound).l			; play it
 
 loc_FB74:
-		move.b	#0,($FFFFFE2D).w
+		move.b	#0,(Invinc_flag).w		; clear the invincibility flag
 
 loc_FB7A:
-		tst.b	($FFFFFE2E).w
-		beq.s	locret_FBAE
-		tst.w	speedshoes_time(a0)
-		beq.s	locret_FBAE
-		subq.w	#1,speedshoes_time(a0)
-		bne.s	locret_FBAE
-		move.w	#$600,(Sonic_top_speed).w
+		tst.b	(Shoes_flag).w			; is speed shoes on?
+		beq.s	locret_FBAE			; if not, return
+		tst.w	speedshoes_time(a0)		; is there time left on the speed shoes?
+		beq.s	locret_FBAE			; if not, return
+		subq.w	#1,speedshoes_time(a0)		; subtract 1 from speed shoes time
+		bne.s	locret_FBAE			; if it's 0, return
+		move.w	#$600,(Sonic_top_speed).w	; set Sonic's speed to normal
 		move.w	#$C,(Sonic_acceleration).w
 		move.w	#$80,(Sonic_deceleration).w
-		move.b	#0,($FFFFFE2E).w
-		move.w	#$E3,d0
+		move.b	#0,(Shoes_flag).w		; turn off the shoes
+		move.w	#$E3,d0                         ; set music speed to normal
 		jmp	(PlaySound).l
 ; ===========================================================================
 
@@ -21740,7 +21740,7 @@ loc_101D4:				; CODE XREF: Sonic_LevelBoundaries+3Ej
 		bne.w	j_KillSonic
 		cmpi.w	#$2000,(MainCharacter+x_pos).w
 		bcs.w	j_KillSonic
-		clr.b	($FFFFFE30).w
+		clr.b	(Last_lamp).w
 		move.w	#1,($FFFFFE02).w
 		move.w	#$103,(Current_ZoneAndAct).w
 		rts
@@ -22669,13 +22669,13 @@ loc_10A1E:				; CODE XREF: Sonic_Animate+12Ej
 loc_10A44:				; CODE XREF: Sonic_Animate+9Aj
 		addq.b	#1,d0
 		bne.s	loc_10A88
-		move.w	inertia(a0),d2
+		move.w	inertia(a0),d2	; move inertia to d2
 		bpl.s	loc_10A50
 		neg.w	d2
 
 loc_10A50:				; CODE XREF: Sonic_Animate+182j
 		lea	(SonicAni_Roll2).l,a1
-		cmpi.w	#$600,d2
+		cmpi.w	#$600,d2	; are you going at top speed?
 		bcc.s	loc_10A62
 		lea	(SonicAni_Roll).l,a1
 
@@ -22913,7 +22913,7 @@ loc_10D1E:				; CODE XREF: Tails_Display+4j
 		jsr	DisplaySprite
 
 loc_10D24:				; CODE XREF: Tails_Display+Cj
-		tst.b	($FFFFFE2D).w
+		tst.b	(Invinc_flag).w
 		beq.s	loc_10D68
 		tst.w	invincibility_time(a0)
 		beq.s	loc_10D68
@@ -22921,7 +22921,7 @@ loc_10D24:				; CODE XREF: Tails_Display+Cj
 		bne.s	loc_10D68
 		tst.b	(Current_Boss_ID).w
 		bne.s	loc_10D62
-		cmpi.w	#$C,($FFFFFE14).w
+		cmpi.w	#$C,(AmountOfAir).w
 		bcs.s	loc_10D62
 		moveq	#0,d0
 		move.b	(Current_Zone).w,d0
@@ -22936,11 +22936,11 @@ loc_10D54:				; CODE XREF: Tails_Display+40j
 
 loc_10D62:				; CODE XREF: Tails_Display+2Aj
 					; Tails_Display+32j
-		move.b	#0,($FFFFFE2D).w
+		move.b	#0,(Invinc_flag).w
 
 loc_10D68:				; CODE XREF: Tails_Display+18j
 					; Tails_Display+1Ej ...
-		tst.b	($FFFFFE2E).w
+		tst.b	(Shoes_flag).w
 		beq.s	locret_10D9C
 		tst.w	speedshoes_time(a0)
 		beq.s	locret_10D9C
@@ -22949,7 +22949,7 @@ loc_10D68:				; CODE XREF: Tails_Display+18j
 		move.w	#$600,(Sonic_top_speed).w
 		move.w	#$C,(Sonic_acceleration).w
 		move.w	#$80,(Sonic_deceleration).w ; '€'
-		move.b	#0,($FFFFFE2E).w
+		move.b	#0,(Shoes_flag).w
 		move.w	#$E3,d0	; 'ã'
 		jmp	(PlaySound).l
 ; ===========================================================================
@@ -23636,7 +23636,7 @@ loc_1134E:				; CODE XREF: Tails_LevelBoundaries+3Ej
 		bne.w	KillTails
 		cmpi.w	#$2000,x_pos(a0)
 		bcs.w	KillTails
-		clr.b	($FFFFFE30).w
+		clr.b	(Last_lamp).w
 		move.w	#1,($FFFFFE02).w
 		move.w	#$103,(Current_ZoneAndAct).w
 		rts
@@ -24562,8 +24562,8 @@ loc_11B66:				; CODE XREF: Tails_Animate+1C6j
 ; ===========================================================================
 
 loc_11B88:				; CODE XREF: Tails_Animate+1B8j
-		move.w	($FFFFB050).w,d1
-		move.w	($FFFFB052).w,d2
+		move.w	(Sidekick+x_vel).w,d1
+		move.w	(Sidekick+y_vel).w,d2
 		jsr	(CalcAngle).l
 		moveq	#0,d1
 		move.b	status(a0),d2
@@ -24908,7 +24908,7 @@ Obj0A_Delete:				; DATA XREF: ROM:00011E7Ao
 ; ===========================================================================
 
 Obj0A_AirLeft:				; DATA XREF: ROM:00011E7Eo
-		cmpi.w	#$C,($FFFFFE14).w
+		cmpi.w	#$C,(AmountOfAir).w
 		bhi.s	loc_11F9A
 		subq.w	#1,objoff_38(a0)
 		bne.s	loc_11F82
@@ -24994,7 +24994,7 @@ Obj0A_Countdown:			; CODE XREF: ROM:00011EC8j
 		jsr	(PseudoRandomNumber).l
 		andi.w	#1,d0
 		move.b	d0,objoff_34(a0)
-		move.w	($FFFFFE14).w,d0
+		move.w	(AmountOfAir).w,d0
 		cmpi.w	#$19,d0
 		beq.s	loc_12166
 		cmpi.w	#$14,d0
@@ -25010,8 +25010,8 @@ Obj0A_Countdown:			; CODE XREF: ROM:00011EC8j
 loc_12152:				; CODE XREF: ROM:00012146j
 		subq.b	#1,objoff_32(a0)
 		bpl.s	loc_12170
-		move.b	$33(a0),objoff_32(a0)
-		bset	#7,$36(a0)
+		move.b	objoff_33(a0),objoff_32(a0)
+		bset	#7,objoff_36(a0)
 		bra.s	loc_12170
 ; ===========================================================================
 
@@ -25022,7 +25022,7 @@ loc_12166:				; CODE XREF: ROM:00012132j
 
 loc_12170:				; CODE XREF: ROM:00012144j
 					; ROM:00012156j ...
-		subq.w	#1,($FFFFFE14).w
+		subq.w	#1,(AmountOfAir).w
 		bcc.w	loc_121FA
 		bsr.w	ResumeMusic
 		move.b	#$81,(Object_control).w
@@ -25067,15 +25067,15 @@ loc_121FA:				; CODE XREF: ROM:00012174j
 
 loc_121FC:				; CODE XREF: ROM:0001210Cj
 					; ROM:000121F8j
-		tst.w	$36(a0)
+		tst.w	objoff_36(a0)
 		beq.w	locret_122DC
-		subq.w	#1,$3A(a0)
+		subq.w	#1,objoff_3A(a0)
 		bpl.w	locret_122DC
 
 loc_1220C:				; CODE XREF: ROM:loc_121FAj
 		jsr	(PseudoRandomNumber).l
 		andi.w	#$F,d0
-		move.w	d0,$3A(a0)
+		move.w	d0,objoff_3A(a0)
 		jsr	SingleObjectLoad
 		bne.w	locret_122DC
 		move.b	#$A,id(a1)
@@ -25107,14 +25107,14 @@ loc_12242:				; CODE XREF: ROM:00012238j
 ; ===========================================================================
 
 loc_1228E:				; CODE XREF: ROM:00012256j
-		btst	#7,$36(a0)
+		btst	#7,objoff_36(a0)
 		beq.s	loc_122D2
-		move.w	($FFFFFE14).w,d2
+		move.w	(AmountOfAir).w,d2
 		lsr.w	#1,d2
 		jsr	(PseudoRandomNumber).l
 		andi.w	#3,d0
 		bne.s	loc_122BA
-		bset	#6,$36(a0)
+		bset	#6,objoff_36(a0)
 		bne.s	loc_122D2
 		move.b	d2,subtype(a1)
 		move.w	#$1C,objoff_38(a1)
@@ -25122,7 +25122,7 @@ loc_1228E:				; CODE XREF: ROM:00012256j
 loc_122BA:				; CODE XREF: ROM:000122A6j
 		tst.b	objoff_34(a0)
 		bne.s	loc_122D2
-		bset	#6,$36(a0)
+		bset	#6,objoff_36(a0)
 		bne.s	loc_122D2
 		move.b	d2,subtype(a1)
 		move.w	#$1C,objoff_38(a1)
@@ -25131,7 +25131,7 @@ loc_122D2:				; CODE XREF: ROM:00012284j
 					; ROM:0001228Cj ...
 		subq.b	#1,objoff_34(a0)
 		bpl.s	locret_122DC
-		clr.w	$36(a0)
+		clr.w	objoff_36(a0)
 
 locret_122DC:				; CODE XREF: ROM:000120FAj
 					; ROM:00012104j ...
@@ -25142,29 +25142,29 @@ locret_122DC:				; CODE XREF: ROM:000120FAj
 
 ResumeMusic:				; These lines below are a leftover from Sonic 1,
 					; these lines weren't changed in Simon Wai either.
-		cmpi.w	#12,($FFFFFE14).w	; is there more than 12 seconds of air left?
-		bhi.s	loc_12310	; if yes, branch
-		move.w	#$82,d0	; Play Labyrinth Zones music (incorrect when playing Hidden Palace zone)
-		cmpi.w	#$103,(Current_ZoneAndAct).w	; Is this Labyrinth Zone Act 4? (there's no water in Labyrinth Zone Act 4)
-		bne.s	loc_122F6	; if not, branch (so this doesn't make any sense)
-		move.w	#$86,d0	; Otherwise, play Scrap Brain
+		cmpi.w	#12,(AmountOfAir).w		; is there more than 12 seconds of air left?
+		bhi.s	loc_12310			; if yes, branch
+		move.w	#$82,d0				; Play Labyrinth Zone's music (incorrect when playing Hidden Palace zone)
+		cmpi.w	#$103,(Current_ZoneAndAct).w	; Is this Labyrinth Zone Act 4? (there's no water in Labyrinth Zone Act 4, so this doesn't make any sense)
+		bne.s	loc_122F6			; if not, branch
+		move.w	#$86,d0				; Otherwise, play Scrap Brain's music
 
 loc_122F6:				; CODE XREF: ResumeMusic+12j
-		tst.b	($FFFFFE2D).w	; is Sonic invincible?
-		beq.s	loc_12300	; if he isn't, branch
-		move.w	#$87,d0	; play the invincibility music
+		tst.b	(Invinc_flag).w			; is Sonic invincible?
+		beq.s	loc_12300			; if he isn't, branch
+		move.w	#$87,d0				; play the invincibility music
 
 loc_12300:				; CODE XREF: ResumeMusic+1Cj
-		tst.b	(Current_Boss_ID).w	; is Sonic at a boss?
-		beq.s	loc_1230A	; if not, branch
-		move.w	#$8C,d0	; play the boss music
+		tst.b	(Current_Boss_ID).w		; is Sonic at a boss?
+		beq.s	loc_1230A			; if not, branch
+		move.w	#$8C,d0				; play the boss music
 
 loc_1230A:				; CODE XREF: ResumeMusic+26j
-		jsr	(PlaySound).l	; play the moosikzzz
+		jsr	(PlaySound).l			; play the music
 
 loc_12310:				; CODE XREF: ResumeMusic+6j
-		move.w	#30,($FFFFFE14).w	; reset the air to 30 seconds
-		clr.b	($FFFFB372).w
+		move.w	#30,(AmountOfAir).w		; reset the air to 30 seconds
+		clr.b	(Object_RAM+$340+objoff_32).w
 		rts
 ; End of function ResumeMusic
 
@@ -25243,9 +25243,9 @@ loc_1240C:				; CODE XREF: ROM:000123F0j
 ; ===========================================================================
 
 Obj38_Shield:				; DATA XREF: ROM:000123CAo
-		tst.b	($FFFFFE2D).w
+		tst.b	(Invinc_flag).w
 		bne.s	locret_1245A
-		tst.b	($FFFFFE2C).w
+		tst.b	(Shield_flag).w
 		beq.s	loc_1245C
 		move.w	(MainCharacter+x_pos).w,x_pos(a0)
 		move.w	(MainCharacter+y_pos).w,y_pos(a0)
@@ -25264,7 +25264,7 @@ loc_1245C:				; CODE XREF: ROM:00012434j
 ; ===========================================================================
 
 Obj38_Stars:				; DATA XREF: ROM:000123CCo
-		tst.b	($FFFFFE2D).w
+		tst.b	(Invinc_flag).w
 		beq.s	loc_124B2
 		move.w	(unk_EEE0).w,d0
 		move.b	anim(a0),d1
@@ -26694,7 +26694,7 @@ Obj79_Init:				; DATA XREF: ROM:Obj79_Indexo
 		bclr	#7,art_tile(a2,d0.w)
 		btst	#0,art_tile(a2,d0.w)
 		bne.s	loc_13536
-		move.b	($FFFFFE30).w,d1
+		move.b	(Last_lamp).w,d1
 		andi.b	#$7F,d1	; ''
 		move.b	subtype(a0),d2
 		andi.b	#$7F,d2	; ''
@@ -26713,7 +26713,7 @@ Obj79_Main:				; CODE XREF: ROM:00013534j
 		bne.w	locret_135CA
 		tst.b	(Object_control).w
 		bmi.w	locret_135CA
-		move.b	($FFFFFE30).w,d1
+		move.b	(Last_lamp).w,d1
 		andi.b	#$7F,d1	; ''
 		move.b	subtype(a0),d2
 		andi.b	#$7F,d2	; ''
@@ -33381,7 +33381,7 @@ locret_19938:				; CODE XREF: TouchResponse+124j
 
 loc_1993A:				; CODE XREF: TouchResponse+E0j
 					; TouchResponse:loc_19B56j
-		tst.b	($FFFFFE2D).w
+		tst.b	(Invinc_flag).w
 		bne.s	loc_19952
 		cmpi.b	#9,anim(a0)
 		beq.s	loc_19952
@@ -33453,7 +33453,7 @@ loc_199EC:				; CODE XREF: TouchResponse:Touch_Caterkillerj
 
 loc_199F2:				; CODE XREF: TouchResponse+EEj
 					; TouchResponse+166j ...
-		tst.b	($FFFFFE2D).w
+		tst.b	(Invinc_flag).w
 		beq.s	Touch_Hurt
 
 loc_199F8:				; CODE XREF: TouchResponse+21Aj
@@ -33473,9 +33473,9 @@ Touch_Hurt:				; CODE XREF: TouchResponse+20Ej
 
 
 HurtSonic:				; CODE XREF: ROM:0000C75Ep
-		tst.b	($FFFFFE2C).w
+		tst.b	(Shield_flag).w
 		bne.s	HurtShield
-		tst.w	($FFFFFE20).w
+		tst.w	(Ring_amount).w
 
 loc_19A10:
 		beq.w	Hurt_NoRings
@@ -33487,7 +33487,7 @@ loc_19A10:
 
 HurtShield:				; CODE XREF: HurtSonic+4j
 					; HurtSonic+14j ...
-		move.b	#0,($FFFFFE2C).w
+		move.b	#0,(Shield_flag).w
 		move.b	#4,routine(a0)
 		bsr.w	j_Sonic_ResetOnFloor
 		bset	#1,status(a0)
@@ -33534,7 +33534,7 @@ Hurt_NoRings:				; CODE XREF: HurtSonic:loc_19A10j
 KillSonic:
 		tst.w	(Debug_placement_mode).w
 		bne.s	Kill_NoDeath
-		move.b	#0,($FFFFFE2D).w
+		move.b	#0,(Invinc_flag).w
 		move.b	#6,routine(a0)
 		bsr.w	j_Sonic_ResetOnFloor
 		bset	#1,status(a0)
@@ -34829,7 +34829,7 @@ Obj09_ChkCont:				; CODE XREF: Obj09_ChkItems+2Cj
 ; loc_1A7D8:
 Obj09_GetCont:                          ; CODE XREF: Obj09_ChkItems+44j
 		jsr	Touch_ConsumeRing
-		cmpi.w	#50,($FFFFFE20).w ; do you have 50 rings?
+		cmpi.w	#50,(Ring_amount).w ; do you have 50 rings?
 		bcs.s	Obj09_NoCont
 		bset	#0,($FFFFFE1B).w
 		bne.s	Obj09_NoCont
@@ -35549,12 +35549,12 @@ Obj21_Init:				; DATA XREF: ROM:Obj21_Indexo
 		move.b	#0,priority(a0)
 
 Obj21_Main:				; DATA XREF: ROM:0001B038o
-		tst.w	($FFFFFE20).w
+		tst.w	(Ring_amount).w
 		beq.s	loc_1B08C
 		moveq	#0,d0
 		btst	#3,($FFFFFE05).w
 		bne.s	loc_1B082
-		cmpi.b	#9,($FFFFFE23).w
+		cmpi.b	#9,(Time_minute).w
 		bne.s	loc_1B082
 		addq.w	#2,d0
 
@@ -35569,7 +35569,7 @@ loc_1B08C:				; CODE XREF: ROM:0001B06Cj
 		btst	#3,($FFFFFE05).w
 		bne.s	loc_1B0A2
 		addq.w	#1,d0
-		cmpi.b	#9,($FFFFFE23).w
+		cmpi.b	#9,(Time_minute).w
 		bne.s	loc_1B0A2
 		addq.w	#2,d0
 
@@ -35686,7 +35686,7 @@ loc_1B272:				; CODE XREF: HudUpdate+2Ej
 		clr.b	($FFFFFE1D).w
 		move.l	#$5F400003,d0
 		moveq	#0,d1
-		move.w	($FFFFFE20).w,d1
+		move.w	(Ring_amount).w,d1
 		bsr.w	HUD_Rings
 
 loc_1B286:				; CODE XREF: HudUpdate+2Cj
@@ -35694,7 +35694,7 @@ loc_1B286:				; CODE XREF: HudUpdate+2Cj
 		beq.s	loc_1B2E2
 		tst.w	(Game_paused).w
 		bne.s	loc_1B2E2
-		lea	($FFFFFE22).w,a1
+		lea	(Time).w,a1
 		cmpi.l	#$93B3B,(a1)+
 		nop
 		addq.b	#1,-(a1)
@@ -35714,7 +35714,7 @@ loc_1B2C2:				; CODE XREF: HudUpdate+72j
 					; HudUpdate+7Ej
 		move.l	#$5E400003,d0
 		moveq	#0,d1
-		move.b	($FFFFFE23).w,d1
+		move.b	(Time_minute).w,d1
 		bsr.w	HUD_Mins
 		move.l	#$5EC00003,d0
 		moveq	#0,d1
@@ -35764,7 +35764,7 @@ loc_1B340:				; CODE XREF: HudUpdate+FCj
 		clr.b	($FFFFFE1D).w
 		move.l	#$5F400003,d0
 		moveq	#0,d1
-		move.w	($FFFFFE20).w,d1
+		move.w	(Ring_amount).w,d1
 		bsr.w	HUD_Rings
 
 loc_1B354:				; CODE XREF: HudUpdate+FAj
