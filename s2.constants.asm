@@ -296,9 +296,9 @@ Water_flag:			equ	$FFFFF730		; 1 byte
 ; ---------------------------------------------------------------------------
 ; Some of Sonic's variables
 Sonic_top_speed:		equ	$FFFFF760		; 2 bytes
-Sonic_acceleration:		equ	$FFFFF762		; 2 bytes
-Sonic_deceleration:		equ	$FFFFF764		; 2 bytes
-Sonic_LastLoadedDPLC:		equ	$FFFFF766		; 2 bytes
+Sonic_acceleration:		equ	Sonic_top_speed+2	; 2 bytes - $FFFFF762, listed like this in case of RAM shifting
+Sonic_deceleration:		equ	Sonic_acceleration+2	; 2 bytes - $FFFFF764, listed like this in case of RAM shifting
+Sonic_LastLoadedDPLC:		equ	Sonic_deceleration+2	; 2 bytes - $FFFFF766, listed like this in case of RAM shifting
 
 ; ---------------------------------------------------------------------------
 ; Tails' CPU variables
@@ -314,22 +314,15 @@ Sprite_Table_2:			equ	$FFFFDD00 		; Sprite attribute table buffer for the bottom
 Obj_placement_routine:		equ	$FFFFF76C		; 2 bytes
 Camera_X_pos_last:		equ	$FFFFF76E		; 2 bytes
 Obj_load_addr_right:		equ	$FFFFF770		; 4 bytes
-Obj_load_addr_left:		equ	$FFFFF774		; 4 bytes
-Obj_load_addr_right_P2:		equ	$FFFFF778		; 4 bytes
-Obj_load_addr_left_P2:		equ	$FFFFF77C		; 4 bytes
+Obj_load_addr_left:		equ	Obj_load_addr_right+4	; 4 bytes
+Obj_load_addr_right_P2:		equ	Obj_load_addr_left+4	; 4 bytes
+Obj_load_addr_left_P2:		equ	Obj_load_addr_right_P2+4; 4 bytes
 Object_State:			equ 	$FFFFFC00		; $200 bytes - object state list
 
 ; ---------------------------------------------------------------------------
 ; Demo variables
 Demo_button_index:		equ	$FFFFF790		; 2 bytes
 Demo_press_counter:		equ	$FFFFF792		; 1 byte
-
-; ---------------------------------------------------------------------------
-; Used in the palette cycles for the special stages
-unk_F79A:			equ	$FFFFF79A		; 2 bytes
-unk_F79C:			equ	$FFFFF79C		; 2 bytes
-unk_F79E:			equ	$FFFFF79E		; 2 bytes
-SpecialStage_BGMode:		equ	$FFFFF7A0		; 2 bytes
 
 ; ---------------------------------------------------------------------------
 ; Misc variables
@@ -345,17 +338,17 @@ Chain_Bonus_counter:		equ	$FFFFF7D0		; 2 bytes
 ; ---------------------------------------------------------------------------
 ; Debug variables
 LevelSelCheat_Flag:		equ	$FFFFFFE0		; 1 byte
-SlowMoCheat_Flag:		equ	$FFFFFFE1		; 1 byte
-DebugCheat_Flag:		equ	$FFFFFFE2		; 1 byte
-S1JapaneseCredits_Flag:		equ	$FFFFFFE3		; 1 byte - somewhat unused
-CorrectBtnPresses:		equ	$FFFFFFE4		; 2 bytes - used to detect correct button presses
-TitleScreenCpresses:		equ	$FFFFFFE6		; 2 bytes - used to detect the C button (title screen only)
+SlowMoCheat_Flag:		equ	LevelSelCheat_Flag+1	; 1 byte - $FFFFFFE1, listed like this in case of RAM shifting
+DebugCheat_Flag:		equ	SlowMoCheat_Flag+1	; 1 byte - $FFFFFFE2, listed like this in case of RAM shifting
+S1JapaneseCredits_Flag:		equ	DebugCheat_Flag+1	; 1 byte - somewhat unused ($FFFFFFE3, listed like this in case of RAM shifting)
+CorrectBtnPresses:		equ	S1JapaneseCredits_Flag+1; 2 bytes - used to detect correct button presses ($FFFFFFE4, listed like this in case of RAM shifting)
+TitleScreenCpresses:		equ	CorrectBtnPresses+2	; 2 bytes - used to detect the C button on the title screen ($FFFFFFE6, listed like this in case of RAM shifting)
 Debug_mode_flag:		equ	$FFFFFFFA		; 2 bytes
-Debug_object:			equ	$FFFFFE06
-Debug_placement_mode:		equ	$FFFFFE08
+Debug_object:			equ	$FFFFFE06               ; 2 bytes - $FFFFFE06, listed like this in case of RAM shifting
+Debug_placement_mode:		equ	Debug_object+2          ; 2 bytes - $FFFFFE08, listed like this in case of RAM shifting
 Register_Buffer:		equ 	$FFFFFC00		; $40 bytes - stores registers d0-a7 during an error event
-SP_Buffer:			equ 	$FFFFFC40		; 4 bytes - stores most recent sp address
-Error_Type:			equ 	$FFFFFC44		; 1 byte - error type
+SP_Buffer:			equ 	Register_Buffer+$40	; 4 bytes - stores most recent sp address ($FFFFFC40, listed like this in case of RAM shifting)
+Error_Type:			equ 	SP_Buffer+4		; 1 byte - error type - $FFFFFC44, listed like this in case of RAM shifting
 
 ; ---------------------------------------------------------------------------
 ; Joypad variables
@@ -398,7 +391,12 @@ Palette_Offset_Counter:		equ	$FFFFF632		; 2 bytes
 Palette_Wait_Counter:		equ	$FFFFF634		; 2 bytes
 PalChangeSpeed:			equ	$FFFFF794		; 2 bytes
 Palette_fadestart:		equ 	$FFFFF626		; 1 byte - used for palette fading, with the start position in bytes
-Palette_fadesize:		equ 	Palette_fadestart+1	; 1 byte - the number of colors to fade in
+Palette_fadesize:		equ 	Palette_fadestart+1	; 1 byte - the number of colors to fade in ($FFFFF627, listed like this in case of RAM shifting)
+; Used in the palette cycles for the special stages
+unk_F79A:			equ	$FFFFF79A		; 2 bytes
+unk_F79C:			equ	unk_F79A+2		; 2 bytes - $FFFFF79C, listed like this in case of RAM shifting
+unk_F79E:			equ	unk_F79C+2		; 2 bytes - $FFFFF79E, listed like this in case of RAM shifting
+SpecialStage_BGMode:		equ	unk_F79E+2		; 2 bytes - $FFFFF7A0, listed like this in case of RAM shifting
 
 ; ---------------------------------------------------------------------------
 ; Misc variables
@@ -413,64 +411,84 @@ Checksum_fourcc:		equ	$FFFFFFFC		; writes "init" here
 
 ; ---------------------------------------------------------------------------
 ; Sound Driver RAM variables; starts at $FFFFF000 and ends at $FFFFF5BF.
-Size_of_SegaPCM:		equ 	$6978   ; Change this if you change the SEGA PCM sample.
+Size_of_SegaPCM:		equ 	$6978   		; Change this if you change the SEGA PCM sample.
 PauseSound:			equ	3
-QueueToPlay:			equ	9	; if NOT set to $80, means new index was requested by 68K
-SFXToPlay:			equ	$A	; when Genesis wants to play "normal" sound, it writes it here
-SFXSpecialToPlay:		equ	$B	; when Genesis wants to play "special" sound, it writes it here
-SFXUnknownToPlay:		equ	$C	; when Genesis wants to play "unused" sound, it writes it here (unused and broken in normal gameplay)
+QueueToPlay:			equ	9			; if NOT set to $80, means new index was requested by 68K
+SFXToPlay:			equ	$A			; when Genesis wants to play "normal" sound, it writes it here
+SFXSpecialToPlay:		equ	$B			; when Genesis wants to play "special" sound, it writes it here
+SFXUnknownToPlay:		equ	$C			; when Genesis wants to play "unused" sound, it writes it here (unused and broken in normal gameplay)
 
 ; ---------------------------------------------------------------------------
 ; VDP addressses
-VDP_data_port:			equ	$C00000 ; (8=r/w, 16=r/w)
-VDP_control_port:		equ	$C00004 ; (8=r/w, 16=r/w)
+VDP_data_port:			equ	$C00000 		; (8=r/w, 16=r/w)
+VDP_control_port:		equ	$C00004 		; (8=r/w, 16=r/w)
 PSG_input:			equ	$C00011
 
 ; ---------------------------------------------------------------------------
 ; VRAM and tile art base addresses.
 ; VRAM Reserved regions.
-VRAM_Plane_A_Name_Table                  = $C000	; Extends until $CFFF
-VRAM_Plane_B_Name_Table                  = $E000	; Extends until $EFFF
-VRAM_Plane_A_Name_Table_2P               = $A000	; Extends until $AFFF
-VRAM_Plane_B_Name_Table_2P               = $8000	; Extends until $8FFF
-VRAM_Plane_Table_Size                    = $1000	; 64 cells x 32 cells x 2 bytes per cell
-VRAM_Sprite_Attribute_Table              = $F800	; Extends until $FA7F
-VRAM_Sprite_Attribute_Table_Size         = $0280	; 640 bytes
-VRAM_Horiz_Scroll_Table                  = $FC00	; Extends until $FF7F
-VRAM_Horiz_Scroll_Table_Size             = $0380	; 224 lines * 2 bytes per entry * 2 PNTs
+VRAM_Plane_A_Name_Table = 		$C000			; Extends until $CFFF
+VRAM_Plane_B_Name_Table = 		$E000			; Extends until $EFFF
+VRAM_Plane_A_Name_Table_2P = 		$A000			; Extends until $AFFF
+VRAM_Plane_B_Name_Table_2P = 		$8000			; Extends until $8FFF
+VRAM_Plane_Table_Size = 		$1000			; 64 cells x 32 cells x 2 bytes per cell
+VRAM_Sprite_Attribute_Table = 		$F800			; Extends until $FA7F
+VRAM_Sprite_Attribute_Table_Size = 	$0280			; 640 bytes
+VRAM_Horiz_Scroll_Table = 		$FC00			; Extends until $FF7F
+VRAM_Horiz_Scroll_Table_Size = 		$0380			; 224 lines * 2 bytes per entry * 2 PNTs
 
 ; ---------------------------------------------------------------------------
 ; Art tile stuff
-flip_x              =      (1<<11)
-flip_y              =      (1<<12)
-palette_bit_0       =      5
-palette_bit_1       =      6
-palette_line_0      =      (0<<13)
-palette_line_1      =      (1<<13)
-palette_line_2      =      (2<<13)
-palette_line_3      =      (3<<13)
-high_priority_bit   =      7
-high_priority       =      (1<<15)
-palette_mask        =      $6000
-tile_mask           =      $07FF
-nontile_mask        =      $F800
-drawing_mask        =      $7FFF
+flip_x =      				(1<<11)
+flip_y =      				(1<<12)
+palette_bit_0 =      			5
+palette_bit_1 =      			6
+palette_line_0 =      			(0<<13)
+palette_line_1 =      			(1<<13)
+palette_line_2  =      			(2<<13)
+palette_line_3 =      			(3<<13)
+high_priority_bit =      		7
+high_priority  =      			(1<<15)
+palette_mask =      			$6000
+tile_maskn=      			$07FF
+nontile_mask =      			$F800
+drawing_mask =      			$7FFF
+
+; Joypad input
+btnStart: 			equ 	%10000000 ; Start button ($80)
+btnA: 				equ 	%01000000 ; A ($40)
+btnC:				equ 	%00100000 ; C ($20)
+btnB:				equ 	%00010000 ; B		($10)
+btnR:				equ 	%00001000 ; Right		($08)
+btnL:				equ 	%00000100 ; Left		($04)
+btnDn:				equ 	%00000010 ; Down		($02)
+btnUp:				equ 	%00000001 ; Up		($01)
+btnDir:				equ 	%00001111 ; Any direction	($0F)
+btnABC:				equ 	%01110000 ; A, B or C	($70)
+bitStart:			equ 	7
+bitA:				equ 	6
+bitC:				equ 	5
+bitB:				equ 	4
+bitR:				equ 	3
+bitL:				equ 	2
+bitDn:				equ 	1
+bitUp:				equ 	0
 
 ; ---------------------------------------------------------------------------
 ; Z80 addresses
-Z80_RAM:		equ $A00000	; start of Z80 RAM
-Z80_DAC3_Pitch:		equ $A000EA	; !! change this if you modify the Z80 driver
-Z80_DAC_Status:		equ $A01FFD
-Z80_DAC_Sample:		equ $A01FFF
-Z80_RAM_end:		equ $A02000	; end of non-reserved Z80 RAM
-Z80_Version:		equ $A10001
-Z80_Port_1_Data:	equ $A10002
-Z80_Port_1_Control:	equ $A10008
-Z80_Port_2_Control:	equ $A1000A
-Z80_Expansion_Control:	equ $A1000C
-Z80_Bus_Request:	equ $A11100
-Z80_Reset:		equ $A11200
-YM2612_a0:		equ $A04000
-YM2612_d0:		equ $A04001
-YM2612_a1:		equ $A04002
-MY2612_d1:		equ $A04003
+Z80_RAM:			equ 	$A00000			; start of Z80 RAM
+Z80_DAC3_Pitch:			equ 	$A000EA			; !! change this if you modify the Z80 driver
+Z80_DAC_Status:			equ	$A01FFD
+Z80_DAC_Sample:			equ 	$A01FFF
+Z80_RAM_end:			equ 	$A02000			; end of non-reserved Z80 RAM
+Z80_Version:			equ 	$A10001
+Z80_Port_1_Data:		equ 	$A10002
+Z80_Port_1_Control:		equ 	$A10008
+Z80_Port_2_Control:		equ 	$A1000A
+Z80_Expansion_Control:		equ 	$A1000C
+Z80_Bus_Request:		equ 	$A11100
+Z80_Reset:			equ 	$A11200
+YM2612_a0:			equ 	$A04000
+YM2612_d0:			equ 	$A04001
+YM2612_a1:			equ 	$A04002
+MY2612_d1:			equ 	$A04003

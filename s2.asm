@@ -440,7 +440,7 @@ ShowErrDigit_NoOverflow:		; CODE XREF: ShowErrDigit+Aj
 Error_WaitForC:				; CODE XREF: ROM:ErrorMsg_Waitp
 					; Error_WaitForC+Aj
 		bsr.w	ReadJoypads
-		cmpi.b	#$20,(Ctrl_1_Press).w ; ' '
+		cmpi.b	#btnC,(Ctrl_1_Press).w ; ' '
 		bne.w	Error_WaitForC
 		rts
 ; End of function Error_WaitForC
@@ -1121,7 +1121,7 @@ Pause:					; CODE XREF: ROM:Level_MainLoopp
 		beq.s	Unpause
 		tst.w	(Game_paused).w
 		bne.s	Pause_AlreadyPaused
-		btst	#7,(Ctrl_1_Press).w
+		btst	#bitStart,(Ctrl_1_Press).w
 		beq.s	Pause_DoNothing
 
 Pause_AlreadyPaused:			; CODE XREF: Pause+Cj
@@ -1133,7 +1133,7 @@ Pause_Loop:				; CODE XREF: Pause+5Aj
 		bsr.w	DelayProgram
 		tst.b	(SlowMoCheat_Flag).w
 		beq.s	Pause_CheckStart
-		btst	#6,(Ctrl_1_Press).w
+		btst	#bitA,(Ctrl_1_Press).w
 		beq.s	Pause_CheckBC
 		move.b	#GMid_TS,(Game_Mode).w
 		nop
@@ -1141,13 +1141,13 @@ Pause_Loop:				; CODE XREF: Pause+5Aj
 ; ===========================================================================
 
 Pause_CheckBC:				; CODE XREF: Pause+38j
-		btst	#4,(Ctrl_1_Held).w
+		btst	#bitB,(Ctrl_1_Held).w
 		bne.s	loc_1472
-		btst	#5,(Ctrl_1_Press).w
+		btst	#bitC,(Ctrl_1_Press).w
 		bne.s	loc_1472
 
 Pause_CheckStart:			; CODE XREF: Pause+30j
-		btst	#7,(Ctrl_1_Press).w
+		btst	#bitStart,(Ctrl_1_Press).w
 		beq.s	Pause_Loop
 
 loc_1464:				; CODE XREF: Pause+42j
@@ -3750,7 +3750,7 @@ Sega_WaitEnd:				; CODE XREF: ROM:000031D4j
 		bsr.w	DelayProgram
 		tst.w	($FFFFF614).w
 		beq.s	Sega_GoToTitleScreen
-		andi.b	#$80,(Ctrl_1_Press).w
+		andi.b	#btnStart,(Ctrl_1_Press).w
 		beq.s	Sega_WaitEnd
 
 Sega_GoToTitleScreen:			; CODE XREF: ROM:000031CCj
@@ -3832,7 +3832,7 @@ loc_32C4:				; CODE XREF: ROM:000032C6j
 		move.w	(a5)+,(a6)
 		dbf	d1,loc_32C4
 		nop
-		move.b	#0,(Last_lamp).w
+		move.b	#0,($FFFFFE30).w
 		move.w	#0,(Debug_placement_mode).w
 		move.w	#0,(Demo_mode_flag).w
 		move.w	#0,($FFFFFFEA).w
@@ -3920,7 +3920,7 @@ LevelSelectCheat:			; CODE XREF: ROM:0000341Ej
 		move.w	(CorrectBtnPresses).w,d0
 		adda.w	d0,a0
 		move.b	(Ctrl_1_Press).w,d0
-		andi.b	#$F,d0
+		andi.b	#btnDir,d0
 		cmp.b	(a0),d0
 		bne.s	Title_Cheat_NoMatch
 		addq.w	#1,(CorrectBtnPresses).w
@@ -3954,14 +3954,14 @@ Title_Cheat_NoMatch:			; CODE XREF: ROM:00003436j
 Title_Cheat_CountC:			; CODE XREF: ROM:0000343Ej
 					; ROM:0000346Aj ...
 		move.b	(Ctrl_1_Press).w,d0
-		andi.b	#$20,d0	; ' '
+		andi.b	#btnC,d0	; ' '
 		beq.s	Title_Cheat_NoC
 		addq.w	#1,(TitleScreenCpresses).w
 
 Title_Cheat_NoC:			; CODE XREF: ROM:00003486j
 		tst.w	($FFFFF614).w
 		beq.w	Demo
-		andi.b	#$80,(Ctrl_1_Press).w
+		andi.b	#btnStart,(Ctrl_1_Press).w
 		beq.w	TitleScreen_Loop
 
 Title_CheckLvlSel:			; CODE XREF: ROM:0000365Cj
@@ -3998,7 +3998,7 @@ LevelSelect_Loop:			; CODE XREF: ROM:000034F8j
 		andi.b	#$F0,(Ctrl_1_Press).w
 		beq.s	LevelSelect_Loop
 		move.w	#0,(Two_player_mode).w
-		btst	#4,(Ctrl_1_Held).w    	; is B held?
+		btst	#bitB,(Ctrl_1_Held).w    ; is B held?
 		beq.s	loc_3516                ; if not, branch
 		move.w	#1,(Two_player_mode).w  ; otherwise, turn it on
 
@@ -4016,7 +4016,7 @@ loc_3516:				; CODE XREF: ROM:0000350Ej
 		beq.s	loc_355A	; Go to the credits
 
 loc_353A:				; CODE XREF: ROM:0000352Cj
-		cmpi.w	#$94,d0	; Same fix as stock Sonic 1....
+		cmpi.w	#$94,d0		; Same fix as stock Sonic 1....
 		bcs.s	loc_3546
 		cmpi.w	#$A0,d0	; ' '
 		bcs.s	LevelSelect_Loop
@@ -4170,7 +4170,7 @@ loc_3706:				; CODE XREF: LevelSelect_Controls+8j
 		andi.b	#3,d1
 		beq.s	loc_3740
 		move.w	($FFFFFF82).w,d0
-		btst	#0,d1
+		btst	#bitUp,d1
 		beq.s	loc_3726
 		subq.w	#1,d0
 		bcc.s	loc_3726
@@ -4178,7 +4178,7 @@ loc_3706:				; CODE XREF: LevelSelect_Controls+8j
 
 loc_3726:				; CODE XREF: LevelSelect_Controls+28j
 					; LevelSelect_Controls+2Cj
-		btst	#1,d1
+		btst	#bitDn,d1
 		beq.s	loc_3736
 		addq.w	#1,d0
 		cmpi.w	#$15,d0
@@ -4200,7 +4200,7 @@ loc_3740:				; CODE XREF: LevelSelect_Controls+Ej
 		andi.b	#$C,d1
 		beq.s	locret_377A
 		move.w	($FFFFFF84).w,d0
-		btst	#2,d1
+		btst	#bitL,d1
 		beq.s	loc_3762
 		subq.w	#1,d0
 		bcc.s	loc_3762
@@ -4208,7 +4208,7 @@ loc_3740:				; CODE XREF: LevelSelect_Controls+Ej
 
 loc_3762:				; CODE XREF: LevelSelect_Controls+64j
 					; LevelSelect_Controls+68j
-		btst	#3,d1
+		btst	#bitR,d1
 		beq.s	loc_3772
 		addq.w	#1,d0
 		cmpi.w	#$50,d0	; 'P'
@@ -4573,7 +4573,7 @@ LevelInit_NoWater:
 
 loc_3CB6:
 		bsr.w	PalLoad3_Water
-		tst.b	(Last_lamp).w
+		tst.b	($FFFFFE30).w
 		beq.s	loc_3CC6
 		move.b	($FFFFFE53).w,(Water_move).w
 
@@ -4664,7 +4664,7 @@ loc_3DD0:
 		jsr	BuildSprites
 		bsr.w	j_AniArt_Load
 		moveq	#0,d0
-		tst.b	(Last_lamp).w
+		tst.b	($FFFFFE30).w
 		bne.s	loc_3E00
 		move.w	d0,(Ring_amount).w
 		move.l	d0,(Time).w
@@ -4932,18 +4932,18 @@ DynWater_Index:	dc.w DynWater_HPZ1-DynWater_Index; 0 ; DATA XREF: ROM:DynWater_I
 DynWater_HPZ1:				; You can control the water using P2's controller, rather interesting
 					; since you can't even do this in Simon Wai or any later builds
 
-		btst	#0,(Ctrl_2_Held).w; is P2 pressing up?
-		beq.s	loc_40E2	; if not, branch
+		btst	#bitUp,(Ctrl_2_Held).w	; is P2 pressing up?
+		beq.s	loc_40E2		; if not, branch
 		tst.w	(TargetWaterHeight).w   ; is the water height at it's lowest?
-		beq.s	loc_40E2	; if so, don't keep decreasing the height and causing underflow
+		beq.s	loc_40E2		; if so, don't keep decreasing the height and causing underflow
 		subq.w	#1,(TargetWaterHeight).w; subtract 1 from height
 
 loc_40E2:				; CODE XREF: ROM:000040D6j
 					; ROM:000040DCj
-		btst	#1,(Ctrl_2_Held).w; is P2 pressing down?
-		beq.s	locret_40F6	; if not, return
+		btst	#bitDn,(Ctrl_2_Held).w	; is P2 pressing down?
+		beq.s	locret_40F6		; if not, return
 		cmpi.w	#$700,(TargetWaterHeight).w; is the water height $700?
-		beq.s	locret_40F6	; if not, return
+		beq.s	locret_40F6		; if not, return
 		addq.w	#1,(TargetWaterHeight).w; add 1 to height
 
 locret_40F6:				; CODE XREF: ROM:000040E8j
@@ -6223,7 +6223,7 @@ S1EndingStartLoc:dc.w	$50, $3B0, $EA0, $46C,$1750,  $BD, $A00, $62C; 0
 ; ===========================================================================
 
 LevelSize_CheckLamp:			; CODE XREF: LevelSizeLoad+76j
-		tst.b	(Last_lamp).w
+		tst.b	($FFFFFE30).w
 		beq.s	LevelSize_StartLoc
 		jsr	Lamppost_LoadInfo
 		move.w	(MainCharacter+x_pos).w,d1
@@ -6289,7 +6289,7 @@ StartLocArray:	incbin	"level/Startpos array.bin"
 
 
 BgScrollSpeed:				; CODE XREF: LevelSizeLoad+1F2p
-		tst.b	(Last_lamp).w
+		tst.b	($FFFFFE30).w
 		bne.s	loc_59B6
 		move.w	d0,(Camera_BG_Y_pos).w
 		move.w	d0,(Camera_BG2_Y_pos).w
@@ -9650,7 +9650,7 @@ DynResize_LZ4:
 		bcs.s	locret_774E
 		cmpi.w	#$18,(MainCharacter+y_pos).w
 		bcc.s	locret_774E
-		clr.b	(Last_lamp).w
+		clr.b	($FFFFFE30).w
 		move.w	#1,($FFFFFE02).w
 		move.w	#$502,(Current_ZoneAndAct).w
 		move.b	#1,(Object_control).w
@@ -15185,7 +15185,7 @@ loc_BC80:				; DATA XREF: ROM:0000BB5Ao
 ; ===========================================================================
 
 loc_BCAA:				; CODE XREF: ROM:0000BCA0j
-		clr.b	(Last_lamp).w
+		clr.b	($FFFFFE30).w
 		tst.b	(Sonic_EnteredBigRing).w
 		beq.s	loc_BCBC
 		move.b	#GMid_S1SpecStg,(Game_Mode).w
@@ -21270,14 +21270,14 @@ loc_FE06:				; CODE XREF: Sonic_Move+B8j
 
 Sonic_LookUp:				; CODE XREF: Sonic_Move+7Cj
 					; Sonic_Move+9Cj ...
-		btst	#0,(Ctrl_1_Held_Logical).w
+		btst	#bitUp,(Ctrl_1_Held_Logical).w
 		beq.s	Sonic_Duck
 		move.b	#7,anim(a0)
 		bra.s	loc_FE2C
 ; ===========================================================================
 
 Sonic_Duck:				; CODE XREF: Sonic_Move+D6j
-		btst	#1,(Ctrl_1_Logical).w
+		btst	#bitDn,(Ctrl_1_Logical).w
 		beq.s	loc_FE2C
 		move.b	#8,anim(a0)
 
@@ -21512,12 +21512,12 @@ Sonic_RollSpeed:			; CODE XREF: ROM:0000FCFCp
 		bne.w	loc_1008A
 		tst.w	$2E(a0)
 		bne.s	loc_10046
-		btst	#2,(Ctrl_1_Logical).w
+		btst	#bitL,(Ctrl_1_Logical).w
 		beq.s	loc_1003A
 		bsr.w	Sonic_RollLeft
 
 loc_1003A:				; CODE XREF: Sonic_RollSpeed+26j
-		btst	#3,(Ctrl_1_Logical).w
+		btst	#bitR,(Ctrl_1_Logical).w
 		beq.s	loc_10046
 		bsr.w	Sonic_RollRight
 
@@ -21635,7 +21635,7 @@ Sonic_ChgJumpDir:			; CODE XREF: ROM:0000FCCEp
 		btst	#4,status(a0)
 		bne.s	loc_10150
 		move.w	x_vel(a0),d0
-		btst	#2,(Ctrl_1_Logical).w
+		btst	#bitL,(Ctrl_1_Logical).w
 		beq.s	loc_10136
 		bset	#0,status(a0)
 		sub.w	d5,d0
@@ -21647,7 +21647,7 @@ Sonic_ChgJumpDir:			; CODE XREF: ROM:0000FCCEp
 
 loc_10136:				; CODE XREF: Sonic_ChgJumpDir+1Cj
 					; Sonic_ChgJumpDir+2Cj
-		btst	#3,(Ctrl_1_Logical).w
+		btst	#bitR,(Ctrl_1_Logical).w
 		beq.s	loc_1014C
 		bclr	#0,status(a0)
 		add.w	d5,d0
@@ -21740,7 +21740,7 @@ loc_101D4:				; CODE XREF: Sonic_LevelBoundaries+3Ej
 		bne.w	j_KillSonic
 		cmpi.w	#$2000,(MainCharacter+x_pos).w
 		bcs.w	j_KillSonic
-		clr.b	(Last_lamp).w
+		clr.b	($FFFFFE30).w
 		move.w	#1,($FFFFFE02).w
 		move.w	#$103,(Current_ZoneAndAct).w
 		rts
@@ -21772,7 +21772,7 @@ loc_10220:				; CODE XREF: Sonic_Roll+Aj
 		move.b	(Ctrl_1_Logical).w,d0
 		andi.b	#$C,d0
 		bne.s	Obj01_NoRoll
-		btst	#1,(Ctrl_1_Logical).w
+		btst	#bitDn,(Ctrl_1_Logical).w
 		bne.s	loc_1023A
 
 Obj01_NoRoll:				; CODE XREF: Sonic_Roll+4j
@@ -21877,7 +21877,7 @@ loc_1033C:				; CODE XREF: Sonic_JumpHeight+10j
 		cmp.w	y_vel(a0),d1
 		ble.s	locret_10350
 		move.b	(Ctrl_1_Logical).w,d0
-		andi.b	#$70,d0	; 'p'
+		andi.b	#btnABC,d0	; 'p'
 		bne.s	locret_10350
 		move.w	d1,y_vel(a0)
 
@@ -21920,7 +21920,7 @@ locret_10394:				; CODE XREF: Sonic_Spindash+Cj
 
 loc_10396:				; CODE XREF: Sonic_Spindash+4j
 		move.b	(Ctrl_1_Logical).w,d0
-		btst	#1,d0
+		btst	#bitDn,d0
 		bne.s	loc_103DC
 		move.b	#$E,y_radius(a0)
 		move.b	#7,x_radius(a0)
@@ -23128,12 +23128,12 @@ Tails_Move:				; CODE XREF: ROM:00010E84p
 		bne.w	loc_11026
 		tst.w	$2E(a0)
 		bne.w	loc_10FFA
-		btst	#2,(Ctrl_2).w
+		btst	#bitL,(Ctrl_2).w
 		beq.s	loc_10F3C
 		bsr.w	Tails_MoveLeft
 
 loc_10F3C:				; CODE XREF: Tails_Move+22j
-		btst	#3,(Ctrl_2).w
+		btst	#bitR,(Ctrl_2).w
 		beq.s	loc_10F48
 		bsr.w	Tails_MoveRight
 
@@ -23195,14 +23195,14 @@ loc_10FD4:				; CODE XREF: Tails_Move+B0j
 
 Tails_LookUp:				; CODE XREF: Tails_Move+74j
 					; Tails_Move+94j ...
-		btst	#0,(Ctrl_2).w
+		btst	#bitUp,(Ctrl_2).w
 		beq.s	Tails_Duck
 		move.b	#7,anim(a0)
 		bra.s	loc_10FFA
 ; ===========================================================================
 
 Tails_Duck:				; CODE XREF: Tails_Move+CEj
-		btst	#1,(Ctrl_2).w
+		btst	#bitDn,(Ctrl_2).w
 		beq.s	loc_10FFA
 		move.b	#8,anim(a0)
 
@@ -23408,12 +23408,12 @@ Tails_RollSpeed:			; CODE XREF: ROM:00010ED2p
 		bne.w	loc_11204
 		tst.w	$2E(a0)
 		bne.s	loc_111C0
-		btst	#2,(Ctrl_2).w
+		btst	#bitL,(Ctrl_2).w
 		beq.s	loc_111B4
 		bsr.w	Tails_RollLeft
 
 loc_111B4:				; CODE XREF: Tails_RollSpeed+26j
-		btst	#3,(Ctrl_2).w
+		btst	#bitR,(Ctrl_2).w
 		beq.s	loc_111C0
 		bsr.w	Tails_RollRight
 
@@ -23531,7 +23531,7 @@ Tails_ChgJumpDir:			; CODE XREF: ROM:00010EA4p
 		btst	#4,status(a0)
 		bne.s	loc_112CA
 		move.w	x_vel(a0),d0
-		btst	#2,(Ctrl_2).w
+		btst	#bitL,(Ctrl_2).w
 		beq.s	loc_112B0
 		bset	#0,status(a0)
 		sub.w	d5,d0
@@ -23543,7 +23543,7 @@ Tails_ChgJumpDir:			; CODE XREF: ROM:00010EA4p
 
 loc_112B0:				; CODE XREF: Tails_ChgJumpDir+1Cj
 					; Tails_ChgJumpDir+2Cj
-		btst	#3,(Ctrl_2).w
+		btst	#bitR,(Ctrl_2).w
 		beq.s	loc_112C6
 		bclr	#0,status(a0)
 		add.w	d5,d0
@@ -23636,7 +23636,7 @@ loc_1134E:				; CODE XREF: Tails_LevelBoundaries+3Ej
 		bne.w	KillTails
 		cmpi.w	#$2000,x_pos(a0)
 		bcs.w	KillTails
-		clr.b	(Last_lamp).w
+		clr.b	($FFFFFE30).w
 		move.w	#1,($FFFFFE02).w
 		move.w	#$103,(Current_ZoneAndAct).w
 		rts
@@ -23668,7 +23668,7 @@ loc_1139A:				; CODE XREF: Tails_Roll+Aj
 		move.b	(Ctrl_2).w,d0
 		andi.b	#$C,d0
 		bne.s	locret_113B2
-		btst	#1,(Ctrl_2).w
+		btst	#bitDn,(Ctrl_2).w
 		bne.s	loc_113B4
 
 locret_113B2:				; CODE XREF: Tails_Roll+4j
@@ -23705,7 +23705,7 @@ locret_113F0:				; CODE XREF: Tails_Roll+5Cj
 Tails_Jump:				; CODE XREF: ROM:00010E7Cp
 					; ROM:Obj02_MdRollp
 		move.b	(Ctrl_2_Press).w,d0
-		andi.b	#$70,d0	; 'p'
+		andi.b	#btnABC,d0	; 'p'
 		beq.w	locret_11496
 		moveq	#0,d0
 		move.b	angle(a0),d0
@@ -23777,7 +23777,7 @@ loc_114B6:				; CODE XREF: Tails_JumpHeight+10j
 		cmp.w	y_vel(a0),d1
 		ble.s	locret_114CA
 		move.b	(Ctrl_2).w,d0
-		andi.b	#$70,d0	; 'p'
+		andi.b	#btnABC,d0	; 'p'
 		bne.s	locret_114CA
 		move.w	d1,y_vel(a0)
 
@@ -23805,7 +23805,7 @@ Tails_Spindash:				; CODE XREF: ROM:Obj02_MdNormalp
 		cmpi.b	#8,anim(a0)
 		bne.s	locret_1150E
 		move.b	(Ctrl_2_Press).w,d0
-		andi.b	#$70,d0	; 'p'
+		andi.b	#btnABC,d0	; 'p'
 		beq.w	locret_1150E
 		move.b	#9,anim(a0)
 		move.w	#$BE,d0	; '¾'
@@ -23840,7 +23840,7 @@ loc_1154E:				; CODE XREF: Tails_Spindash+6Cj
 
 loc_11556:				; CODE XREF: Tails_Spindash+3Cj
 		move.b	(Ctrl_2_Press).w,d0
-		andi.b	#$70,d0	; 'p'
+		andi.b	#btnABC,d0	; 'p'
 		beq.w	loc_11564
 		nop
 
@@ -26694,7 +26694,7 @@ Obj79_Init:				; DATA XREF: ROM:Obj79_Indexo
 		bclr	#7,art_tile(a2,d0.w)
 		btst	#0,art_tile(a2,d0.w)
 		bne.s	loc_13536
-		move.b	(Last_lamp).w,d1
+		move.b	($FFFFFE30).w,d1
 		andi.b	#$7F,d1	; ''
 		move.b	subtype(a0),d2
 		andi.b	#$7F,d2	; ''
@@ -26713,7 +26713,7 @@ Obj79_Main:				; CODE XREF: ROM:00013534j
 		bne.w	locret_135CA
 		tst.b	(Object_control).w
 		bmi.w	locret_135CA
-		move.b	(Last_lamp).w,d1
+		move.b	($FFFFFE30).w,d1
 		andi.b	#$7F,d1	; ''
 		move.b	subtype(a0),d2
 		andi.b	#$7F,d2	; ''
@@ -34438,12 +34438,12 @@ Obj09_Display:				; CODE XREF: ROM:0001A464j
 
 Obj09_Move:				; CODE XREF: ROM:0001A45Cp
 					; ROM:0001A46Ap
-		btst	#2,(Ctrl_1_Logical).w
+		btst	#bitL,(Ctrl_1_Logical).w
 		beq.s	loc_1A4A4
 		bsr.w	Obj09_MoveLeft
 
 loc_1A4A4:				; CODE XREF: Obj09_Move+6j
-		btst	#3,(Ctrl_1_Logical).w
+		btst	#bitR,(Ctrl_1_Logical).w
 		beq.s	loc_1A4B0
 		bsr.w	Obj09_MoveRight
 
