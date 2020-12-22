@@ -64,6 +64,7 @@ palid_Ending:		equ (ptr_Pal_Ending-PalPointers)/8	; $13
 ; ---------------------------------------------------------------------------
 ; Object Status Table offsets (for everything between Object_RAM and Primary_Collision)
 ; ---------------------------------------------------------------------------
+id =			  0
 render_flags =		  1 ; bitfield ; bit 7 = onscreen flag, bit 0 = x mirror, bit 1 = y mirror, bit 2 = coordinate system
 art_tile =		  2 ; and 3 ; start of sprite's art
 mappings =		  4 ; and 5 and 6 and 7
@@ -108,9 +109,9 @@ invulnerable_time  = 	$30 ; and $31 ; time remaining until you stop blinking
 invincibility_time  = 	$32 ; and $33 ; remaining
 speedshoes_time  = 	$34 ; and $35 ; remaining
 next_tilt  = 		$36 ; angle on ground in front of sprite
-tilt  = 			$37 ; angle on ground
+tilt  = 		$37 ; angle on ground
 stick_to_convex  = 	$38 ; 0 for normal, 1 to make Sonic stick to convex surfaces like the rotating discs in Sonic 1 and 3 (unused in Sonic 2 but fully functional)
-spindash_flag  = 		$39 ; 0 for normal, 1 for charging a spindash or forced rolling
+spindash_flag  = 	$39 ; 0 for normal, 1 for charging a spindash or forced rolling
 spindash_counter  = 	$3A ; and $3B
 jumping  = 		$3C
 interact  = 		$3D ; RAM address of the last object Sonic stood on, minus $FFFFB000 and divided by $40
@@ -125,17 +126,17 @@ parent  = 		$3E ; and $3F ; address of object that owns or spawned this one, if 
 ; ---------------------------------------------------------------------------
 ; unknown or inconsistently used offsets that are not applicable to sonic/tails:
 ; (provided because rearrangement of the above values sometimes r = ires making space in here too)
-objoff_A  = 		2+x_pos ; note: x_pos can be 4 bytes, but sometimes the last 2 bytes of x_pos are used for other unrelated things
-objoff_B  = 		3+x_pos
-objoff_E  = 		2+y_pos
-objoff_F  = 		3+y_pos
-objoff_14  = 		$14
-objoff_15  = 		$15
-objoff_1F  = 		$1F
-objoff_27  = 		$27
-objoff_28  = 		$28 ; overlaps subtype, but a few objects use it for other things anyway
-objoff_29  =  $29
-objoff_2A  =  $2A
+objoff_A = 2+x_pos ; note: x_pos can be 4 bytes, but sometimes the last 2 bytes of x_pos are used for other unrelated things
+objoff_B = 3+x_pos
+objoff_E = 2+y_pos
+objoff_F = 3+y_pos
+objoff_14 = $14
+objoff_15 = $15
+objoff_1F = $1F
+objoff_27 = $27
+objoff_28 = $28 ; overlaps subtype, but a few objects use it for other things anyway
+objoff_29 = $29
+objoff_2A = $2A
 objoff_2B = $2B
 objoff_2C = $2C
 objoff_2D = $2D
@@ -176,12 +177,19 @@ Decomp_Buffer:			equ	$FFFFAA00		; $200 bytes
 Primary_Collision:		equ	$FFFFD000
 Secondary_Collision:		equ	$FFFFD600
 Collision_addr:			equ	$FFFFF796		; 4 bytes
+Ring_amount:			equ 	$FFFFFE20		; 2 bytes - rings
+Ring_byte:			equ 	v_rings+1		; low byte for rings
+Time:				equ 	$FFFFFE22		; 4 bytes - time
+Time_minute:			equ 	Time+1			; time - minutes ($FFFFFE23, listed like this in case of RAM shifting)
+Time_seconds:			equ 	Time_minute+1		; time - seconds ($FFFFFE24, listed like this in case of RAM shifting)
+Time_centisecond:		equ 	Time_seconds+1		; time - centiseconds ($FFFFFE25, listed like this in case of RAM shifting)
+v_score:		equ $FFFFFE26	; score (4 bytes)
 
 ; ---------------------------------------------------------------------------
 ; Object variables
 Sprite_Table_Input:		equ	$FFFFAC00		; $400 bytes
 Ring_Positions:			equ	$FFFFE800		; $600 bytes
-Object_RAM:			equ	$FFFFB000 		; through $FFFFD5FF, each object takes up $40 bytes
+Object_RAM:			equ	$FFFFB000 		; through $FFFFD5FF, each object takes up $40 bytes of this RAM
 MainCharacter:			equ	Object_RAM 		; Usually where the Sonic object is located - $FFFFB000, listed like this in case of RAM shifting
 Sidekick:			equ	Object_RAM+$40 		; Usually where the Tails object is located - $FFFFB040, listed like this in case of RAM shifting
 Tails_Tails:			equ	Sidekick+$40		; Usually where Tails' tail object is located - $FFFFB080, listed like this in case of RAM shifting
@@ -266,16 +274,23 @@ RNG_seed:			equ	$FFFFF636		; 4 bytes
 Game_paused:			equ	$FFFFF63A		; 2 bytes
 DMA_data_thunk:			equ	$FFFFF640		; 2 bytes
 Hint_flag:			equ	$FFFFF644		; 2 bytes
-WaterHeight:			equ	$FFFFF646		; 2 bytes
-AverageWtrHeight:		equ	$FFFFF648               ; 2 bytes
-TargetWaterHeight:		equ	$FFFFF64A		; 2 bytes
-Water_on:			equ	$FFFFF64C 		; 1 byte
-Water_routine:			equ	$FFFFF64D		; 1 byte
-Water_move:			equ 	$FFFFF64E               ; 1 byte
 Do_Updates_in_H_int:		equ	$FFFFF64F		; 1 byte
 unk_F662:			equ	$FFFFF662		; 2 bytes - unused but cleared on the SEGA screen
 Level_started_flag:		equ	$FFFFF711		; 1 byte - used to determine if the HUD should display or not
 Screen_redraw_flag:		equ	$FFFFF720		; 1 byte
+Shield_flag:			equ 	$FFFFFE2C		; 1 byte - shield status (00 = no; 01 = yes)
+Invinc_flag:			equ 	$FFFFFE2D		; 1 byte - invinciblity status (00 = no; 01 = yes)
+Shoes_flag:			equ 	$FFFFFE2E		; 1 byte - speed shoes status (00 = no; 01 = yes)
+
+; ---------------------------------------------------------------------------
+; Water variables
+AmountOfAir:			equ 	$FFFFFE14		; 2 bytes - air remaining while underwater
+WaterHeight:			equ	$FFFFF646		; 2 bytes
+AverageWtrHeight:		equ	WaterHeight+2           ; 2 bytes - $FFFFF648, listed like this in case of RAM shifting
+TargetWaterHeight:		equ	AverageWtrHeight+2	; 2 bytes - $FFFFF64A, listed like this in case of RAM shifting
+Water_on:			equ	TargetWaterHeight+2	; 1 byte - $FFFFF64C, listed like this in case of RAM shifting
+Water_routine:			equ	Water_on+1		; 1 byte - $FFFFF64D, listed like this in case of RAM shifting
+Water_move:			equ 	Water_routine+1         ; 1 byte - $FFFFF64E, listed like this in case of RAM shifting
 Water_flag:			equ	$FFFFF730		; 1 byte
 
 ; ---------------------------------------------------------------------------
@@ -293,8 +308,8 @@ Tails_CPU_routine:		equ	$FFFFF708 ; 2 bytes - used to determine what routine the
 
 ; ---------------------------------------------------------------------------
 ; Object placement variables
-Object_Respawn_Table:		equ	$FFFFFC00
 Sprite_Table:			equ	$FFFFF800		; $200 bytes
+Sprite_Table_End:               equ	Sprite_Table+$200
 Sprite_Table_2:			equ	$FFFFDD00 		; Sprite attribute table buffer for the bottom split screen in 2-player mode
 Obj_placement_routine:		equ	$FFFFF76C		; 2 bytes
 Camera_X_pos_last:		equ	$FFFFF76E		; 2 bytes
@@ -362,6 +377,7 @@ VDP_Command_Buffer:		equ	$FFFFDC00 		; 2 bytes - stores VDP commands to issue th
 VDP_Reg0_Val:			equ	$FFFFF60C 		; 2 bytes
 VDP_Command_Buffer_Slot:	equ	$FFFFDCFC 		; 4 bytes - stores the address of the next open slot for a queued VDP command
 Horiz_Scroll_Buf:		equ	$FFFFE000               ; 2 bytes
+
 Vscroll_Factor:			equ	$FFFFF616               ; 4 bytes
 Hint_counter_reserve:		equ	$FFFFF624 		; 2 bytes - Must contain a VDP command word, preferably a write to register $0A. Executed every vertical blank.
 Vint_routine:			equ	$FFFFF62A		; 1 byte
