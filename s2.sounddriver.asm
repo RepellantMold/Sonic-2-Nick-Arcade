@@ -79,7 +79,7 @@ ptr_mus93:	dc.l Mus_Emerald
 ;ptr_mus9D:	dc.l Music9D
 ;ptr_mus9E:	dc.l Music9E
 ;ptr_mus9F:	dc.l Music9F
-ptr_musend:
+ptr_musend:     even
 ; ---------------------------------------------------------------------------
 ; Type of sound	being played ($90 = music; $70 = normal	sound effect)
 ; ---------------------------------------------------------------------------
@@ -119,7 +119,7 @@ loc_71B5A:
 ; ===========================================================================
 
 loc_71B82:
-		lea	(SoundDriver_RAM&$FFFFFF).l,a6
+		lea	(SoundDriver_RAM).l,a6
 		clr.b	$E(a6)
 		tst.b	PauseSound(a6)		; is music paused?
 		bne.w	PauseMusic		; if yes, branch
@@ -661,11 +661,11 @@ ptr_flgend:
 ; loc_71FAC: Sound_E1:
 PlaySegaSound:
 		move.b	#$88,(Z80_DAC_Sample).l		; play DAC sample $88 (normally hi-timpani)
-		startZ80				; start	the Z80
+		move.w	#0,(Z80_Bus_Request).l		; start	the Z80
 		move.w	#$11,d1
 
 loc_71FC0:
-		move.w	#-1,d0
+		move.w	#$FFFF,d0
 
 loc_71FC4:
 		nop
@@ -2423,10 +2423,10 @@ ptr_sndCC:	dc.l SoundCC
 ptr_sndCD:	dc.l SoundCD
 ptr_sndCE:	dc.l SoundCE
 ptr_sndCF:	dc.l SoundCF
-ptr_sndend:
+ptr_sndend:     even
 SoundD0Index:
 ptr_sndD0:	dc.l SoundD0
-ptr_specend:
+ptr_specend:    even
 SoundA0:	incbin	"sound/sfx/SndA0 - Jump.bin"
 		even
 SoundA1:	incbin	"sound/sfx/SndA1 - Lamppost.bin"
