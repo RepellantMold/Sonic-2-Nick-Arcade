@@ -139,25 +139,25 @@ InitValues:	dc.w $8000		; DATA XREF: ROM:00000216t
 		dc.l VDP_control_port	; VDP control port
 
 		dc.b   4,$14,$30,$3C	; 0 ; values for VDP registers
-		dc.b   7,$6C,  0,  0	; 4
-		dc.b   0,  0,$FF,  0	; 8
-		dc.b $81,$37,  0,  1	; 12
-		dc.b   1,  0,  0,$FF	; 16
-		dc.b $FF,  0,  0,$80	; 20
+		dc.b   7,$6C,0,0	; 4
+		dc.b   0,0,$FF,0	; 8
+		dc.b $81,$37,0,1	; 12
+		dc.b   1,0,0,$FF	; 16
+		dc.b $FF,0,0,$80	; 20
 
 		dc.l $40000080		; value	for VRAM fill
 		; Z80 instructions
 		dc.b $AF		; xor	a
-		dc.b $01, $D9, $1F	; ld	bc,1FD9h
-		dc.b $11, $27, $00	; ld	de,0027h
-		dc.b $21, $26, $00	; ld	hl,0026h
+		dc.b $01,$D9,$1F	; ld	bc,1FD9h
+		dc.b $11,$27,$00	; ld	de,0027h
+		dc.b $21,$26,$00	; ld	hl,0026h
 		dc.b $F9		; ld	sp,hl
 		dc.b $77		; ld	(hl),a
-		dc.b $ED, $B0		; ldir
-		dc.b $DD, $E1		; pop	ix
-		dc.b $FD, $E1		; pop	iy
-		dc.b $ED, $47		; ld	i,a
-		dc.b $ED, $4F		; ld	r,a
+		dc.b $ED,$B0		; ldir
+		dc.b $DD,$E1		; pop	ix
+		dc.b $FD,$E1		; pop	iy
+		dc.b $ED,$47		; ld	i,a
+		dc.b $ED,$4F		; ld	r,a
 		dc.b $D1		; pop	de
 		dc.b $E1		; pop	hl
 		dc.b $F1		; pop	af
@@ -169,8 +169,8 @@ InitValues:	dc.w $8000		; DATA XREF: ROM:00000216t
 		dc.b $F1		; pop	af
 		dc.b $F9		; ld	sp,hl
 		dc.b $F3		; di
-		dc.b $ED, $56		; im1
-		dc.b $36, $E9		; ld	(hl),e9h
+		dc.b $ED,$56		; im1
+		dc.b $36,$E9		; ld	(hl),e9h
 		dc.b $E9		; jp	(hl)
 
 		dc.w $8104		; VDP display mode
@@ -178,7 +178,7 @@ InitValues:	dc.w $8000		; DATA XREF: ROM:00000216t
 		dc.l $C0000000		; value	for CRAM Write mode
 		dc.l $40000010		; value	for VSRAM write	mode
 
-		dc.b  $9F, $BF,	$DF, $FF; 0 ; values for PSG channel volumes
+		dc.b $9F,$BF,$DF,$FF	; values for PSG channel volumes
 ; ===========================================================================
 
 GameProgram:

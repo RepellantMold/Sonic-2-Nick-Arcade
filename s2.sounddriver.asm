@@ -2444,6 +2444,13 @@ SoundCF:	incbin	"sound/sfx/SndCF - Signpost.bin"
 		even
 SoundD0:	incbin	"sound/sfx/SndD0 - Waterfall.bin"
 		even
-		bankalign Size_of_SegaPCM		; The DAC driver doesn't change banks automatically
+		;bankalign Size_of_SegaPCM		; The DAC driver doesn't change banks automatically
 Snd_Sega:	incbin	"sound/PCM/SEGA.bin"		; so we need to make it not cross a $8000 byte boundary
 Snd_Sega_End:	even
+
+		if Snd_Sega_End-Snd_Sega>$8000
+			inform 3,"Sega sound must fit within $8000 bytes, but you have a $%h byte Sega sound.",SegaPCM_End-SegaPCM
+		endc
+		if Snd_Sega_End-Snd_Sega>Size_of_SegaPCM
+			inform 3,"Size_of_SegaPCM = $%h, but you have a $%h byte Sega sound.",Size_of_SegaPCM,SegaPCM_End-SegaPCM
+		endc
