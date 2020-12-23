@@ -60,28 +60,6 @@ palid_LZ4SonWat:	equ (ptr_Pal_LZ4SonWat-PalPointers)/8	; $10
 palid_SSResult:		equ (ptr_Pal_SSResult-PalPointers)/8	; $11
 palid_Continue:		equ (ptr_Pal_Continue-PalPointers)/8	; $12
 palid_Ending:		equ (ptr_Pal_Ending-PalPointers)/8	; $13
-; Background music
-bgm__First:	equ $81
-bgm_GHZ:	equ ((ptr_mus81-MusicIndex)/4)+bgm__First
-bgm_LZ:		equ ((ptr_mus82-MusicIndex)/4)+bgm__First
-bgm_CPZ:	equ ((ptr_mus83-MusicIndex)/4)+bgm__First
-bgm_EHZ:	equ ((ptr_mus84-MusicIndex)/4)+bgm__First
-bgm_HPZ:	equ ((ptr_mus85-MusicIndex)/4)+bgm__First
-bgm_HTZ:	equ ((ptr_mus86-MusicIndex)/4)+bgm__First
-bgm_Invincible:	equ ((ptr_mus87-MusicIndex)/4)+bgm__First
-bgm_ExtraLife:	equ ((ptr_mus88-MusicIndex)/4)+bgm__First
-bgm_SS:		equ ((ptr_mus89-MusicIndex)/4)+bgm__First
-bgm_Title:	equ ((ptr_mus8A-MusicIndex)/4)+bgm__First
-bgm_Ending:	equ ((ptr_mus8B-MusicIndex)/4)+bgm__First
-bgm_Boss:	equ ((ptr_mus8C-MusicIndex)/4)+bgm__First
-bgm_FZ:		equ ((ptr_mus8D-MusicIndex)/4)+bgm__First
-bgm_GotThrough:	equ ((ptr_mus8E-MusicIndex)/4)+bgm__First
-bgm_GameOver:	equ ((ptr_mus8F-MusicIndex)/4)+bgm__First
-bgm_Continue:	equ ((ptr_mus90-MusicIndex)/4)+bgm__First
-bgm_Credits:	equ ((ptr_mus91-MusicIndex)/4)+bgm__First
-bgm_Drowning:	equ ((ptr_mus92-MusicIndex)/4)+bgm__First
-bgm_Emerald:	equ ((ptr_mus93-MusicIndex)/4)+bgm__First
-bgm__Last:	equ ((ptr_musend-MusicIndex-4)/4)+bgm__First
 ; Sound effects
 sfx__First:	equ $A0
 sfx_Jump:	equ ((ptr_sndA0-SoundIndex)/4)+sfx__First

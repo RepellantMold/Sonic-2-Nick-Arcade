@@ -1,0 +1,5 @@
+
+*.log
+*.lst
+s2built.bin
+s2built.prev.bin

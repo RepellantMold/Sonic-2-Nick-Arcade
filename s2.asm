@@ -3871,7 +3871,7 @@ loc_3330:
 		bsr.w	ShowVDPGraphics
 		moveq	#palid_Title,d0
 		bsr.w	PalLoad1
-		move.b	#bgm_Title,d0
+		move.b	#$8A,d0
 		bsr.w	PlaySFX
 		move.b	#0,(Debug_mode_flag).w
 		move.w	#0,(Two_player_mode).w
@@ -4034,7 +4034,7 @@ loc_354C:				; CODE XREF: ROM:00003532j
 
 loc_355A:				; CODE XREF: ROM:00003538j
 		move.b	#$1C,(Game_Mode).w	; this one just makes the screen turn into a horizontal
-		move.b	#bgm_Credits,d0	; strip of lines with the credits music playing on Fusion
+		move.b	#$91,d0	; strip of lines with the credits music playing on Fusion
 		bsr.w	PlaySFX
 		move.w	#0,($FFFFFFF4).w
 		rts
@@ -4438,13 +4438,13 @@ loc_3AFC:				; CODE XREF: UnknownSub_4+12j
 ; ===========================================================================
 ; Same as Sonic 1
 MusicList:
-		dc.b bgm_GHZ	; GHZ
-		dc.b bgm_LZ	; LZ
-		dc.b bgm_CPZ	; CPZ
-		dc.b bgm_EHZ	; EHZ
-		dc.b bgm_HPZ	; HPZ
-		dc.b bgm_HTZ	; HTZ
-		dc.b bgm_FZ	; Ending
+		dc.b $81	; GHZ
+		dc.b $82	; LZ
+		dc.b $83	; CPZ
+		dc.b $84	; EHZ
+		dc.b $85	; HPZ
+		dc.b $86	; HTZ
+		dc.b $8D	; Ending
 		even
 ; ===========================================================================
 
@@ -5762,7 +5762,7 @@ SS_ClrNemRam:				; CODE XREF: ROM:000050CEj
 		bsr.w	PalCycle_S1SS
 		clr.w	($FFFFF780).w
 		move.w	#$40,($FFFFF782).w ; '@'
-		move.w	#bgm_SS,d0	; 'â'
+		move.w	#$89,d0	; 'â'
 		bsr.w	PlayMusic
 		move.w	#0,(Demo_button_index).w
 		lea	(Demo_Index).l,a1
@@ -5857,7 +5857,7 @@ loc_5214:				; CODE XREF: ROM:00005208j
 		move.w	(Ring_amount).w,d0
 		mulu.w	#$A,d0
 		move.w	d0,($FFFFF7D4).w
-		move.w	#bgm_GotThrough,d0
+		move.w	#$8E,d0
 		jsr	(PlaySFX).l
 		lea	(Object_RAM).w,a1
 		moveq	#0,d0
@@ -9580,7 +9580,7 @@ loc_7672:
 		move.w	#$280,y_pos(a1)
 
 loc_7692:
-		move.w	#bgm_Boss,d0
+		move.w	#$8C,d0
 		bsr.w	PlayMusic
 		move.b	#1,(Current_Boss_ID).w
 		addq.b	#2,(Dynamic_Resize_Routine).w
@@ -9636,7 +9636,7 @@ loc_76EA:
 		move.b	#$77,id(a1)	; load Obj77 (LZ boss in Sonic 1, blank slot here)
 
 loc_770C:
-		move.w	#bgm_Boss,d0
+		move.w	#$8C,d0
 		bsr.w	PlayMusic
 		move.b	#1,(Current_Boss_ID).w
 		addq.b	#2,(Dynamic_Resize_Routine).w
@@ -9871,7 +9871,7 @@ DynResize_EHZ2_01:
 		move.w	#$426,y_pos(a1)
 
 loc_7946:
-		move.w	#bgm_Boss,d0
+		move.w	#$8C,d0
 		bsr.w	PlayMusic
 		move.b	#1,(Current_Boss_ID).w
 		moveq	#PLCID_Boss,d0
@@ -9936,7 +9936,7 @@ loc_79AA:
 		move.b	#$7A,(a1)	; load Obj7A (SLZ boss in Sonic 1, blank slot here)
 
 loc_79BC:
-		move.w	#bgm_Boss,d0
+		move.w	#$8C,d0
 		bsr.w	PlayMusic
 		move.b	#1,(Current_Boss_ID).w
 		addq.b	#2,(Dynamic_Resize_Routine).w
@@ -10017,7 +10017,7 @@ loc_7A48:
 		addq.b	#2,(Dynamic_Resize_Routine).w
 
 loc_7A64:
-		move.w	#bgm_Boss,d0
+		move.w	#$8C,d0
 		bsr.w	PlayMusic
 		move.b	#1,(Current_Boss_ID).w
 		moveq	#PLCID_Boss,d0
@@ -13737,7 +13737,7 @@ Touch_ConsumeRing:
 loc_A90C:
 		addq.b	#1,($FFFFFE12).w
 		addq.b	#1,($FFFFFE1C).w
-		move.w	#bgm_ExtraLife,d0
+		move.w	#$88,d0
 
 loc_A918:
 		jmp	(PlaySFX).l
@@ -14364,14 +14364,14 @@ Monitor_SonicLife:			; CODE XREF: ROM:0000B11Aj
 					; DATA XREF: ...
 		addq.b	#1,($FFFFFE12).w
 		addq.b	#1,($FFFFFE1C).w
-		move.w	#bgm_ExtraLife,d0	; 'à'
+		move.w	#$88,d0	; 'à'
 		jmp	(PlayMusic).l
 ; ===========================================================================
 
 Monitor_TailsLife:			; DATA XREF: ROM:0000B0CAo
 		addq.b	#1,($FFFFFE12).w; basically a duplicate of above
 		addq.b	#1,($FFFFFE1C).w
-		move.w	#bgm_ExtraLife,d0	; 'à'
+		move.w	#$88,d0	; 'à'
 		jmp	(PlayMusic).l
 ; ===========================================================================
 
@@ -14419,7 +14419,7 @@ Monitor_Invincibility:			; DATA XREF: ROM:0000B0D4o
 		bne.s	locret_B1A8
 		cmpi.w	#$C,(AmountOfAir).w
 		bls.s	locret_B1A8
-		move.w	#bgm_Invincible,d0	; 'á'
+		move.w	#$87,d0	; 'á'
 		jmp	(PlayMusic).l
 ; ===========================================================================
 
@@ -15243,7 +15243,7 @@ loc_BD1E:				; CODE XREF: ROM:0000BD02j
 		bne.w	DeleteObject
 		addq.b	#2,routine(a0)
 		clr.b	(Control_locked).w
-		move.w	#bgm_FZ,d0	; 'ç'
+		move.w	#$8D,d0	; 'ç'
 		jmp	(PlayMusic).l
 ; ===========================================================================
 		addq.w	#2,(Camera_Max_X_pos).w
@@ -19987,7 +19987,7 @@ loc_F140:				; CODE XREF: GotThroughAct+42j
 		move.w	(Ring_amount).w,d0
 		mulu.w	#$A,d0
 		move.w	d0,($FFFFF7D4).w
-		move.w	#bgm_GotThrough,d0	; 'é'
+		move.w	#$8E,d0	; 'é'
 		jsr	(PlaySFX).l
 
 locret_F15E:				; CODE XREF: ROM:0000F0C8j
@@ -20986,12 +20986,12 @@ Obj01_Modes:	dc.w Obj01_MdNormal-Obj01_Modes
 ; Identical to the seccond music playlist when
 ; the invincibility wears off in Sonic 1
 MusicList_Sonic:
-		dc.b bgm_GHZ
-		dc.b bgm_LZ
-		dc.b bgm_CPZ
-		dc.b bgm_EHZ
-		dc.b bgm_HPZ
-		dc.b bgm_HTZ
+		dc.b $81
+		dc.b $82
+		dc.b $83
+		dc.b $84
+		dc.b $85
+		dc.b $86
 		; The ending doesn't get an entry
 		even
 
@@ -22472,7 +22472,7 @@ Sonic_GameOver:				; CODE XREF: ROM:Obj01_Deathp
 		clr.b	($FFFFFE1A).w
 
 loc_10876:				; CODE XREF: Sonic_GameOver+80j
-		move.w	#bgm_GameOver,d0	; 'è'
+		move.w	#$8F,d0	; 'è'
 		jsr	(PlayMusic).l
 		moveq	#PLCID_GameOver,d0
 		jmp	(LoadPLC).l
@@ -22911,12 +22911,12 @@ Obj02_Modes:	dc.w Obj02_MdNormal-Obj02_Modes	; DATA XREF: ROM:Obj02_Modeso
 		dc.w Obj02_MdJump2-Obj02_Modes
 ; This is the same as Sonic's
 MusicList_Tails:
-		dc.b bgm_GHZ
-		dc.b bgm_LZ
-		dc.b bgm_CPZ
-		dc.b bgm_EHZ
-		dc.b bgm_HPZ
-		dc.b bgm_HTZ
+		dc.b $81
+		dc.b $82
+		dc.b $83
+		dc.b $84
+		dc.b $85
+		dc.b $86
 		; The ending doesn't get an entry
                 even
 
@@ -25024,7 +25024,7 @@ Obj0A_Countdown:			; CODE XREF: ROM:00011EC8j
 		cmpi.w	#$C,d0
 		bhi.s	loc_12170
 		bne.s	loc_12152
-		move.w	#bgm_Drowning,d0	; 'í'
+		move.w	#$92,d0	; 'í'
 		jsr	(PlayMusic).l
 
 loc_12152:				; CODE XREF: ROM:00012146j
@@ -25164,20 +25164,20 @@ ResumeMusic:				; These lines below are a leftover from Sonic 1,
 					; these lines weren't changed in Simon Wai either.
 		cmpi.w	#12,(AmountOfAir).w		; is there more than 12 seconds of air left?
 		bhi.s	loc_12310			; if yes, branch
-		move.w	#bgm_LZ,d0			; Play Labyrinth Zone's music (incorrect when playing Hidden Palace zone)
+		move.w	#$82,d0				; Play Labyrinth Zone's music (incorrect when playing Hidden Palace zone)
 		cmpi.w	#$103,(Current_ZoneAndAct).w	; Is this Labyrinth Zone Act 4? (there's no water in Labyrinth Zone Act 4, so this doesn't make any sense)
 		bne.s	loc_122F6			; if not, branch
-		move.w	#bgm_HTZ,d0			; Otherwise, play Scrap Brain's music
+		move.w	#$86,d0				; Otherwise, play Scrap Brain's music
 
 loc_122F6:				; CODE XREF: ResumeMusic+12j
 		tst.b	(Invinc_flag).w			; is Sonic invincible?
 		beq.s	loc_12300			; if he isn't, branch
-		move.w	#bgm_Invincible,d0		; play the invincibility music
+		move.w	#$87,d0				; play the invincibility music
 
 loc_12300:				; CODE XREF: ResumeMusic+1Cj
 		tst.b	(Current_Boss_ID).w		; is Sonic at a boss?
 		beq.s	loc_1230A			; if not, branch
-		move.w	#bgm_Boss,d0			; play the boss music
+		move.w	#$8C,d0				; play the boss music
 
 loc_1230A:				; CODE XREF: ResumeMusic+26j
 		jsr	(PlayMusic).l			; play the music
@@ -32677,7 +32677,7 @@ loc_18FD8:				; CODE XREF: ROM:00018FC6j
 
 loc_18FE0:				; CODE XREF: ROM:00018FC8j
 		clr.w	y_vel(a0)
-		move.w	#bgm_GHZ,d0	; 'Å'
+		move.w	#$81,d0		; 'Å'
 		jsr	(PlayMusic).l
 
 loc_18FEE:				; CODE XREF: ROM:00018FB8j
@@ -34877,7 +34877,7 @@ Obj09_Chk1Up:				; CODE XREF: Obj09_ChkItems+3Ej
 Obj09_Get1Up:				; CODE XREF: Obj09_ChkItems+80j
 		addq.b	#1,($FFFFFE12).w	; add 1 to the number of lives
 		addq.b	#1,($FFFFFE1C).w        ; add 1 to the lives counter
-		move.w	#bgm_ExtraLife,d0	; 'à'
+		move.w	#$88,d0			; 'à'
 		jsr	(PlayMusic).l
 		moveq	#0,d4
 		rts
@@ -34907,7 +34907,7 @@ Obj09_GetEmer:				; CODE XREF: Obj09_ChkItems+B0j
 
 ; loc_1A862:
 Obj09_NoEmer:				; CODE XREF: Obj09_ChkItems+C0j
-		move.w	#bgm_Emerald,d0	; 'ì'
+		move.w	#$93,d0	; 'ì'
 		jsr	(PlaySFX).l
 		moveq	#0,d4
 		rts
@@ -35670,7 +35670,7 @@ loc_1B214:				; CODE XREF: AddPoints+14j
 		bmi.s	locret_1B23C
 		addq.b	#1,($FFFFFE12).w
 		addq.b	#1,($FFFFFE1C).w
-		move.w	#bgm_ExtraLife,d0	; 'à'
+		move.w	#$88,d0	; 'à'
 		jmp	(PlayMusic).l
 ; ===========================================================================
 
