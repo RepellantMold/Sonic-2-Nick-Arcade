@@ -25,13 +25,6 @@ stopZ80 macro
 startZ80 macro
 	move.w	#0,(Z80_Bus_Request).l
      endm
-; Macros to disable/enable interrupts
-disable_ints:	macro
-		move	#$2700,sr
-		endm
-enable_ints:	macro
-		move	#$2300,sr
-		endm
 
 ; tells the VDP to fill a region of VRAM with a certain byte
 dmaFillVRAM macro byte,addr,length
