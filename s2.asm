@@ -1562,12 +1562,12 @@ RunPLC:					; CODE XREF: Pal_FadeTo+2Ep
 
 loc_16FE:				; CODE XREF: RunPLC+1Cj
 		andi.w	#$7FFF,d2
-		move.w	d2,($FFFFF6F8).w
-		bsr.w	NemesisDec4
-		move.b	(a0)+,d5
-		asl.w	#8,d5
-		move.b	(a0)+,d5
-		moveq	#$10,d6
+		move.w	d2,($FFFFF6F8).w	; This line causes a race condition where this value
+		bsr.w	NemesisDec4		; is set before the decompression starts and causes
+		move.b	(a0)+,d5		; the pointer to the routine to use decompressed output
+		asl.w	#8,d5			; to be 0, and since there's no data at 0.
+		move.b	(a0)+,d5		; This bug can be triggered if you ride up against the wall on HPZ 3
+		moveq	#$10,d6                 ; and also if you're at the bottom of CPZ 3 and you move the camera to 0520
 		moveq	#0,d0
 		move.l	a0,($FFFFF680).w
 		move.l	a3,($FFFFF6E0).w
@@ -10077,8 +10077,8 @@ locret_7AF2:
 ; ===========================================================================
 
 loc_7AF4:
-		cmpi.w	#$1EB0,(Camera_X_pos).w
-		bcs.s	locret_7B10
+		cmpi.w	#$1EB0,(Camera_X_pos).w ; is the camera's X position at $1EB0?
+		bcs.s	locret_7B10		; if not, return
 		bsr.w	SingleObjectLoad
 		bne.s	locret_7B10
 		move.b	#$83,(a1)		; load Obj83 (SBZ2 Eggman cutscene in Sonic 1, blank slot here)
@@ -10092,8 +10092,8 @@ locret_7B10:
 ; ===========================================================================
 
 loc_7B12:
-		cmpi.w	#$1F60,(Camera_X_pos).w
-		bcs.s	loc_7B2E
+		cmpi.w	#$1F60,(Camera_X_pos).w	; is camera's X position at $1F60?
+		bcs.s	loc_7B2E                ; if so, branch
 		bsr.w	SingleObjectLoad
 		bne.s	loc_7B28
 		move.b	#$82,(a1)		; load Obj82 (SBZ2 platforms in Sonic 1, blank slot here)
@@ -10107,13 +10107,13 @@ loc_7B2E:
 ; ===========================================================================
 
 loc_7B30:
-		cmpi.w	#$2050,(Camera_X_pos).w
-		bcs.s	loc_7B3A
+		cmpi.w	#$2050,(Camera_X_pos).w			; is the camera's X position $2050?
+		bcs.s	loc_7B3A				; if so, branch.
 		rts
 ; ===========================================================================
 
 loc_7B3A:
-		move.w	(Camera_X_pos).w,(Camera_Min_X_pos).w
+		move.w	(Camera_X_pos).w,(Camera_Min_X_pos).w	; move the camera's X position to the left boundary
 		rts
 ; ===========================================================================
 
@@ -11610,7 +11610,7 @@ locret_8D44:				; CODE XREF: ROM:00008D1Ej sub_8D2A+6j
 ; ===========================================================================
 
 loc_8D46:				; CODE XREF: ROM:00008D06j
-		bsr.w	ObjectFall
+		bsr.w	ObjectMoveAndFall
 		tst.b	render_flags(a0)
 		bpl.w	DeleteObject
 		bra.w	DisplaySprite
@@ -11712,7 +11712,7 @@ locret_8E2C:				; CODE XREF: ROM:00008E06j sub_8E12+6j
 ; ===========================================================================
 
 loc_8E2E:				; CODE XREF: ROM:00008DEEj
-		bsr.w	ObjectFall
+		bsr.w	ObjectMoveAndFall
 		tst.b	render_flags(a0)
 		bpl.w	DeleteObject
 		bra.w	DisplaySprite
@@ -12222,7 +12222,7 @@ loc_966E:				; DATA XREF: ROM:S1Obj_1E_Indexo
 		move.b	#4,priority(a0)
 		move.b	#5,collision_flags(a0)
 		move.b	#$C,width_pixels(a0)
-		bsr.w	ObjectFall
+		bsr.w	ObjectMoveAndFall
 		jsr	ObjHitFloor
 		tst.w	d1
 		bpl.s	locret_96C0
@@ -12307,7 +12307,7 @@ loc_9742:				; DATA XREF: ROM:S1Obj20_Indexo
 		move.b	#4,mapping_frame(a0)
 
 loc_978A:				; DATA XREF: ROM:00009740o
-		jsr	ObjectFall
+		jsr	ObjectMoveAndFall
 		tst.w	y_vel(a0)
 		bmi.s	loc_97C6
 		jsr	ObjHitFloor
@@ -12689,7 +12689,7 @@ loc_9CAA:				; CODE XREF: ROM:00009C82j
 loc_9CB8:				; DATA XREF: ROM:off_9AB6o
 		tst.b	render_flags(a0)
 		bpl.w	DeleteObject
-		bsr.w	ObjectFall
+		bsr.w	ObjectMoveAndFall
 		tst.w	y_vel(a0)
 		bmi.s	loc_9D0E
 		jsr	ObjHitFloor
@@ -12717,7 +12717,7 @@ loc_9D0E:				; CODE XREF: ROM:00009CC8j
 
 loc_9D12:				; CODE XREF: ROM:00009E60j
 					; DATA XREF: ROM:off_9AB6o
-		bsr.w	ObjectFall
+		bsr.w	ObjectMoveAndFall
 		move.b	#1,mapping_frame(a0)
 		tst.w	y_vel(a0)
 		bmi.s	loc_9D3C
@@ -12739,7 +12739,7 @@ loc_9D3C:				; CODE XREF: ROM:00009D20j
 
 loc_9D4E:				; CODE XREF: ROM:00009E06j
 					; DATA XREF: ROM:off_9AB6o
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		addi.w	#$18,y_vel(a0)
 		tst.w	y_vel(a0)
 		bmi.s	loc_9D8A
@@ -12816,7 +12816,7 @@ loc_9E0E:				; DATA XREF: ROM:off_9AB6o
 		bpl.s	loc_9E44
 		clr.w	x_vel(a0)
 		clr.w	objoff_32(a0)
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		addi.w	#$18,y_vel(a0)
 		bsr.w	sub_9F52
 		bsr.w	sub_9F7A
@@ -12841,7 +12841,7 @@ loc_9E48:				; DATA XREF: ROM:off_9AB6o
 ; ===========================================================================
 
 loc_9E64:				; DATA XREF: ROM:off_9AB6o
-		bsr.w	ObjectFall
+		bsr.w	ObjectMoveAndFall
 		move.b	#1,mapping_frame(a0)
 		tst.w	y_vel(a0)
 		bmi.s	loc_9E9E
@@ -12868,7 +12868,7 @@ loc_9EA2:				; DATA XREF: ROM:off_9AB6o
 		bpl.s	loc_9EBC
 		clr.w	x_vel(a0)
 		clr.w	objoff_32(a0)
-		bsr.w	ObjectFall
+		bsr.w	ObjectMoveAndFall
 		bsr.w	sub_9F52
 		bsr.w	sub_9F7A
 
@@ -12879,7 +12879,7 @@ loc_9EBC:				; CODE XREF: ROM:00009EA6j
 loc_9EC0:				; DATA XREF: ROM:off_9AB6o
 		bsr.w	sub_9F92
 		bpl.s	loc_9EFA
-		bsr.w	ObjectFall
+		bsr.w	ObjectMoveAndFall
 		move.b	#1,mapping_frame(a0)
 		tst.w	y_vel(a0)
 		bmi.s	loc_9EFA
@@ -12900,7 +12900,7 @@ loc_9EFA:				; CODE XREF: ROM:00009EC4j
 loc_9EFE:				; DATA XREF: ROM:off_9AB6o
 		bsr.w	sub_9F92
 		bpl.s	loc_9F4E
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		addi.w	#$18,y_vel(a0)
 		tst.w	y_vel(a0)
 		bmi.s	loc_9F38
@@ -13004,7 +13004,7 @@ loc_9FB2:				; DATA XREF: ROM:Obj29_Indexo
 loc_9FE0:				; DATA XREF: ROM:00009FB0o
 		tst.w	y_vel(a0)
 		bpl.w	DeleteObject
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		addi.w	#$18,y_vel(a0)
 		bra.w	DisplaySprite
 ; ===========================================================================
@@ -13093,7 +13093,7 @@ loc_A0E8:				; DATA XREF: ROM:Obj1F_Indexo
 		move.b	#3,priority(a0)
 		move.b	#6,collision_flags(a0)
 		move.b	#$15,width_pixels(a0)
-		bsr.w	ObjectFall
+		bsr.w	ObjectMoveAndFall
 		jsr	ObjHitFloor
 		tst.w	d1
 		bpl.s	locret_A13E
@@ -13173,7 +13173,7 @@ locret_A1FC:				; CODE XREF: ROM:0000A1D6j
 loc_A1FE:				; DATA XREF: ROM:0000A15Eo
 		subq.w	#1,objoff_30(a0)
 		bmi.s	loc_A252
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		bchg	#0,objoff_32(a0)
 		bne.s	loc_A238
 		move.w	x_pos(a0),d3
@@ -13262,7 +13262,7 @@ loc_A2A0:				; DATA XREF: ROM:0000A0E4o
 loc_A2DA:				; DATA XREF: ROM:0000A0E6o
 		lea	(Ani_Obj1F).l,a1
 		bsr.w	AnimateSprite
-		bsr.w	ObjectFall
+		bsr.w	ObjectMoveAndFall
 		move.w	(Camera_Max_Y_pos_now).w,d0
 		addi.w	#$E0,d0	; 'à'
 		cmp.w	y_pos(a0),d0
@@ -13415,7 +13415,7 @@ locret_A4FE:				; CODE XREF: ROM:0000A4A0j
 loc_A500:				; DATA XREF: ROM:0000A468o
 		subq.w	#1,objoff_32(a0)
 		bmi.s	loc_A536
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		tst.b	objoff_34(a0)
 		bne.s	locret_A558
 		move.w	(MainCharacter+x_pos).w,d0
@@ -13510,7 +13510,7 @@ loc_A5EC:				; DATA XREF: ROM:0000A570o
 		bne.s	loc_A620
 		move.b	#$87,collision_flags(a0)
 		move.b	#1,anim(a0)
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		lea	(Ani_Obj33).l,a1
 		bsr.w	AnimateSprite
 		move.w	(Camera_Max_Y_pos_now).w,d0
@@ -13534,7 +13534,7 @@ loc_A630:				; CODE XREF: ROM:0000A5CEj
 loc_A634:				; DATA XREF: ROM:0000A574o
 		tst.b	render_flags(a0)
 		bpl.s	loc_A630
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 
 loc_A63E:				; CODE XREF: ROM:0000A5C2j
 		lea	(Ani_Obj33).l,a1
@@ -13822,7 +13822,7 @@ loc_A9DE:				; CODE XREF: ROM:0000A952j
 
 loc_A9FA:				; DATA XREF: ROM:0000A92Eo
 		move.b	($FFFFFEC7).w,mapping_frame(a0)
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		addi.w	#$18,y_vel(a0)
 		bmi.s	loc_AA34
 		move.b	($FFFFFE0F).w,d0
@@ -14169,7 +14169,7 @@ loc_AF00:				; CODE XREF: ROM:0000AEF4j
 ; ===========================================================================
 
 loc_AF10:				; CODE XREF: ROM:0000AEDEj
-		bsr.w	ObjectFall
+		bsr.w	ObjectMoveAndFall
 		jsr	ObjHitFloor
 		tst.w	d1
 		bpl.w	loc_AFBA
@@ -14319,7 +14319,7 @@ loc_B092:				; DATA XREF: ROM:0000B04Ao
 sub_B098:				; CODE XREF: ROM:loc_B092p
 		tst.w	y_vel(a0)
 		bpl.w	loc_B0AC
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		addi.w	#$18,y_vel(a0)
 		rts
 ; ===========================================================================
@@ -14695,7 +14695,7 @@ loc_B72E:				; DATA XREF: ROM:Obj2B_Indexo
 loc_B768:				; DATA XREF: ROM:0000B72Co
 		lea	(Ani_Obj2B).l,a1
 		bsr.w	AnimateSprite
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		addi.w	#$18,y_vel(a0)
 		move.w	objoff_30(a0),d0
 		cmp.w	y_pos(a0),d0
@@ -14774,7 +14774,7 @@ loc_B842:				; CODE XREF: ROM:0000B83Cj
 loc_B85E:				; CODE XREF: ROM:0000B846j
 		lea	(Ani_Obj2C).l,a1
 		bsr.w	AnimateSprite
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		bra.w	MarkObjGone
 ; ===========================================================================
 Ani_Obj2C:	dc.b   0,  2,  7,  0,  1,  2,  3,$FF; 0	; DATA XREF: ROM:loc_B85Eo
@@ -15816,7 +15816,7 @@ loc_C6EA:				; CODE XREF: ROM:0000C6DCj
 		bne.s	loc_C766
 		swap	d6
 		andi.w	#3,d6
-		bne.s	loc_C736
+		bne.s	Obj36_Hurt
 		bra.s	loc_C766
 ; ===========================================================================
 
@@ -15829,12 +15829,13 @@ loc_C70C:				; CODE XREF: ROM:0000C6E4j
 		move.w	x_pos(a0),d4
 		bsr.w	SolidObject
 		btst	#3,status(a0)
-		bne.s	loc_C736
+		bne.s	Obj36_Hurt
 		swap	d6
 		andi.w	#$C0,d6	; 'À'
 		beq.s	loc_C766
 
-loc_C736:				; CODE XREF: ROM:0000C708j
+;loc_C736:
+Obj36_Hurt:				; CODE XREF: ROM:0000C708j
 					; ROM:0000C72Cj
 		tst.b	(Invinc_flag).w   ; annoying spike bug....
 		bne.s	loc_C766
@@ -16064,7 +16065,7 @@ loc_C96E:				; CODE XREF: ROM:0000C960j
 		bsr.s	sub_C99E
 
 loc_C988:				; DATA XREF: ROM:0000C8DAo
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		addi.w	#$70,y_vel(a0) ; 'p'
 		tst.b	render_flags(a0)
 		bpl.w	DeleteObject
@@ -16108,7 +16109,7 @@ loc_C9CA:				; CODE XREF: sub_C99E+22j
 		bcc.s	loc_CA18
 		move.l	a0,-(sp)
 		movea.l	a1,a0
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		add.w	d2,y_vel(a0)
 		movea.l	(sp)+,a0
 		bsr.w	DisplaySprite2
@@ -16246,44 +16247,46 @@ jmp_DeleteObject:			; DATA XREF: ROM:Obj_Indexo
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
 
-ObjectFall:				; CODE XREF: ROM:loc_8D46p
+; ObjectFall:
+ObjectMoveAndFall:				; CODE XREF: ROM:loc_8D46p
 					; ROM:loc_8E2Ep ...
-		move.l	x_pos(a0),d2
-		move.l	y_pos(a0),d3
-		move.w	x_vel(a0),d0
+		move.l	x_pos(a0),d2	; load x position
+		move.l	y_pos(a0),d3	; load y position
+		move.w	x_vel(a0),d0	; load x speed
 		ext.l	d0
-		asl.l	#8,d0
-		add.l	d0,d2
-		move.w	y_vel(a0),d0
-		addi.w	#$38,y_vel(a0) ; '8'
+		asl.l	#8,d0		; shift velocity to line up with the middle 16 bits of the 32-bit position
+		add.l	d0,d2		; add x speed to x position - note this affects the subpixel position x_sub(a0) = 2+x_pos(a0)
+		move.w	y_vel(a0),d0	; load y speed
+		addi.w	#$38,y_vel(a0)	; increase vertical speed (apply gravity)
 		ext.l	d0
-		asl.l	#8,d0
-		add.l	d0,d3
-		move.l	d2,x_pos(a0)
-		move.l	d3,y_pos(a0)
+		asl.l	#8,d0		; shift velocity to line up with the middle 16 bits of the 32-bit position
+		add.l	d0,d3		; add old y speed to y position - note this affects the subpixel position y_sub(a0) = 2+y_pos(a0)
+		move.l	d2,x_pos(a0)	; store new x position
+		move.l	d3,y_pos(a0)	; store new y position
 		rts
-; End of function ObjectFall
+; End of function ObjectMoveAndFall
 
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
 
-SpeedToPos:				; CODE XREF: ROM:loc_9D4Ep
+; SpeedToPos:
+ObjectMove:				; CODE XREF: ROM:loc_9D4Ep
 					; ROM:00009E1Cp ...
-		move.l	x_pos(a0),d2
-		move.l	y_pos(a0),d3
-		move.w	x_vel(a0),d0
+		move.l	x_pos(a0),d2	; load x position
+		move.l	y_pos(a0),d3	; load y position
+		move.w	x_vel(a0),d0	; load horizontal speed
 		ext.l	d0
-		asl.l	#8,d0
-		add.l	d0,d2
-		move.w	y_vel(a0),d0
+		asl.l	#8,d0		; shift velocity to line up with the middle 16 bits of the 32-bit position
+		add.l	d0,d2		; add to x-axis position - note this affects the subpixel position x_sub(a0) = 2+x_pos(a0)
+		move.w	y_vel(a0),d0	; load vertical speed
 		ext.l	d0
-		asl.l	#8,d0
-		add.l	d0,d3
-		move.l	d2,x_pos(a0)
-		move.l	d3,y_pos(a0)
+		asl.l	#8,d0		; shift velocity to line up with the middle 16 bits of the 32-bit position
+		add.l	d0,d3		; add to y-axis position - note this affects the subpixel position y_sub(a0) = 2+y_pos(a0)
+		move.l	d2,x_pos(a0)	; update x-axis position
+		move.l	d3,y_pos(a0)	; update y-axis position
 		rts
-; End of function SpeedToPos
+; End of function ObjectMove
 
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
@@ -19679,7 +19682,7 @@ loc_EC8C:				; CODE XREF: ROM:0000EC72j
 		move.b	#$C,collision_flags(a0)
 
 loc_EC9A:				; CODE XREF: ROM:0000EC92j
-		bsr.w	ObjectFall
+		bsr.w	ObjectMoveAndFall
 		bsr.w	ObjHitFloor
 		tst.w	d1
 		bpl.s	locret_ECDE
@@ -19704,7 +19707,7 @@ locret_ECDE:				; CODE XREF: ROM:0000ECA4j
 ; ===========================================================================
 
 loc_ECE0:				; DATA XREF: ROM:0000EC20o
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		bsr.w	ObjHitFloor
 		cmpi.w	#$FFF8,d1
 		blt.s	loc_ECFA
@@ -19721,7 +19724,7 @@ loc_ECFA:				; CODE XREF: ROM:0000ECECj
 ; ===========================================================================
 
 loc_ED00:				; DATA XREF: ROM:0000EC22o
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		rts
 ; ===========================================================================
 
@@ -20044,7 +20047,7 @@ loc_F25E:				; DATA XREF: ROM:off_F256o
 		move.b	#$E,y_radius(a0)
 		move.b	#8,x_radius(a0)
 		move.b	#$C,collision_flags(a0)
-		bsr.w	ObjectFall
+		bsr.w	ObjectMoveAndFall
 		jsr	ObjHitFloor
 		tst.w	d1
 		bpl.s	locret_F2BC
@@ -20092,7 +20095,7 @@ locret_F308:				; CODE XREF: ROM:0000F2EAj
 ; ===========================================================================
 
 loc_F30A:				; DATA XREF: ROM:0000F2E4o
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		jsr	ObjHitFloor
 		cmpi.w	#$FFF8,d1
 		blt.s	loc_F356
@@ -21142,7 +21145,7 @@ Obj01_MdNormal:				; DATA XREF: ROM:Obj01_Modeso
 		bsr.w	Sonic_Move
 		bsr.w	Sonic_Roll
 		bsr.w	Sonic_LevelBoundaries
-		jsr	SpeedToPos
+		jsr	ObjectMove
 		bsr.w	Sonic_AnglePos
 		bsr.w	Sonic_SlopeRepel
 		rts
@@ -21152,7 +21155,7 @@ Obj01_MdJump:				; DATA XREF: ROM:0000FB14o
 		bsr.w	Sonic_JumpHeight
 		bsr.w	Sonic_ChgJumpDir
 		bsr.w	Sonic_LevelBoundaries
-		jsr	ObjectFall
+		jsr	ObjectMoveAndFall
 		btst	#6,status(a0)
 		beq.s	loc_FCEA
 		subi.w	#$28,y_vel(a0) ; '('
@@ -21168,7 +21171,7 @@ Obj01_MdRoll:				; DATA XREF: ROM:0000FB16o
 		bsr.w	Sonic_RollRepel
 		bsr.w	Sonic_RollSpeed
 		bsr.w	Sonic_LevelBoundaries
-		jsr	SpeedToPos
+		jsr	ObjectMove
 		bsr.w	Sonic_AnglePos
 		bsr.w	Sonic_SlopeRepel
 		rts
@@ -21178,7 +21181,7 @@ Obj01_MdJump2:				; DATA XREF: ROM:0000FB18o
 		bsr.w	Sonic_JumpHeight
 		bsr.w	Sonic_ChgJumpDir
 		bsr.w	Sonic_LevelBoundaries
-		jsr	ObjectFall
+		jsr	ObjectMoveAndFall
 		btst	#6,status(a0)
 		beq.s	loc_FD34
 		subi.w	#$28,y_vel(a0) ; '('
@@ -22364,7 +22367,7 @@ loc_10748:				; CODE XREF: Sonic_ResetOnFloor+26j
 Obj01_Hurt:				; DATA XREF: ROM:0000FA1Ao
 		tst.b	routine_secondary(a0)
 		bmi.w	loc_107E8
-		jsr	SpeedToPos
+		jsr	ObjectMove
 		addi.w	#$30,y_vel(a0) ; '0'
 		btst	#6,status(a0)
 		beq.s	loc_1077E
@@ -22431,7 +22434,7 @@ loc_10804:				; CODE XREF: ROM:000107F8j
 
 Obj01_Death:				; DATA XREF: ROM:0000FA1Co
 		bsr.w	Sonic_GameOver
-		jsr	ObjectFall
+		jsr	ObjectMoveAndFall
 		bsr.w	Sonic_RecordPos
 		bsr.w	Sonic_Animate
 		bsr.w	LoadSonicDynPLC
@@ -23071,7 +23074,7 @@ Obj02_MdNormal:				; DATA XREF: ROM:Obj02_Modeso
 		bsr.w	Tails_Move
 		bsr.w	Tails_Roll
 		bsr.w	Tails_LevelBoundaries
-		jsr	SpeedToPos
+		jsr	ObjectMove
 		bsr.w	Sonic_AnglePos
 		bsr.w	Tails_SlopeRepel
 		rts
@@ -23081,7 +23084,7 @@ Obj02_MdJump:				; DATA XREF: ROM:00010D04o
 		bsr.w	Tails_JumpHeight
 		bsr.w	Tails_ChgJumpDir
 		bsr.w	Tails_LevelBoundaries
-		jsr	ObjectFall
+		jsr	ObjectMoveAndFall
 		btst	#6,status(a0)
 		beq.s	loc_10EC0
 		subi.w	#$28,y_vel(a0) ; '('
@@ -23097,7 +23100,7 @@ Obj02_MdRoll:				; DATA XREF: ROM:00010D06o
 		bsr.w	Tails_RollRepel
 		bsr.w	Tails_RollSpeed
 		bsr.w	Tails_LevelBoundaries
-		jsr	SpeedToPos
+		jsr	ObjectMove
 		bsr.w	Sonic_AnglePos
 		bsr.w	Tails_SlopeRepel
 		rts
@@ -23107,7 +23110,7 @@ Obj02_MdJump2:				; DATA XREF: ROM:00010D08o
 		bsr.w	Tails_JumpHeight
 		bsr.w	Tails_ChgJumpDir
 		bsr.w	Tails_LevelBoundaries
-		jsr	ObjectFall
+		jsr	ObjectMoveAndFall
 		btst	#6,status(a0)
 		beq.s	loc_10F0A
 		subi.w	#$28,y_vel(a0) ; '('
@@ -24254,7 +24257,7 @@ loc_118AA:				; CODE XREF: Tails_ResetTailsOnFloor+26j
 ; ===========================================================================
 
 Obj02_Hurt:				; DATA XREF: ROM:Obj02_Indexo
-		jsr	SpeedToPos
+		jsr	ObjectMove
 		addi.w	#$30,y_vel(a0) ; '0'
 		btst	#6,status(a0)
 		beq.s	loc_118D8
@@ -24294,7 +24297,7 @@ locret_1192A:				; CODE XREF: Tails_HurtStop+1Aj
 
 Obj02_Death:				; DATA XREF: ROM:Obj02_Indexo
 		bsr.w	Tails_GameOver
-		jsr	ObjectFall
+		jsr	ObjectMoveAndFall
 		bsr.w	Tails_Animate
 		bsr.w	LoadTailsDynPLC
 		jmp	DisplaySprite
@@ -24884,7 +24887,7 @@ loc_11F14:				; CODE XREF: ROM:00011F0Ej
 		add.w	objoff_30(a0),d0
 		move.w	d0,x_pos(a0)
 		bsr.s	Obj0A_ShowNumber
-		jsr	SpeedToPos
+		jsr	ObjectMove
 		tst.b	render_flags(a0)
 		bpl.s	loc_11F48
 		jmp	DisplaySprite
@@ -25055,7 +25058,7 @@ loc_121D6:				; CODE XREF: ROM:000120F0j
 loc_121E4:				; CODE XREF: ROM:000121DAj
 		move.l	a0,-(sp)
 		lea	(MainCharacter).w,a0
-		jsr	SpeedToPos
+		jsr	ObjectMove
 		addi.w	#$10,y_vel(a0)
 		movea.l	(sp)+,a0
 		bra.s	loc_121FC
@@ -26899,7 +26902,10 @@ loc_13804:				; CODE XREF: ROM:00013798j
 loc_13818:				; CODE XREF: ROM:00013814j
 		jmp	DeleteObject
 ; ===========================================================================
-Obj7D_Points:	dc.w	 0, 1000,  100,	   1; 0
+Obj7D_Points:	dc.w 0			; Bonus	points array
+		dc.w 1000               ; 1000*10, 10000 points
+		dc.w 100                ; 100*10, 1000 points
+		dc.w 1			; 1*10, 10 points
 ; ===========================================================================
 
 Obj7D_DelayDelete:			; DATA XREF: ROM:00013780o
@@ -26922,7 +26928,7 @@ Map_Obj7D:	incbin	"mappings/sprite/obj7D.bin"
 ; ===========================================================================
 		nop
 ;----------------------------------------------------
-; Object 47 - bumper (from Spring Yard)
+; Object 47 - Bumper (from Spring Yard)
 ;----------------------------------------------------
 S1Obj47:
 		moveq	#0,d0
@@ -27126,7 +27132,7 @@ loc_13A7E:				; CODE XREF: ROM:00013A6Ej
 
 loc_13B0A:				; CODE XREF: ROM:00013AA2j
 					; ROM:00013AA8j
-		bsr.w	SpeedToPos
+		bsr.w	ObjectMove
 		tst.b	render_flags(a0)
 		bpl.s	loc_13B1A
 		jmp	DisplaySprite
@@ -28383,19 +28389,19 @@ loc_14F30:				; CODE XREF: ROM:00014EF0j
 					; DATA XREF: ROM:00014CD0o
 		tst.w	y_vel(a0)
 		bpl.s	loc_14F4E
-		bsr.w	j_ObjectFall
+		bsr.w	j_ObjectMoveAndFall
 		move.w	objoff_34(a0),d0
 		subi.w	#$2F,d0	; '/'
 		cmp.w	y_pos(a0),d0
 		bgt.s	locret_14F4C
-		bsr.w	j_ObjectFall
+		bsr.w	j_ObjectMoveAndFall
 
 locret_14F4C:				; CODE XREF: ROM:00014F46j
 		rts
 ; ===========================================================================
 
 loc_14F4E:				; CODE XREF: ROM:00014F34j
-		bsr.w	j_ObjectFall
+		bsr.w	j_ObjectMoveAndFall
 		movea.l	objoff_3C(a0),a1
 		lea	(word_14FF4).l,a2
 		moveq	#0,d0
@@ -28482,9 +28488,9 @@ Map_Obj14b:	incbin	"mappings/sprite/obj14b.bin"
 ; ===========================================================================
 		nop
 
-j_ObjectFall:				; CODE XREF: ROM:00014F36p
+j_ObjectMoveAndFall:				; CODE XREF: ROM:00014F36p
 					; ROM:00014F48p ...
-		jmp	ObjectFall
+		jmp	ObjectMoveAndFall
 ; ===========================================================================
 		align 4
 ;----------------------------------------------------
@@ -28566,7 +28572,7 @@ locret_151BE:				; CODE XREF: ROM:000151A6j
 ; ===========================================================================
 
 Obj16_Move:				; DATA XREF: ROM:0001519Ao
-		bsr.w	j_SpeedToPos_0
+		bsr.w	j_ObjectMove_0
 		subq.w	#1,objoff_34(a0)
 		bne.s	locret_151CE
 		addq.b	#1,subtype(a0)
@@ -28591,8 +28597,8 @@ loc_152AA:				; CODE XREF: ROM:0001517Cj
 		jmp	DeleteObject
 ; ===========================================================================
 
-j_SpeedToPos_0:				; CODE XREF: ROM:Obj16_Movep
-		jmp	SpeedToPos
+j_ObjectMove_0:				; CODE XREF: ROM:Obj16_Movep
+		jmp	ObjectMove
 ; ===========================================================================
 		align 4
 ;----------------------------------------------------
@@ -28738,7 +28744,7 @@ loc_153E6:				; CODE XREF: ROM:000153D8j
 ; ===========================================================================
 
 loc_153EC:				; DATA XREF: ROM:00015370o
-		bsr.w	j_SpeedToPos_1
+		bsr.w	j_ObjectMove_1
 		addi.w	#$18,y_vel(a0)
 		bsr.w	ObjHitFloor
 		tst.w	d1
@@ -28838,8 +28844,8 @@ loc_154C6:				; CODE XREF: ROM:00015348j
 		jmp	DeleteObject
 ; ===========================================================================
 
-j_SpeedToPos_1:				; CODE XREF: ROM:loc_153ECp
-		jmp	SpeedToPos
+j_ObjectMove_1:				; CODE XREF: ROM:loc_153ECp
+		jmp	ObjectMove
 ; ===========================================================================
 		align 4
 ;----------------------------------------------------
@@ -29011,7 +29017,7 @@ Obj4D_Init:				; DATA XREF: ROM:Obj4D_Indexo
 		move.b	#$18,width_pixels(a0)
 		move.b	#$10,y_radius(a0)
 		move.b	#$18,x_radius(a0)
-		bsr.w	j_ObjectFall_0
+		bsr.w	j_ObjectMoveAndFall_0
 		jsr	ObjHitFloor
 		tst.w	d1
 		bpl.s	locret_158DC
@@ -29054,7 +29060,7 @@ locret_15920:				; CODE XREF: ROM:00015902j
 
 loc_15922:				; DATA XREF: ROM:000158FCo
 		bsr.w	sub_1596C
-		bsr.w	j_ObjectFall_0
+		bsr.w	j_ObjectMoveAndFall_0
 		jsr	ObjHitFloor
 		cmpi.w	#$FFF8,d1
 		blt.s	loc_15948
@@ -29140,9 +29146,9 @@ j_AnimateSprite_0:			; CODE XREF: ROM:000158F2p
 		jmp	AnimateSprite
 ; ===========================================================================
 
-j_ObjectFall_0:				; CODE XREF: ROM:000158C0p
+j_ObjectMoveAndFall_0:				; CODE XREF: ROM:000158C0p
 					; ROM:00015926p
-		jmp	ObjectFall
+		jmp	ObjectMoveAndFall
 ; ===========================================================================
 		align 4
 ;----------------------------------------------------
@@ -29208,7 +29214,7 @@ loc_15BE4:				; CODE XREF: ROM:00015BDEj
 loc_15C06:				; CODE XREF: ROM:00015BE8j
 		lea	(Ani_Obj52).l,a1
 		bsr.w	j_AnimateSprite_1
-		bsr.w	j_SpeedToPos_2
+		bsr.w	j_ObjectMove_2
 		tst.w	objoff_3A(a0)
 		bgt.w	loc_15D90
 		cmpi.w	#$FFFF,objoff_3A(a0)
@@ -29327,8 +29333,8 @@ j_AnimateSprite_1:			; CODE XREF: ROM:00015C0Cp
 		jmp	AnimateSprite
 ; ===========================================================================
 
-j_SpeedToPos_2:				; CODE XREF: ROM:00015C10p
-		jmp	SpeedToPos
+j_ObjectMove_2:				; CODE XREF: ROM:00015C10p
+		jmp	ObjectMove
 ; ===========================================================================
 		align 4
 ;----------------------------------------------------
@@ -29356,7 +29362,7 @@ Obj4F_Init:				; DATA XREF: ROM:Obj4F_Indexo
 		move.b	#$10,y_radius(a0)
 		move.b	#6,x_radius(a0)
 		move.b	#$C,collision_flags(a0)
-		bsr.w	j_ObjectFall_1
+		bsr.w	j_ObjectMoveAndFall_1
 		jsr	ObjHitFloor
 		tst.w	d1
 		bpl.s	locret_15E0C
@@ -29417,7 +29423,7 @@ locret_15E7A:				; CODE XREF: ROM:00015E5Cj
 ; ===========================================================================
 
 loc_15E7C:				; DATA XREF: ROM:00015E56o
-		bsr.w	j_SpeedToPos_3
+		bsr.w	j_ObjectMove_3
 		jsr	ObjHitFloor
 		cmpi.w	#$FFF8,d1
 		blt.s	loc_15E98
@@ -29461,12 +29467,12 @@ j_AnimateSprite_2:			; CODE XREF: ROM:00015E22p
 		jmp	AnimateSprite
 ; ===========================================================================
 
-j_ObjectFall_1:				; CODE XREF: ROM:00015DEAp
-		jmp	ObjectFall
+j_ObjectMoveAndFall_1:				; CODE XREF: ROM:00015DEAp
+		jmp	ObjectMoveAndFall
 ; ===========================================================================
 
-j_SpeedToPos_3:				; CODE XREF: ROM:loc_15E7Cp
-		jmp	SpeedToPos
+j_ObjectMove_3:				; CODE XREF: ROM:loc_15E7Cp
+		jmp	ObjectMove
 ; ===========================================================================
 		align 4
 ;----------------------------------------------------
@@ -29560,14 +29566,14 @@ loc_16006:				; DATA XREF: ROM:00015F1Ao
 
 loc_16030:				; DATA XREF: ROM:00015F1Co
 		bsr.w	loc_162FC
-		bsr.w	j_SpeedToPos_4
+		bsr.w	j_ObjectMove_4
 		lea	(Ani_Obj50).l,a1
 		bsr.w	j_AnimateSprite_3
 		bra.w	loc_1677A
 ; ===========================================================================
 
 loc_16046:				; DATA XREF: ROM:Obj50_SubIndexo
-		bsr.w	j_SpeedToPos_4
+		bsr.w	j_ObjectMove_4
 		bsr.w	sub_162DE
 		bsr.w	sub_16184
 		bsr.w	sub_1611C
@@ -29575,14 +29581,14 @@ loc_16046:				; DATA XREF: ROM:Obj50_SubIndexo
 ; ===========================================================================
 
 loc_16058:				; DATA XREF: ROM:00016002o
-		bsr.w	j_SpeedToPos_4
+		bsr.w	j_ObjectMove_4
 		bsr.w	sub_162DE
 		bsr.w	sub_161A6
 		rts
 ; ===========================================================================
 
 loc_16066:				; DATA XREF: ROM:00016004o
-		bsr.w	j_ObjectFall_2
+		bsr.w	j_ObjectMoveAndFall_2
 		bsr.w	sub_162DE
 		bsr.w	sub_16078
 		bsr.w	sub_160F4
@@ -29772,7 +29778,7 @@ loc_16208:				; CODE XREF: sub_161D8+2Cj
 
 Obj50_Routine08:			; DATA XREF: ROM:00015F1Eo
 					; ROM:0001653At
-		bsr.w	j_ObjectFall_2
+		bsr.w	j_ObjectMoveAndFall_2
 		bsr.w	sub_16228
 		lea	(Ani_Obj50).l,a1
 		bsr.w	j_AnimateSprite_3
@@ -29996,14 +30002,14 @@ off_165BC:	dc.w loc_165D4-off_165BC ; DATA	XREF: ROM:off_165BCo
 
 loc_165C0:				; DATA XREF: ROM:00016536o
 		bsr.w	loc_162FC
-		bsr.w	j_SpeedToPos_4
+		bsr.w	j_ObjectMove_4
 		lea	Ani_Obj50(pc),a1
 		bsr.w	j_AnimateSprite_3
 		bra.w	loc_1677A
 ; ===========================================================================
 
 loc_165D4:				; DATA XREF: ROM:off_165BCo
-		bsr.w	j_SpeedToPos_4
+		bsr.w	j_ObjectMove_4
 		bsr.w	sub_162DE
 		bsr.w	loc_16626
 		bsr.w	loc_16708
@@ -30012,7 +30018,7 @@ loc_165D4:				; DATA XREF: ROM:off_165BCo
 ; ===========================================================================
 
 loc_165EA:				; DATA XREF: ROM:000165BEo
-		bsr.w	j_SpeedToPos_4
+		bsr.w	j_ObjectMove_4
 		bsr.w	sub_162DE
 		bsr.w	loc_16626
 		bsr.w	loc_16708
@@ -30195,14 +30201,14 @@ j_AnimateSprite_3:			; CODE XREF: ROM:00015FE0p
 		jmp	AnimateSprite
 ; ===========================================================================
 
-j_ObjectFall_2:				; CODE XREF: ROM:loc_16066p
+j_ObjectMoveAndFall_2:				; CODE XREF: ROM:loc_16066p
 					; ROM:Obj50_Routine08p
-		jmp	ObjectFall
+		jmp	ObjectMoveAndFall
 ; ===========================================================================
 
-j_SpeedToPos_4:				; CODE XREF: ROM:00016034p
+j_ObjectMove_4:				; CODE XREF: ROM:00016034p
 					; ROM:loc_16046p ...
-		jmp	SpeedToPos
+		jmp	ObjectMove
 ; ===========================================================================
 		align 4
 ;----------------------------------------------------
@@ -30223,7 +30229,7 @@ Obj4B_Index:	dc.w Obj4B_Init-Obj4B_Index ; DATA XREF: ROM:Obj4B_Indexo
 ; ===========================================================================
 
 loc_167AA:				; DATA XREF: ROM:000167A8o
-		bsr.w	j_SpeedToPos_5
+		bsr.w	j_ObjectMove_5
 		lea	(Ani_Obj4B).l,a1
 		bsr.w	j_AnimateSprite_4
 		bra.w	loc_16A8C
@@ -30309,7 +30315,7 @@ loc_168C0:				; DATA XREF: ROM:Obj4B_SubIndexo
 		tst.w	d0
 		bpl.s	locret_168E4
 		subq.w	#1,$2E(a0)
-		bgt.w	j_SpeedToPos_5
+		bgt.w	j_ObjectMove_5
 		move.w	#$1E,objoff_30(a0)
 
 locret_168E4:				; CODE XREF: ROM:000168D4j
@@ -30446,9 +30452,9 @@ j_ModifySpriteAttr_2P_2:		; CODE XREF: ROM:00016802p
 		jmp	ModifySpriteAttr_2P
 ; ===========================================================================
 
-j_SpeedToPos_5:				; CODE XREF: ROM:loc_167AAp
+j_ObjectMove_5:				; CODE XREF: ROM:loc_167AAp
 					; ROM:000168DAj
-		jmp	SpeedToPos
+		jmp	ObjectMove
 ; ===========================================================================
 		align 4
 ;----------------------------------------------------
@@ -30475,7 +30481,7 @@ loc_16AB6:				; DATA XREF: ROM:00016AB4o
 ; ===========================================================================
 
 loc_16AC0:				; CODE XREF: ROM:00016ABCj
-		bsr.w	j_ObjectFall_3
+		bsr.w	j_ObjectMoveAndFall_3
 		lea	(Ani_Obj4A).l,a1
 		bsr.w	j_AnimateSprite_5
 		bra.w	loc_16D3C
@@ -30496,7 +30502,7 @@ loc_16ADE:				; DATA XREF: ROM:Obj4A_Indexo
 		move.b	#$10,width_pixels(a0)
 		move.b	#$10,y_radius(a0)
 		move.b	#8,x_radius(a0)
-		bsr.w	j_ObjectFall_3
+		bsr.w	j_ObjectMoveAndFall_3
 		jsr	ObjHitFloor
 		tst.w	d1
 		bpl.s	loc_16B3C
@@ -30647,9 +30653,9 @@ j_AnimateSprite_5:			; CODE XREF: ROM:00016ACAp
 		jmp	AnimateSprite
 ; ===========================================================================
 
-j_ObjectFall_3:				; CODE XREF: ROM:loc_16AC0p
+j_ObjectMoveAndFall_3:				; CODE XREF: ROM:loc_16AC0p
 					; ROM:00016B10p
-		jmp	ObjectFall
+		jmp	ObjectMoveAndFall
 ; ===========================================================================
 		align 4
 ;----------------------------------------------------
@@ -30737,7 +30743,7 @@ loc_16E10:				; DATA XREF: ROM:00016D62o
 		bsr.w	sub_16F0E
 		bsr.w	sub_16EB0
 		bsr.w	sub_16E30
-		bsr.w	j_SpeedToPos_8
+		bsr.w	j_ObjectMove_8
 		lea	(Ani_Obj4C).l,a1
 		bsr.w	j_AnimateSprite_6
 		bra.w	loc_171C4
@@ -30937,8 +30943,8 @@ j_AnimateSprite_6:			; CODE XREF: ROM:00016DBAp
 		jmp	AnimateSprite
 ; ===========================================================================
 
-j_SpeedToPos_8:				; CODE XREF: ROM:00016E1Cp
-		jmp	SpeedToPos
+j_ObjectMove_8:				; CODE XREF: ROM:00016E1Cp
+		jmp	ObjectMove
 ; ===========================================================================
 		align 4
 ;----------------------------------------------------
@@ -30965,7 +30971,7 @@ Obj4E_Init:				; DATA XREF: ROM:Obj4E_Indexo
 		move.b	#$10,width_pixels(a0)
 		move.b	#$10,y_radius(a0)
 		move.b	#8,x_radius(a0)
-		bsr.w	j_ObjectFall_4
+		bsr.w	j_ObjectMoveAndFall_4
 		jsr	ObjHitFloor
 		tst.w	d1
 		bpl.s	locret_17238
@@ -31008,7 +31014,7 @@ locret_1727C:				; CODE XREF: ROM:0001725Ej
 
 loc_1727E:				; DATA XREF: ROM:00017258o
 		bsr.w	sub_172B6
-		bsr.w	j_SpeedToPos_6
+		bsr.w	j_ObjectMove_6
 		jsr	ObjHitFloor
 		cmpi.w	#$FFF8,d1
 		blt.s	loc_1729E
@@ -31077,12 +31083,12 @@ j_AnimateSprite_7:			; CODE XREF: ROM:0001724Ep
 		jmp	AnimateSprite
 ; ===========================================================================
 
-j_ObjectFall_4:				; CODE XREF: ROM:0001721Cp
-		jmp	ObjectFall
+j_ObjectMoveAndFall_4:				; CODE XREF: ROM:0001721Cp
+		jmp	ObjectMoveAndFall
 ; ===========================================================================
 
-j_SpeedToPos_6:				; CODE XREF: ROM:00017282p
-		jmp	SpeedToPos
+j_ObjectMove_6:				; CODE XREF: ROM:00017282p
+		jmp	ObjectMove
 ; ===========================================================================
 
 Obj53:					; DATA XREF: ROM:Obj_Indexo
@@ -31114,7 +31120,7 @@ Obj53_Init:				; DATA XREF: ROM:Obj53_Indexo
 Obj53_Main:				; DATA XREF: ROM:000174E4o
 		lea	(Ani_Obj53).l,a1
 		bsr.w	j_AnimateSprite
-		bsr.w	j_SpeedToPos
+		bsr.w	j_ObjectMove
 		addi.w	#$18,y_vel(a0)
 		move.w	objoff_30(a0),d0
 		cmp.w	y_pos(a0),d0
@@ -31159,8 +31165,8 @@ j_ModifySpriteAttr_2P:			; CODE XREF: ROM:000174F8p
 		jmp	ModifySpriteAttr_2P
 ; ===========================================================================
 
-j_SpeedToPos:				; CODE XREF: ROM:0001752Ap
-		jmp	SpeedToPos
+j_ObjectMove:				; CODE XREF: ROM:0001752Ap
+		jmp	ObjectMove
 ; ===========================================================================
 ;----------------------------------------------------
 ; Object 54 - Snail badnik from	EHZ
@@ -31220,7 +31226,7 @@ loc_17682:				; CODE XREF: ROM:0001767Ej
 
 loc_17688:				; DATA XREF: ROM:000175E0o
 		bsr.w	sub_176D0
-		bsr.w	j_SpeedToPos_7
+		bsr.w	j_ObjectMove_7
 		jsr	ObjHitFloor
 		cmpi.w	#$FFF8,d1
 		blt.s	loc_176B4
@@ -31330,7 +31336,7 @@ loc_177B4:				; DATA XREF: ROM:000175E2o
 		subi.w	#1,objoff_30(a0)
 		bpl.w	loc_1786C
 		neg.w	x_vel(a0)
-		bsr.w	j_ObjectFall_5
+		bsr.w	j_ObjectMoveAndFall_5
 		move.w	x_vel(a0),d0
 		asr.w	#2,d0
 		move.w	d0,x_vel(a0)
@@ -31389,12 +31395,12 @@ j_ModifySpriteAttr_2P_3:		; CODE XREF: ROM:000175F6p
 		jmp	ModifySpriteAttr_2P
 ; ===========================================================================
 
-j_ObjectFall_5:				; CODE XREF: ROM:000177C2p
-		jmp	ObjectFall
+j_ObjectMoveAndFall_5:				; CODE XREF: ROM:000177C2p
+		jmp	ObjectMoveAndFall
 ; ===========================================================================
 
-j_SpeedToPos_7:				; CODE XREF: ROM:0001768Cp
-		jmp	SpeedToPos
+j_ObjectMove_7:				; CODE XREF: ROM:0001768Cp
+		jmp	ObjectMove
 ; ===========================================================================
 ;----------------------------------------------------
 ; Object 57 - sub object of the	EHZ boss
@@ -31765,7 +31771,7 @@ loc_17C36:				; DATA XREF: ROM:00017C12o
 
 loc_17C58:				; CODE XREF: ROM:00017C52j
 		bsr.w	sub_17A6A
-		bsr.w	j_ObjectFall_6
+		bsr.w	j_ObjectMoveAndFall_6
 		jsr	ObjHitFloor
 		tst.w	d1
 		bpl.s	loc_17C6E
@@ -31800,7 +31806,7 @@ loc_17C96:				; DATA XREF: ROM:00017C14o
 loc_17CC2:				; DATA XREF: ROM:00017C16o
 		subq.w	#1,objoff_2A(a0)
 		bpl.w	loc_181A8
-		bsr.w	j_ObjectFall_6
+		bsr.w	j_ObjectMoveAndFall_6
 		bsr.w	ObjHitFloor
 		tst.w	d1
 		bpl.s	loc_17CE0
@@ -32057,9 +32063,9 @@ j_AnimateSprite_9:			; CODE XREF: ROM:00017B22p
 		jmp	AnimateSprite
 ; ===========================================================================
 
-j_ObjectFall_6:				; CODE XREF: ROM:00017C5Cp
+j_ObjectMoveAndFall_6:				; CODE XREF: ROM:00017C5Cp
 					; ROM:00017CCAp
-		jmp	ObjectFall
+		jmp	ObjectMoveAndFall
 ; ===========================================================================
 
 Obj55:					; DATA XREF: ROM:Obj_Indexo
@@ -34425,7 +34431,7 @@ Obj09_InAir:				; DATA XREF: ROM:0001A456o
 Obj09_Display:				; CODE XREF: ROM:0001A464j
 		bsr.w	Obj09_ChkItems
 		bsr.w	Obj09_ChkItems2
-		jsr	SpeedToPos
+		jsr	ObjectMove
 		bsr.w	S1SS_FixCamera
 		move.w	($FFFFF780).w,d0
 		add.w	($FFFFF782).w,d0
@@ -35550,30 +35556,30 @@ Obj21_Init:				; DATA XREF: ROM:Obj21_Indexo
 
 Obj21_Main:				; DATA XREF: ROM:0001B038o
 		tst.w	(Ring_amount).w
-		beq.s	loc_1B08C
+		beq.s	Obj21_Flash
 		moveq	#0,d0
 		btst	#3,($FFFFFE05).w
-		bne.s	loc_1B082
+		bne.s	Obj21_Display2
 		cmpi.b	#9,(Time_minute).w
-		bne.s	loc_1B082
+		bne.s	Obj21_Display2
 		addq.w	#2,d0
 
-loc_1B082:				; CODE XREF: ROM:0001B076j
+Obj21_Display2:				; CODE XREF: ROM:0001B076j
 					; ROM:0001B07Ej
 		move.b	d0,mapping_frame(a0)
 		jmp	DisplaySprite
 ; ===========================================================================
 
-loc_1B08C:				; CODE XREF: ROM:0001B06Cj
+Obj21_Flash:				; CODE XREF: ROM:0001B06Cj
 		moveq	#0,d0
 		btst	#3,($FFFFFE05).w
-		bne.s	loc_1B0A2
+		bne.s	Obj21_Display
 		addq.w	#1,d0
-		cmpi.b	#9,(Time_minute).w
-		bne.s	loc_1B0A2
+		cmpi.b	#9,(Time_minute).w	; has 9 minutes passed?
+		bne.s	Obj21_Display
 		addq.w	#2,d0
 
-loc_1B0A2:				; CODE XREF: ROM:0001B094j
+Obj21_Display:				; CODE XREF: ROM:0001B094j
 					; ROM:0001B09Ej
 		move.b	d0,mapping_frame(a0)
 		jmp	DisplaySprite
@@ -37102,66 +37108,18 @@ ObjPos_LZ2:	incbin	"level/objects/NULL.bin"
 		even
 ObjPos_LZ3:	incbin	"level/objects/NULL.bin"
 		even
-ObjPos_S1LZ1pf1:dc.w	 7,$1078, $21A	; 0 ; DATA XREF: ROM:ObjPos_Indexo
-		dc.w	 0,$10BE, $291	; 3
-		dc.w	 2,$10BE, $307	; 6
-		dc.w	 2,$10BE, $37E	; 9
-		dc.w	 2,$105C, $390	; 12
-		dc.w	 4,$1022, $352	; 15
-		dc.w	 5,$1022, $2DB	; 18
-		dc.w	 5,$1022, $265	; 21
-		dc.w	 5		; 24
-ObjPos_S1LZ1pf2:dc.w	 7,$127E, $280	; 0 ; DATA XREF: ROM:ObjPos_Indexo
-		dc.w   $10,$12CE, $305	; 3
-		dc.w   $12,$12CE, $38A	; 6
-		dc.w   $12,$12CE, $40F	; 9
-		dc.w   $12,$12A7, $46E	; 12
-		dc.w   $13,$1232, $40F	; 15
-		dc.w   $14,$1232, $38A	; 18
-		dc.w   $14,$1232, $305	; 21
-		dc.w   $14		; 24
-ObjPos_S1LZ2pf1:dc.w	 7, $D22, $483	; 0 ; DATA XREF: ROM:ObjPos_Indexo
-		dc.w   $21, $D9C, $482	; 3
-		dc.w   $20, $DAE, $4EA	; 6
-		dc.w   $23, $DAE, $564	; 9
-		dc.w   $23, $DAE, $5DD	; 12
-		dc.w   $23, $D34, $5DE	; 15
-		dc.w   $22, $D22, $576	; 18
-		dc.w   $21, $D22, $4FC	; 21
-		dc.w   $21		; 24
-ObjPos_S1LZ2pf2:dc.w	 7, $D62, $3A2	; 0 ; DATA XREF: ROM:ObjPos_Indexo
-		dc.w   $30, $DD4, $3A2	; 3
-		dc.w   $31, $DEE, $3FA	; 6
-		dc.w   $32, $DEE, $46C	; 9
-		dc.w   $32, $DEE, $4DD	; 12
-		dc.w   $32, $D7C, $4DE	; 15
-		dc.w   $33, $D62, $486	; 18
-		dc.w   $30, $D62, $414	; 21
-		dc.w   $30		; 24
-ObjPos_S1LZ3pf1:dc.w	$B, $CAD, $242	; 0 ; DATA XREF: ROM:ObjPos_Indexo
-		dc.w   $41, $D2D, $242	; 3
-		dc.w   $41, $DAC, $242	; 6
-		dc.w   $41, $DDE, $28F	; 9
-		dc.w   $42, $DDE, $30E	; 12
-		dc.w   $42, $DDE, $38D	; 15
-		dc.w   $42, $DB0, $3DE	; 18
-		dc.w   $43, $D31, $3DE	; 21
-		dc.w   $43, $CB2, $3DE	; 24
-		dc.w   $43, $C52, $3BF	; 27
-		dc.w   $44, $C52, $340	; 30
-		dc.w   $44, $C52, $2C1	; 33
-		dc.w   $44		; 36
-ObjPos_S1LZ3pf2:dc.w	 8,$1252, $20A	; 0 ; DATA XREF: ROM:ObjPos_Indexo
-		dc.w   $50,$12D2, $20A	; 3
-		dc.w   $51,$1352, $20A	; 6
-		dc.w   $51,$13D2, $20A	; 9
-		dc.w   $51,$13DE, $27E	; 12
-		dc.w   $52,$139E, $2BE	; 15
-		dc.w   $53,$131E, $2BE	; 18
-		dc.w   $53,$129E, $2BE	; 21
-		dc.w   $53,$1252, $28A	; 24
-		dc.w   $50,$FFFF,    0	; 27
-		dc.w	 0		; 30
+ObjPos_S1LZ1pf1:incbin	"level/misc/lz1pf1.bin"
+		even
+ObjPos_S1LZ1pf2:incbin	"level/misc/lz1pf2.bin"
+		even
+ObjPos_S1LZ2pf1:incbin	"level/misc/lz2pf1.bin"
+		even
+ObjPos_S1LZ2pf2:incbin	"level/misc/lz2pf2.bin"
+		even
+ObjPos_S1LZ3pf1:incbin	"level/misc/lz3pf1.bin"
+		even
+ObjPos_S1LZ3pf2:incbin	"level/misc/lz3pf2.bin"
+		even
 ObjPos_CPZ1:    incbin	"level/objects/CPZ_1.bin"
 		even
 ObjPos_CPZ2:	incbin	"level/objects/NULL.bin"
@@ -37186,61 +37144,18 @@ ObjPos_HTZ2:	incbin	"level/objects/NULL.bin"
 		even
 ObjPos_HTZ3:	incbin	"level/objects/HTZ_3.bin"
 		even
-ObjPos_S1SBZ1pf1:dc.w 7			; DATA XREF: ROM:ObjPos_Indexo
-		dc.w  $E14, $370,    0	; 0
-		dc.w  $E5A, $34D,    1	; 3
-		dc.w  $EA0, $32A,    1	; 6
-		dc.w  $EE7, $307,    1	; 9
-		dc.w  $EEF, $340,    2	; 12
-		dc.w  $EA9, $363,    3	; 15
-		dc.w  $E63, $386,    3	; 18
-		dc.w  $E1C, $3A9,    3	; 21
-ObjPos_S1SBZ1pf2:dc.w 7			; DATA XREF: ROM:ObjPos_Indexo
-		dc.w  $F14, $2E0,  $10	; 0
-		dc.w  $F5A, $2BD,  $11	; 3
-		dc.w  $FA0, $29A,  $11	; 6
-		dc.w  $FE7, $277,  $11	; 9
-		dc.w  $FEF, $2B0,  $12	; 12
-		dc.w  $FA9, $2D3,  $13	; 15
-		dc.w  $F63, $2F6,  $13	; 18
-		dc.w  $F1C, $319,  $13	; 21
-ObjPos_S1SBZ1pf3:dc.w 7			; DATA XREF: ROM:ObjPos_Indexo
-		dc.w $1014, $270,  $20	; 0
-		dc.w $105A, $24D,  $21	; 3
-		dc.w $10A0, $22A,  $21	; 6
-		dc.w $10E7, $207,  $21	; 9
-		dc.w $10EF, $240,  $22	; 12
-		dc.w $10A9, $263,  $23	; 15
-		dc.w $1063, $286,  $23	; 18
-		dc.w $101C, $2A9,  $23	; 21
-ObjPos_S1SBZ1pf4:dc.w 7			; DATA XREF: ROM:ObjPos_Indexo
-		dc.w  $F14, $570,  $30	; 0
-		dc.w  $F5A, $54D,  $31	; 3
-		dc.w  $FA0, $52A,  $31	; 6
-		dc.w  $FE7, $507,  $31	; 9
-		dc.w  $FEF, $540,  $32	; 12
-		dc.w  $FA9, $563,  $33	; 15
-		dc.w  $F63, $586,  $33	; 18
-		dc.w  $F1C, $5A9,  $33	; 21
-ObjPos_S1SBZ1pf5:dc.w 7			; DATA XREF: ROM:ObjPos_Indexo
-		dc.w $1B14, $670,  $40	; 0
-		dc.w $1B5A, $64D,  $41	; 3
-		dc.w $1BA0, $62A,  $41	; 6
-		dc.w $1BE7, $607,  $41	; 9
-		dc.w $1BEF, $640,  $42	; 12
-		dc.w $1BA9, $663,  $43	; 15
-		dc.w $1B63, $686,  $43	; 18
-		dc.w $1B1C, $6A9,  $43	; 21
-ObjPos_S1SBZ1pf6:dc.w	  7,$1C14, $5E0	 ; 0 ; DATA XREF: ROM:ObjPos_Indexo
-		dc.w   $50,$1C5A, $5BD	; 3
-		dc.w   $51,$1CA0, $59A	; 6
-		dc.w   $51,$1CE7, $577	; 9
-		dc.w   $51,$1CEF, $5B0	; 12
-		dc.w   $52,$1CA9, $5D3	; 15
-		dc.w   $53,$1C63, $5F6	; 18
-		dc.w   $53,$1C1C, $619	; 21
-		dc.w   $53,$FFFF,    0	; 24
-		dc.w	 0		; 27
+ObjPos_S1SBZ1pf1:incbin	"level/misc/sbz1pf1.bin"
+		even
+ObjPos_S1SBZ1pf2:incbin	"level/misc/sbz1pf2.bin"
+		even
+ObjPos_S1SBZ1pf3:incbin	"level/misc/sbz1pf3.bin"
+		even
+ObjPos_S1SBZ1pf4:incbin	"level/misc/sbz1pf4.bin"
+		even
+ObjPos_S1SBZ1pf5:incbin	"level/misc/sbz1pf5.bin"
+		even
+ObjPos_S1SBZ1pf6:incbin	"level/misc/sbz1pf6.bin"
+		even
 ObjPos_S1Ending:incbin	"level/objects/S1E.bin"
 		even
 ObjPos_Null:	incbin	"level/objects/NULL.bin"
