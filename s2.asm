@@ -34367,14 +34367,14 @@ Obj09_Normal:				; CODE XREF: ROM:0001A3BCj
 		move.w	Obj09_Index(pc,d0.w),d1
 		jmp	Obj09_Index(pc,d1.w)
 ; ===========================================================================
-Obj09_Index:	dc.w loc_1A3DC-Obj09_Index ; DATA XREF:	ROM:Obj09_Indexo
+Obj09_Index:	dc.w Obj09_Main-Obj09_Index ; DATA XREF:	ROM:Obj09_Indexo
 					; ROM:0001A3D6o ...
-		dc.w loc_1A41C-Obj09_Index
-		dc.w loc_1A618-Obj09_Index
-		dc.w loc_1A66C-Obj09_Index
+		dc.w Obj09_ChkDebug-Obj09_Index
+		dc.w Obj09_ExitStage-Obj09_Index
+		dc.w Obj09_Exit2-Obj09_Index
 ; ===========================================================================
 
-loc_1A3DC:				; DATA XREF: ROM:Obj09_Indexo
+Obj09_Main:				; DATA XREF: ROM:Obj09_Indexo
 		addq.b	#2,routine(a0)
 		move.b	#$E,y_radius(a0)
 		move.b	#7,x_radius(a0)
@@ -34387,14 +34387,14 @@ loc_1A3DC:				; DATA XREF: ROM:Obj09_Indexo
 		bset	#2,status(a0)
 		bset	#1,status(a0)
 
-loc_1A41C:				; DATA XREF: ROM:0001A3D6o
-		tst.w	(Debug_mode_flag).w
-		beq.s	loc_1A430
-		btst	#4,(Ctrl_1_Press).w
-		beq.s	loc_1A430
-		move.w	#1,(Debug_placement_mode).w
+Obj09_ChkDebug:				; DATA XREF: ROM:0001A3D6o
+		tst.w	(Debug_mode_flag).w	; is debug mode on?
+		beq.s	Obj09_NoDebug		; if not, branch
+		btst	#4,(Ctrl_1_Press).w	; is the B button pressed?
+		beq.s	Obj09_NoDebug		; if not, branch
+		move.w	#1,(Debug_placement_mode).w	; go into debug placement mode
 
-loc_1A430:				; CODE XREF: ROM:0001A420j
+Obj09_NoDebug:				; CODE XREF: ROM:0001A420j
 					; ROM:0001A428j
 		move.b	#0,objoff_30(a0)
 		moveq	#0,d0
@@ -34439,10 +34439,10 @@ Obj09_Display:				; CODE XREF: ROM:0001A464j
 Obj09_Move:				; CODE XREF: ROM:0001A45Cp
 					; ROM:0001A46Ap
 		btst	#bitL,(Ctrl_1_Logical).w
-		beq.s	loc_1A4A4
+		beq.s	Obj09_ChkRight
 		bsr.w	Obj09_MoveLeft
 
-loc_1A4A4:				; CODE XREF: Obj09_Move+6j
+Obj09_ChkRight:				; CODE XREF: Obj09_Move+6j
 		btst	#bitR,(Ctrl_1_Logical).w
 		beq.s	loc_1A4B0
 		bsr.w	Obj09_MoveRight
@@ -34634,7 +34634,7 @@ locret_1A616:				; CODE XREF: S1SS_FixCamera+20j
 
 ; ===========================================================================
 
-loc_1A618:				; DATA XREF: ROM:0001A3D8o
+Obj09_ExitStage:				; DATA XREF: ROM:0001A3D8o
 		addi.w	#$40,($FFFFF782).w ; '@'
 		cmpi.w	#$1800,($FFFFF782).w
 		bne.s	loc_1A62C
@@ -34658,7 +34658,7 @@ loc_1A64A:				; CODE XREF: ROM:0001A632j
 		jmp	DisplaySprite
 ; ===========================================================================
 
-loc_1A66C:				; DATA XREF: ROM:0001A3DAo
+Obj09_Exit2:				; DATA XREF: ROM:0001A3DAo
 		subq.w	#1,objoff_38(a0)
 		bne.s	loc_1A678
 		move.b	#GMid_Level,(Game_Mode).w
@@ -35004,9 +35004,9 @@ loc_1A954:				; CODE XREF: OBj09_ChkItems2+7Ej
 
 ; loc_1A95E:
 Obj09_GOAL:				; CODE XREF: OBj09_ChkItems2+24j
-		cmpi.b	#$27,d0	; '''
+		cmpi.b	#$27,d0	; is this a goal item?
 		bne.s	Obj09_UPblock
-		addq.b	#2,routine(a0)
+		addq.b	#2,routine(a0) ; 
 		move.w	#$A8,d0	; '¨'
 		jsr	(PlaySound_Special).l
 		rts
@@ -35578,55 +35578,8 @@ loc_1B0A2:				; CODE XREF: ROM:0001B094j
 		move.b	d0,mapping_frame(a0)
 		jmp	DisplaySprite
 ; ===========================================================================
-Map_Obj21:	dc.w word_1B0B4-Map_Obj21 ; DATA XREF: ROM:0001B04Ao
-					; ROM:Map_Obj21o ...
-		dc.w word_1B106-Map_Obj21
-		dc.w word_1B158-Map_Obj21
-		dc.w word_1B1AA-Map_Obj21
-word_1B0B4:	dc.w $A			; DATA XREF: ROM:Map_Obj21o
-		dc.w $800D,$A000,$A000,	   0; 0
-		dc.w $800D,$A018,$A00C,	 $20; 4
-		dc.w $800D,$A020,$A010,	 $40; 8
-		dc.w $900D,$A010,$A008,	   0; 12
-		dc.w $900D,$A028,$A014,	 $28; 16
-		dc.w $A00D,$A008,$A004,	   0; 20
-		dc.w $A001,$A000,$A000,	 $20; 24
-		dc.w $A009,$A030,$A018,	 $30; 28
-		dc.w $4005,$810A,$8085,	   0; 32
-		dc.w $400D,$A10E,$A087,	 $10; 36
-word_1B106:	dc.w $A			; DATA XREF: ROM:0001B0AEo
-		dc.w $800D,$A000,$A000,	   0; 0
-		dc.w $800D,$A018,$A00C,	 $20; 4
-		dc.w $800D,$A020,$A010,	 $40; 8
-		dc.w $900D,$A010,$A008,	   0; 12
-		dc.w $900D,$A028,$A014,	 $28; 16
-		dc.w $A00D,$8008,$8004,	   0; 20
-		dc.w $A001,$8000,$8000,	 $20; 24
-		dc.w $A009,$A030,$A018,	 $30; 28
-		dc.w $4005,$810A,$8085,	   0; 32
-		dc.w $400D,$A10E,$A087,	 $10; 36
-word_1B158:	dc.w $A			; DATA XREF: ROM:0001B0B0o
-		dc.w $800D,$A000,$A000,	   0; 0
-		dc.w $800D,$A018,$A00C,	 $20; 4
-		dc.w $800D,$A020,$A010,	 $40; 8
-		dc.w $900D,$8010,$8008,	   0; 12
-		dc.w $900D,$A028,$A014,	 $28; 16
-		dc.w $A00D,$A008,$A004,	   0; 20
-		dc.w $A001,$A000,$A000,	 $20; 24
-		dc.w $A009,$A030,$A018,	 $30; 28
-		dc.w $4005,$810A,$8085,	   0; 32
-		dc.w $400D,$A10E,$A087,	 $10; 36
-word_1B1AA:	dc.w $A			; DATA XREF: ROM:0001B0B2o
-		dc.w $800D,$A000,$A000,	   0; 0
-		dc.w $800D,$A018,$A00C,	 $20; 4
-		dc.w $800D,$A020,$A010,	 $40; 8
-		dc.w $900D,$8010,$8008,	   0; 12
-		dc.w $900D,$A028,$A014,	 $28; 16
-		dc.w $A00D,$8008,$8004,	   0; 20
-		dc.w $A001,$8000,$8000,	 $20; 24
-		dc.w $A009,$A030,$A018,	 $30; 28
-		dc.w $4005,$810A,$8085,	   0; 32
-		dc.w $400D,$A10E,$A087,	 $10; 36
+Map_Obj21:	incbin "mappings/sprite/obj21.bin"
+		even
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
