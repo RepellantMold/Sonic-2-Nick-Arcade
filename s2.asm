@@ -36,7 +36,7 @@ Vectors:	dc.l System_Stack,EntryPoint,BusError,AddressError; 0 ; test Port A Ctr
 		dc.b "SONIC THE             HEDGEHOG 2                " ; Domestic name
 		dc.b "SONIC THE             HEDGEHOG 2                " ; Overseas name
 		dc.b "GM 00004049-01"   ; Serial/version number (same as Sonic 1 REV01)
-Checksum:	dc.w $AFC7		; ROM Checksum (same as Sonic 1 REV01)
+Checksum:	dc.w $AFC7		; ROM Checksum
 		dc.b "J               " ; I/O support (3 button controller)
 		dc.l 0			; ROM start location
 ROMEnd:		dc.l $7FFFF		; ROM end location (512 KB)
@@ -252,7 +252,7 @@ ChecksumError:
 		moveq	#$3F,d7	; '?'			; set d7 to $3F
 
 ChksumErr_RedFill:			; CODE XREF: ROM:000003C8j
-		move.w	#$E,(VDP_data_port).l
+		move.w	#cRed,(VDP_data_port).l
 		dbf	d7,ChksumErr_RedFill            ; fill the screen with red
 
 ChksumErr_InfLoop:			; CODE XREF: ROM:ChksumErr_InfLoopj
@@ -352,7 +352,7 @@ ErrorMsg_Wait:				; CODE XREF: ROM:00000458j
 ShowErrorMsg:				; CODE XREF: ROM:00000444p
 					; ROM:00000464p
 		lea	(VDP_data_port).l,a6
-		move.l	#$78000003,(VDP_control_port).l
+		locVRAM	$F800
 		lea	(Art_Text).l,a0
 		move.w	#$27F,d1
 
@@ -363,7 +363,7 @@ Error_LoadGfx:				; CODE XREF: ShowErrorMsg+1Cj
 		move.b	(Error_Type).w,d0
 		move.w	ErrorText(pc,d0.w),d0
 		lea	ErrorText(pc,d0.w),a0
-		move.l	#$46040003,(VDP_control_port).l
+		locVRAM	(VRAM_Plane_A_Name_Table+$604)
 		moveq	#$12,d1
 
 Error_CharsLoop:			; CODE XREF: ShowErrorMsg+44j
@@ -439,9 +439,9 @@ ShowErrDigit_NoOverflow:		; CODE XREF: ShowErrDigit+Aj
 
 Error_WaitForC:				; CODE XREF: ROM:ErrorMsg_Waitp
 					; Error_WaitForC+Aj
-		bsr.w	ReadJoypads
-		cmpi.b	#btnC,(Ctrl_1_Press).w ; ' '
-		bne.w	Error_WaitForC
+		bsr.w	ReadJoypads             ; read the joypads
+		cmpi.b	#btnC,(Ctrl_1_Press).w  ; is the C button pressed?
+		bne.w	Error_WaitForC		; if not, keep waiting
 		rts
 ; End of function Error_WaitForC
 
@@ -1074,7 +1074,7 @@ SoundDriverLoad:
 		move.w	#$100,(Z80_Reset).l
 		lea	(Kos_Z80).l,a0
 		lea	(Z80_RAM).l,a1          ; The line above got removed, Z80 commands starts here;
-		bsr.w	KosinskiDec             ; move.b #$F3,(a1)+ - di
+		bsr.w	KosDec             ; move.b #$F3,(a1)+ - di
 		move.w	#0,(Z80_Reset).l        ; move.b #$F3,(a1)+ - di
 		nop                             ; move.b #$C3,(a1)+ - jp
 		nop                             ; move.b #0,(a1)+ - jp address low byte
@@ -1271,32 +1271,32 @@ ProcessDMAQueue_Done:
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
 
-NemesisDec:				; CODE XREF: RunPLC_ROM+28p
+NemDec:				; CODE XREF: RunPLC_ROM+28p
 					; ROM:00003110p ...
 		movem.l	d0-a1/a3-a5,-(sp)
-		lea	(NemesisDec_Output).l,a3
+		lea	(NemDec_Output).l,a3
 		lea	(VDP_data_port).l,a4
 		bra.s	loc_154C
 ; ===========================================================================
 
-NemesisDec_ToRAM:
+NemDec_ToRAM:
 		movem.l	d0-a1/a3-a5,-(sp)
-		lea	(NemesisDec_OutputRAM).l,a3
+		lea	(NemDec_OutputRAM).l,a3
 
-loc_154C:				; CODE XREF: NemesisDec+10j
+loc_154C:				; CODE XREF: NemDec+10j
 		lea	(Decomp_Buffer).w,a1
 		move.w	(a0)+,d2
 		lsl.w	#1,d2
 		bcc.s	loc_155A
 		adda.w	#$A,a3
 
-loc_155A:				; CODE XREF: NemesisDec+24j
+loc_155A:				; CODE XREF: NemDec+24j
 		lsl.w	#2,d2
 		movea.w	d2,a5
 		moveq	#8,d3
 		moveq	#0,d2
 		moveq	#0,d4
-		bsr.w	NemesisDec4
+		bsr.w	NemDec4
 		move.b	(a0)+,d5
 		asl.w	#8,d5
 		move.b	(a0)+,d5
@@ -1304,13 +1304,13 @@ loc_155A:				; CODE XREF: NemesisDec+24j
 		bsr.s	sub_157A
 		movem.l	(sp)+,d0-a1/a3-a5
 		rts
-; End of function NemesisDec
+; End of function NemDec
 
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
 
-sub_157A:				; CODE XREF: NemesisDec+42p
+sub_157A:				; CODE XREF: NemDec+42p
 					; sub_157A+4Aj
 		move.w	d6,d7
 		subq.w	#8,d7
@@ -1346,7 +1346,7 @@ loc_15B2:				; CODE XREF: sub_157A:loc_15C0j
 		jmp	(a3)
 ; ===========================================================================
 
-NemesisDec3:				; CODE XREF: ROM:000015F8j
+NemDec3:				; CODE XREF: ROM:000015F8j
 					; ROM:00001604j ...
 		moveq	#0,d4
 		moveq	#8,d3
@@ -1381,57 +1381,57 @@ loc_15D4:				; CODE XREF: sub_157A+52j
 
 ; ===========================================================================
 
-NemesisDec_Output:			; DATA XREF: NemesisDec:loc_1534o
+NemDec_Output:			; DATA XREF: NemDec:loc_1534o
 					; RunPLC+10t
 		move.l	d4,(a4)
 		subq.w	#1,a5
 		move.w	a5,d4
-		bne.s	NemesisDec3
+		bne.s	NemDec3
 		rts
 ; ===========================================================================
 
-NemesisDec_Output_XOR:
+NemDec_Output_XOR:
 		eor.l	d4,d2
 		move.l	d2,(a4)
 		subq.w	#1,a5
 		move.w	a5,d4
-		bne.s	NemesisDec3
+		bne.s	NemDec3
 		rts
 ; ===========================================================================
 
-NemesisDec_OutputRAM:			; DATA XREF: NemesisDec+16o
+NemDec_OutputRAM:			; DATA XREF: NemDec+16o
 		move.l	d4,(a4)+
 		subq.w	#1,a5
 		move.w	a5,d4
-		bne.s	NemesisDec3
+		bne.s	NemDec3
 		rts
 ; ===========================================================================
 
-NemesisDec_OutputRAM_XOR:
+NemDec_OutputRAM_XOR:
 		eor.l	d4,d2
 		move.l	d2,(a4)+
 		subq.w	#1,a5
 		move.w	a5,d4
-		bne.s	NemesisDec3
+		bne.s	NemDec3
 		rts
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
 
-NemesisDec4:				; CODE XREF: NemesisDec+34p RunPLC+2Ap
+NemDec4:				; CODE XREF: NemDec+34p RunPLC+2Ap
 		move.b	(a0)+,d0
 
-loc_1620:				; CODE XREF: NemesisDec4+12j
+loc_1620:				; CODE XREF: NemDec4+12j
 		cmpi.b	#$FF,d0
 		bne.s	loc_1628
 		rts
 ; ===========================================================================
 
-loc_1628:				; CODE XREF: NemesisDec4+6j
+loc_1628:				; CODE XREF: NemDec4+6j
 		move.w	d0,d7
 
-loc_162A:				; CODE XREF: NemesisDec4+38j
-					; NemesisDec4+50j
+loc_162A:				; CODE XREF: NemDec4+38j
+					; NemDec4+50j
 		move.b	(a0)+,d0
 		cmpi.b	#$80,d0
 		bcc.s	loc_1620
@@ -1452,7 +1452,7 @@ loc_162A:				; CODE XREF: NemesisDec4+38j
 		bra.s	loc_162A
 ; ===========================================================================
 
-loc_1658:				; CODE XREF: NemesisDec4+2Ej
+loc_1658:				; CODE XREF: NemDec4+2Ej
 		move.b	(a0)+,d0
 		lsl.w	d1,d0
 		add.w	d0,d0
@@ -1460,12 +1460,12 @@ loc_1658:				; CODE XREF: NemesisDec4+2Ej
 		lsl.w	d1,d5
 		subq.w	#1,d5
 
-loc_1664:				; CODE XREF: NemesisDec4+4Cj
+loc_1664:				; CODE XREF: NemDec4+4Cj
 		move.w	d7,(a1,d0.w)
 		addq.w	#2,d0
 		dbf	d5,loc_1664
 		bra.s	loc_162A
-; End of function NemesisDec4
+; End of function NemDec4
 
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
@@ -1553,7 +1553,7 @@ RunPLC:					; CODE XREF: Pal_FadeTo+2Ep
 		tst.w	($FFFFF6F8).w
 		bne.s	locret_1730
 		movea.l	($FFFFF680).w,a0
-		lea	NemesisDec_Output(pc),a3
+		lea	NemDec_Output(pc),a3
 		nop
 		lea	(Decomp_Buffer).w,a1
 		move.w	(a0)+,d2
@@ -1563,7 +1563,7 @@ RunPLC:					; CODE XREF: Pal_FadeTo+2Ep
 loc_16FE:				; CODE XREF: RunPLC+1Cj
 		andi.w	#$7FFF,d2
 		move.w	d2,($FFFFF6F8).w	; This line causes a race condition where this value
-		bsr.w	NemesisDec4		; is set before the decompression starts and causes
+		bsr.w	NemDec4		; is set before the decompression starts and causes
 		move.b	(a0)+,d5		; the pointer to the routine to use decompressed output
 		asl.w	#8,d5			; to be 0, and since there's no data at 0.
 		move.b	(a0)+,d5		; This bug can be triggered if you ride up against the wall on HPZ 3
@@ -1623,7 +1623,7 @@ loc_1766:				; CODE XREF: sub_1732+1Aj
 
 loc_179A:				; CODE XREF: sub_1732+7Aj
 		movea.w	#8,a5
-		bsr.w	NemesisDec3
+		bsr.w	NemDec3
 		subq.w	#1,($FFFFF6F8).w
 		beq.s	loc_17CC
 		subq.w	#1,($FFFFF6FA).w
@@ -1670,7 +1670,7 @@ loc_17EE:				; CODE XREF: RunPLC_ROM+2Cj
 		ori.w	#$4000,d0
 		swap	d0
 		move.l	d0,(VDP_control_port).l
-		bsr.w	NemesisDec
+		bsr.w	NemDec
 		dbf	d1,loc_17EE
 		rts
 ; End of function RunPLC_ROM
@@ -1679,7 +1679,7 @@ loc_17EE:				; CODE XREF: RunPLC_ROM+2Cj
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
 
-EnigmaDec:				; CODE XREF: ROM:00003124p
+EniDec:				; CODE XREF: ROM:00003124p
 					; ROM:00003308p ...
 		movem.l	d0-d7/a1-a5,-(sp)
 		movea.w	d0,a3
@@ -1711,13 +1711,13 @@ loc_182E:				; CODE XREF: ROM:00001860j
 		moveq	#6,d0
 		lsr.w	#1,d2
 
-loc_1848:				; CODE XREF: EnigmaDec+34j
+loc_1848:				; CODE XREF: EniDec+34j
 		bsr.w	sub_197C
 		andi.w	#$F,d2
 		lsr.w	#4,d1
 		add.w	d1,d1
 		jmp	loc_18A4(pc,d1.w)
-; End of function EnigmaDec
+; End of function EniDec
 
 ; ===========================================================================
 
@@ -1909,7 +1909,7 @@ loc_195A:
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
 
-sub_197C:				; CODE XREF: EnigmaDec:loc_1848p
+sub_197C:				; CODE XREF: EniDec:loc_1848p
 					; sub_18CC+8Aj
 		sub.w	d0,d6
 		cmpi.w	#9,d6
@@ -1926,7 +1926,7 @@ locret_198A:				; CODE XREF: sub_197C+6j
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
 
-KosinskiDec:				; CODE XREF: SoundDriverLoad+1Ep
+KosDec:				; CODE XREF: SoundDriverLoad+1Ep
 
 var_2		= -2
 var_1		= -1
@@ -1937,8 +1937,8 @@ var_1		= -1
 		move.w	(sp),d5
 		moveq	#$F,d4
 
-loc_1998:				; CODE XREF: KosinskiDec+24j
-					; KosinskiDec+8Aj ...
+loc_1998:				; CODE XREF: KosDec+24j
+					; KosDec+8Aj ...
 		lsr.w	#1,d5
 		move	sr,d6
 		dbf	d4,loc_19AA
@@ -1947,14 +1947,14 @@ loc_1998:				; CODE XREF: KosinskiDec+24j
 		move.w	(sp),d5
 		moveq	#$F,d4
 
-loc_19AA:				; CODE XREF: KosinskiDec+10j
+loc_19AA:				; CODE XREF: KosDec+10j
 		move	d6,ccr
 		bcc.s	loc_19B2
 		move.b	(a0)+,(a1)+
 		bra.s	loc_1998
 ; ===========================================================================
 
-loc_19B2:				; CODE XREF: KosinskiDec+20j
+loc_19B2:				; CODE XREF: KosDec+20j
 		moveq	#0,d3
 		lsr.w	#1,d5
 		move	sr,d6
@@ -1964,7 +1964,7 @@ loc_19B2:				; CODE XREF: KosinskiDec+20j
 		move.w	(sp),d5
 		moveq	#$F,d4
 
-loc_19C6:				; CODE XREF: KosinskiDec+2Cj
+loc_19C6:				; CODE XREF: KosDec+2Cj
 		move	d6,ccr
 		bcs.s	loc_19F6
 		lsr.w	#1,d5
@@ -1974,7 +1974,7 @@ loc_19C6:				; CODE XREF: KosinskiDec+2Cj
 		move.w	(sp),d5
 		moveq	#$F,d4
 
-loc_19DA:				; CODE XREF: KosinskiDec+40j
+loc_19DA:				; CODE XREF: KosDec+40j
 		roxl.w	#1,d3
 		lsr.w	#1,d5
 		dbf	d4,loc_19EC
@@ -1983,7 +1983,7 @@ loc_19DA:				; CODE XREF: KosinskiDec+40j
 		move.w	(sp),d5
 		moveq	#$F,d4
 
-loc_19EC:				; CODE XREF: KosinskiDec+52j
+loc_19EC:				; CODE XREF: KosDec+52j
 		roxl.w	#1,d3
 		addq.w	#1,d3
 		moveq	#-1,d2
@@ -1991,7 +1991,7 @@ loc_19EC:				; CODE XREF: KosinskiDec+52j
 		bra.s	loc_1A0C
 ; ===========================================================================
 
-loc_19F6:				; CODE XREF: KosinskiDec+3Cj
+loc_19F6:				; CODE XREF: KosDec+3Cj
 		move.b	(a0)+,d0
 		move.b	(a0)+,d1
 		moveq	#-1,d2
@@ -2003,15 +2003,15 @@ loc_19F6:				; CODE XREF: KosinskiDec+3Cj
 		move.b	d1,d3
 		addq.w	#1,d3
 
-loc_1A0C:				; CODE XREF: KosinskiDec+68j
-					; KosinskiDec+86j ...
+loc_1A0C:				; CODE XREF: KosDec+68j
+					; KosDec+86j ...
 		move.b	(a1,d2.w),d0
 		move.b	d0,(a1)+
 		dbf	d3,loc_1A0C
 		bra.s	loc_1998
 ; ===========================================================================
 
-loc_1A18:				; CODE XREF: KosinskiDec+7Aj
+loc_1A18:				; CODE XREF: KosDec+7Aj
 		move.b	(a0)+,d1
 		beq.s	loc_1A28
 		cmpi.b	#1,d1
@@ -2020,10 +2020,10 @@ loc_1A18:				; CODE XREF: KosinskiDec+7Aj
 		bra.s	loc_1A0C
 ; ===========================================================================
 
-loc_1A28:				; CODE XREF: KosinskiDec+8Ej
+loc_1A28:				; CODE XREF: KosDec+8Ej
 		addq.l	#2,sp
 		rts
-; End of function KosinskiDec
+; End of function KosDec
 
 ;----------------------------------------------------
 ; Chameleon format decompression routine
@@ -3549,23 +3549,22 @@ Pal_LZ4SonicWater:incbin	"art/palettes/Sonic - SBZ3 Underwater.bin"
 		even
 Pal_S1SpecialStageTC:incbin	"art/palettes/SpecialStageResults.bin"
 		even
-Pal_S1Continue:	dc.w	 0,    0, $822,	$A44, $C66, $E88, $EEE,	$AAA, $888, $444, $8AE,	$46A,	$E,    8,    4,	 $EE; 0
-					; DATA XREF: ROM:00002592o
-		dc.w	 0,    0, $424,	$848, $A6A, $E8E,    0,	   0,	 0,    0,    0,	   0,  $EE,  $88,  $44,	   0; 16
+Pal_S1Continue:	incbin	"art/palettes/SpecialStageContinue.bin"
+		even
 Pal_S1Ending:	incbin	"art/palettes/Sonic 1 - Ending.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
 
 DelayProgram:				; CODE XREF: Pause+28p	Pal_FadeTo+28p	...
-		enable_ints
+		enable_ints			; enable interrupts
 
 loc_2C88:				; CODE XREF: DelayProgram+8j
-		tst.b	(Vint_routine).w
-		bne.s	loc_2C88
+		tst.b	(Vint_routine).w	; is vblank routine finished?
+		bne.s	loc_2C88		; if not, keep waiting...
 		rts
 ; End of function DelayProgram
 
@@ -3678,7 +3677,7 @@ loc_2FAA:				; CODE XREF: CalcAngle+Ej
 AngleData:      incbin	"collision/Angles.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 
 SegaScreen:				; CODE XREF: ROM:GameModeArrayj
 		move.b	#$E4,d0
@@ -3686,42 +3685,29 @@ SegaScreen:				; CODE XREF: ROM:GameModeArrayj
 		bsr.w	ClearPLC
 		bsr.w	Pal_FadeFrom
 		lea	(VDP_control_port).l,a6
-		move.w	#$8004,(a6)
-		move.w	#$8230,(a6)
-		move.w	#$8407,(a6)
-		move.w	#$8700,(a6)
-		move.w	#$8B00,(a6)
-		move.w	#$8C81,(a6)
+		move.w	#$8004,(a6)	; use 8-colour mode
+		move.w	#$8200+(VRAM_Plane_A_Name_Table>>10),(a6) ; set foreground nametable address
+		move.w	#$8400+(VRAM_Plane_B_Name_Table>>13),(a6) ; set background nametable address
+		move.w	#$8700,(a6)	; set background colour (palette entry 0)
+		move.w	#$8B00,(a6)	; full-screen vertical scrolling
 		clr.b	(Water_move).w
 		disable_ints
 		move.w	(VDP_Reg0_Val).w,d0
 		andi.b	#$BF,d0
 		move.w	d0,(VDP_control_port).l
 		bsr.w	ClearScreen
-		move.l	#$40000000,(VDP_control_port).l
+		locVRAM	0
 		lea	(Nem_SegaLogo).l,a0
-		bsr.w	NemesisDec
+		bsr.w	NemDec
 		lea	(Chunk_Table).l,a1
 		lea	(Eni_SegaLogo).l,a0
 		move.w	#0,d0
-		bsr.w	EnigmaDec
-		lea	(Chunk_Table).l,a1
-		move.l	#$65100003,d0
-		moveq	#$17,d1
-		moveq	#7,d2
-		bsr.w	ShowVDPGraphics
-		lea	(Chunk_Table+$180).l,a1
-		move.l	#$40000003,d0
-		moveq	#$27,d1	; '''
-		moveq	#$1B,d2
-		bsr.w	ShowVDPGraphics
-		tst.b	(Graphics_Flags).w
-		bmi.s	loc_316A
-		lea	(Chunk_Table+$A40).l,a1
-		move.l	#$453A0003,d0
-		moveq	#2,d1
-		moveq	#1,d2
-		bsr.w	ShowVDPGraphics
+		bsr.w	EniDec
+		copyTilemap	Chunk_Table,$E510,$17,7
+		copyTilemap	Chunk_Table+$180,$C000,$27,$1B
+		tst.b   (Graphics_Flags).w	; is console Japanese?
+		bmi.s   loc_316A
+		copyTilemap	Chunk_Table+$A40,$C53A,2,1 ; hide "TM" with a white rectangle
 
 loc_316A:				; CODE XREF: ROM:00003154j
 		moveq	#palid_SegaBG,d0
@@ -3757,7 +3743,7 @@ Sega_GoToTitleScreen:			; CODE XREF: ROM:000031CCj
 		move.b	#GMid_TS,(Game_Mode).w
 		rts
 ; ===========================================================================
-		dc.w 0		; filler
+		align 2		; filler, could be replaced with even
 ; ===========================================================================
 
 TitleScreen:				; CODE XREF: ROM:000003A0j
@@ -3768,13 +3754,13 @@ TitleScreen:				; CODE XREF: ROM:000003A0j
 		disable_ints
 		bsr.w	SoundDriverLoad
 		lea	(VDP_control_port).l,a6
-		move.w	#$8004,(a6)
-		move.w	#$8230,(a6)
-		move.w	#$8407,(a6)
-		move.w	#$9001,(a6)
-		move.w	#$9200,(a6)
+		move.w	#$8004,(a6)	; 8-colour mode
+		move.w	#$8200+(VRAM_Plane_A_Name_Table>>10),(a6) ; set foreground nametable address
+		move.w	#$8400+(VRAM_Plane_B_Name_Table>>13),(a6) ; set background nametable address
+		move.w	#$9001,(a6)	; 64-cell hscroll size
+		move.w	#$9200,(a6)	; window vertical position
 		move.w	#$8B03,(a6)
-		move.w	#$8720,(a6)
+		move.w	#$8720,(a6)	; set background colour (palette line 2, entry 0)
 		clr.b	(Water_move).w
 		move.w	#$8C81,(a6)
 		bsr.w	ClearScreen
@@ -3817,14 +3803,14 @@ loc_3270:				; CODE XREF: ROM:00003272j
 		bsr.w	PalLoad1
 		bsr.w	Pal_FadeTo
 		disable_ints
-		move.l	#$40000000,(VDP_control_port).l
+		locVRAM	0
 		lea	(Nem_Title).l,a0
-		bsr.w	NemesisDec
-		move.l	#$40000001,(VDP_control_port).l
+		bsr.w	NemDec
+		locVRAM	$4000
 		lea	(Nem_TitleSonicTails).l,a0
-		bsr.w	NemesisDec
+		bsr.w	NemDec
 		lea	(VDP_data_port).l,a6
-		move.l	#$50000003,4(a6)
+		locVRAM	$D000,4(a6)
 		lea	(Art_Text).l,a5
 		move.w	#$28F,d1
 
@@ -3835,7 +3821,7 @@ loc_32C4:				; CODE XREF: ROM:000032C6j
 		move.b	#0,($FFFFFE30).w
 		move.w	#0,(Debug_placement_mode).w
 		move.w	#0,(Demo_mode_flag).w
-		move.w	#0,($FFFFFFEA).w
+		move.w	#0,(unk_FFEA).w
 		move.w	#0,(Current_ZoneAndAct).w
 		move.w	#0,(Palette_Wait_Counter).w
 		bsr.w	Pal_FadeFrom
@@ -3843,7 +3829,7 @@ loc_32C4:				; CODE XREF: ROM:000032C6j
 		lea	(Chunk_Table).l,a1
 		lea	(Eni_TitleMap).l,a0
 		move.w	#0,d0
-		bsr.w	EnigmaDec
+		bsr.w	EniDec
 		lea	(Chunk_Table).l,a1
 		move.l	#$40000003,d0
 		moveq	#$27,d1	; '''
@@ -3852,9 +3838,7 @@ loc_32C4:				; CODE XREF: ROM:000032C6j
 		lea	(Chunk_Table).l,a1
 		lea	(Eni_TitleBg1).l,a0
 		move.w	#0,d0
-
-loc_3330:
-		bsr.w	EnigmaDec
+		bsr.w	EniDec
 		lea	(Chunk_Table).l,a1
 		move.l	#$60000003,d0
 		moveq	#$1F,d1
@@ -3863,7 +3847,7 @@ loc_3330:
 		lea	(Chunk_Table).l,a1
 		lea	(Eni_TitleBg2).l,a0
 		move.w	#0,d0
-		bsr.w	EnigmaDec
+		bsr.w	EniDec
 		lea	(Chunk_Table).l,a1
 		move.l	#$60400003,d0
 		moveq	#$1F,d1
@@ -4034,7 +4018,7 @@ loc_354C:				; CODE XREF: ROM:00003532j
 
 loc_355A:				; CODE XREF: ROM:00003538j
 		move.b	#$1C,(Game_Mode).w	; this one just makes the screen turn into a horizontal
-		move.b	#$91,d0			; strip of lines with the credits music playing on Fusion
+		move.b	#$91,d0			; strip of lines with the credits music playing
 		bsr.w	PlaySound_Special
 		move.w	#0,($FFFFFFF4).w
 		rts
@@ -4434,7 +4418,7 @@ loc_3AFC:				; CODE XREF: UnknownSub_4+12j
 ; End of function UnknownSub_4
 
 ; ===========================================================================
-		nop
+		nop			; filler
 ; ===========================================================================
 ; Same as Sonic 1
 MusicList:      incbin	"misc/Music Playlist 1.bin"
@@ -4456,7 +4440,7 @@ loc_3B38:
 		disable_ints
 		move.l	#$70000002,(VDP_control_port).l
 		lea	(Nem_S1TitleCard).l,a0
-		bsr.w	NemesisDec
+		bsr.w	NemDec
 		bsr.w	ClearScreen
 		lea	(VDP_control_port).l,a5
 		move.w	#$8F01,(a5)
@@ -5753,8 +5737,8 @@ SS_ClrNemRam:				; CODE XREF: ROM:000050CEj
 		move.l	#0,(Camera_Y_pos).w
 		move.b	#9,(MainCharacter).w
 		bsr.w	PalCycle_S1SS
-		clr.w	($FFFFF780).w
-		move.w	#$40,($FFFFF782).w ; '@'
+		clr.w	(SS_Angle).w		; clear the angle of the special stage so it's upright
+		move.w	#$40,(SS_RotationSpeed).w ; set the rotation speed
 		move.w	#$89,d0	; '‰'
 		bsr.w	PlaySound
 		move.w	#0,(Demo_button_index).w
@@ -5836,7 +5820,7 @@ loc_5214:				; CODE XREF: ROM:00005208j
 		bsr.w	ClearScreen
 		move.l	#$70000002,(VDP_control_port).l
 		lea	(Nem_S1TitleCard).l,a0
-		bsr.w	NemesisDec
+		bsr.w	NemDec
 		jsr	HUD_Base
 		enable_ints
 		moveq	#palid_SSResult,d0
@@ -5897,7 +5881,7 @@ S1_SSBGLoad:				; CODE XREF: ROM:00005088p
 		lea	(Chunk_Table).l,a1	; The line below got removed, uncomment if you re-add this
 		;lea	(Eni_SSBg1).l,a0
 		move.w	#$4051,d0
-		bsr.w	EnigmaDec
+		bsr.w	EniDec
 		move.l	#$50000001,d3
 		lea	(Chunk_Table+$80).l,a2
 		moveq	#6,d7
@@ -5947,7 +5931,7 @@ loc_5360:				; CODE XREF: S1_SSBGLoad+6Ej
 		lea	(Chunk_Table).l,a1	; Like above, uncomment if you re-add this
 		;lea	(Eni_SSBg2).l,a0
 		move.w	#$4000,d0
-		bsr.w	EnigmaDec
+		bsr.w	EniDec
 		lea	(Chunk_Table).l,a1
 		move.l	#$40000003,d0
 		moveq	#$3F,d1	; '?'
@@ -6162,7 +6146,7 @@ byte_5709:	dc.b   8,  2,  4,$FF,  2,  3,  8,$FF,  4,  2,  2,  3,  8,$FD,  4,  2;
 					; DATA XREF: S1SS_BgAnimate+36o
 		dc.b   2,  3,  2,$FF,  0; 16
 ; ===========================================================================
-		nop
+		nop			; filler
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -9099,7 +9083,7 @@ loadZoneBlockMaps:
 ; loadZoneBlockMaps_Skip16Convert: Level_LoadEnigmaBlocks:
 		lea	(Block_Table).w,a1
 		move.w	#0,d0
-		bsr.w	EnigmaDec
+		bsr.w	EniDec
 		bra.s	loc_72C2
 ; ===========================================================================
 ; loadZoneBlockMaps_Convert16:
@@ -10722,7 +10706,7 @@ Map_Obj11_HPZ:	incbin	"mappings/sprite/obj11b.bin"
 Map_Obj11_EHZ:	incbin	"mappings/sprite/obj11c.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 ;----------------------------------------------------
 ; Object 15 - swinging platforms
 ;----------------------------------------------------
@@ -11036,7 +11020,7 @@ Map_Obj15_EHZ:	incbin	"mappings/sprite/obj15c.bin"
 Map_Obj48:	incbin	"mappings/sprite/obj48.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 ;----------------------------------------------------
 ; Object 17 - spinning spikes from Green Hill
 ;----------------------------------------------------
@@ -11502,7 +11486,7 @@ Map_Obj18:	incbin	"mappings/sprite/obj18.bin"
 Map_Obj18_EHZ:	incbin	"mappings/sprite/obj18b.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 ;----------------------------------------------------
 ; Object 1A - Collapsing platforms (GHZ, HPZ)
 ;----------------------------------------------------
@@ -11973,7 +11957,7 @@ word_9340:	dc.w $C			; DATA XREF: ROM:000092FAo
 		dc.w	 5, $80C, $806,	 $10; 40
 		dc.w	 5, $808, $804,	 $20; 44
 ; ===========================================================================
-		nop
+		nop				; filler
 ;----------------------------------------------------
 ; Object 1C - Bridge support (GHZ, EHZ/HTZ)
 ;----------------------------------------------------
@@ -12552,7 +12536,7 @@ word_9A92:	dc.w 1			; DATA XREF: ROM:00009A8Ao
 word_9A9C:	dc.w 1			; DATA XREF: ROM:00009A8Co
 		dc.w $F00F,  $50,  $28,$FFF0; 0
 ; ===========================================================================
-		nop
+		nop			; filler
 ;----------------------------------------------------
 ; Object 28 - animals
 ;----------------------------------------------------
@@ -13064,7 +13048,7 @@ word_A0BC:	dc.w 2			; DATA XREF: ROM:0000A06Eo
 		dc.w $F805,   $A,    5,$FFF0; 0
 		dc.w $F805,   $E,    7,	   0; 4
 ; ===========================================================================
-		nop
+		nop			; filler
 ;----------------------------------------------------
 ; Object 1F - GHZ Crabmeat
 ;----------------------------------------------------
@@ -13618,7 +13602,7 @@ word_A7CE:	dc.w 1			; DATA XREF: ROM:0000A7B6o
 word_A7D8:	dc.w 1			; DATA XREF: ROM:0000A7B8o
 		dc.w $F805,  $33,  $19,$FFF8; 0
 ; ===========================================================================
-		nop
+		nop			; filler
 ;----------------------------------------------------
 ; Object 25 - Rings
 ;----------------------------------------------------
@@ -14102,7 +14086,7 @@ word_AE34:	dc.w 4			; DATA XREF: ROM:0000AD64o
 		dc.w	$F,$1044,$1022,$FFE0; 8
 		dc.w	$F,$1844,$1822,	   0; 12
 ; ===========================================================================
-		nop
+		nop				; filler
 ;----------------------------------------------------
 ; Object 26 - monitor
 ;----------------------------------------------------
@@ -15757,7 +15741,7 @@ word_C656:	dc.w 1			; DATA XREF: ROM:0000C620o
 		dc.w $F805,$200C,$2006,$FFF8; 0
 word_C660:	dc.w 0			; DATA XREF: ROM:0000C622o
 ; ===========================================================================
-		nop
+		nop			; filler
 ;----------------------------------------------------
 ; Object 36 - Spikes
 ;----------------------------------------------------
@@ -16142,7 +16126,7 @@ Obj3C_FragSpdLeft:dc.w $FA00,$FA00	  ; 0 ;	DATA XREF: ROM:0000C968o
 Map_Obj3C:	incbin	"mappings/sprite/obj3C.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -17553,7 +17537,7 @@ loc_D862:				; CODE XREF: ROM:0000D842j
 		moveq	#1,d0
 		rts
 ; ===========================================================================
-		nop
+		nop			; filler
 
 ; ===========================================================================
 ; ----------------------------------------------------------------------------
@@ -18255,7 +18239,7 @@ locret_DDDE:				; CODE XREF: ROM:0000DD36j sub_DED2+8j
 
 loc_DDE0:				; CODE XREF: ROM:0000DD10j
 		moveq	#-1,d0
-		move.l	d0,($FFFFF780).w
+		move.l	d0,(SS_Angle).w
 		move.l	d0,($FFFFF784).w
 		move.l	d0,($FFFFF788).w
 		move.l	d0,($FFFFF78C).w
@@ -18524,7 +18508,7 @@ loc_DFFC:				; CODE XREF: sub_DF80+68j sub_DF80+6Cj
 sub_E002:				; CODE XREF: sub_DED2:loc_DF0Cp
 					; sub_DF80:loc_DFACp
 		move.l	a1,-(sp)
-		lea	($FFFFF780).w,a1
+		lea	(SS_Angle).w,a1
 		cmp.b	(a1)+,d6
 		beq.s	loc_E022
 		cmp.b	(a1)+,d6
@@ -18550,7 +18534,7 @@ loc_E022:				; CODE XREF: sub_E002+8j sub_E002+Cj ...
 
 sub_E026:				; CODE XREF: sub_DED2:loc_DF08p
 					; sub_DF80:loc_DFA8p
-		lea	($FFFFF780).w,a1
+		lea	(SS_Angle).w,a1
 		lea	($FFFFBE00).w,a3
 		tst.b	(a1)+
 		bmi.s	loc_E05E
@@ -18582,7 +18566,7 @@ loc_E05E:				; CODE XREF: sub_E026+Aj sub_E026+12j	...
 
 
 sub_E062:				; CODE XREF: sub_DED2+30p sub_DF80+22p
-		lea	($FFFFF780).w,a1
+		lea	(SS_Angle).w,a1
 		lea	($FFFFBE00).w,a3
 		cmp.b	(a1)+,d2
 		beq.s	loc_E09A
@@ -20017,7 +20001,7 @@ byte_F1B3:	dc.b  $F,  0,$FF	; 0 ; DATA XREF: ROM:0000F192o
 Map_Obj0D:	incbin	"mappings/sprite/obj0D.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 ;----------------------------------------------------
 ; Object 40 - GHZ Motobug
 ;----------------------------------------------------
@@ -22823,7 +22807,7 @@ locret_10C34:
 ; End of function LoadSonicDynPLC
 
 ; ===========================================================================
-		nop
+		nop			; filler
 ; START	OF FUNCTION CHUNK FOR Sonic_LevelBoundaries
 
 j_KillSonic:				; CODE XREF: Sonic_LevelBoundaries+48j
@@ -24803,7 +24787,7 @@ byte_11E48:	dc.b   3,$51,$52,$53,$54,$FF; 0	; DATA XREF: ROM:00011E24o
 byte_11E4E:	dc.b   3,$55,$56,$57,$58,$FF; 0	; DATA XREF: ROM:00011E26o
 byte_11E54:	dc.b   2,$81,$82,$83,$84,$FF; 0	; DATA XREF: ROM:00011E28o
 ; ===========================================================================
-		nop
+		nop			; filler
 ; START	OF FUNCTION CHUNK FOR Tails_LevelBoundaries
 
 KillTails:				; CODE XREF: Tails_LevelBoundaries+48j
@@ -26665,7 +26649,7 @@ ObjHitWallLeft:
 locret_134C4:				; CODE XREF: ROM:000134BEj
 		rts
 ; ===========================================================================
-		nop
+		nop			; filler
 ;----------------------------------------------------
 ; Object 79 - lamppost
 ;----------------------------------------------------
@@ -26926,7 +26910,7 @@ loc_13844:				; CODE XREF: ROM:0001382Aj
 Map_Obj7D:	incbin	"mappings/sprite/obj7D.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 ;----------------------------------------------------
 ; Object 47 - Bumper (from Spring Yard)
 ;----------------------------------------------------
@@ -27032,7 +27016,7 @@ byte_1398B:	dc.b   3,  1,  2,  1,  2,$FD,  0; 0 ; DATA XREF: ROM:00013986o
 Map_S1Obj47:	incbin	"mappings/sprite/S1obj47.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 ;----------------------------------------------------
 ; Object 64 - Bubbles from Labyrinth
 ;----------------------------------------------------
@@ -27310,7 +27294,7 @@ byte_13CE9:	dc.b  $F,$13,$14,$15,$FF; 0 ; DATA XREF: ROM:00013CCEo
 Map_Obj0A_Bubbles:incbin	"mappings/sprite/obj0A.bin"
 		even
 ; ===========================================================================
-		nop
+		nop				; filler
 ;----------------------------------------------------
 ; Object 03 - collision	index switcher (in loops)
 ;----------------------------------------------------
@@ -27656,7 +27640,7 @@ byte_14296:	dc.b   7,  4,  3,  2,  1,  0,$FE,  1; 0	; DATA XREF: ROM:0001428Co
 Map_Obj0B:	incbin	"mappings/sprite/obj0B.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 
 Obj0C:					; DATA XREF: ROM:Obj_Indexo
 		moveq	#0,d0
@@ -27748,7 +27732,7 @@ loc_143B2:				; CODE XREF: ROM:0001438Aj
 Map_Obj0C:	incbin	"mappings/sprite/obj0C.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 
 j_CalcSine:				; CODE XREF: ROM:00014374p
 					; ROM:loc_143A0p
@@ -27795,7 +27779,7 @@ Obj12_Display:				; DATA XREF: ROM:000143ECo
 Map_Obj12:	incbin	"mappings/sprite/obj12.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 ;----------------------------------------------------
 ; Object 13 - HPZ waterfall
 ;----------------------------------------------------
@@ -28130,7 +28114,7 @@ Obj06_PlayerDeltaYArray:dc.b  $20, $20,	$20, $20, $20, $20, $20, $20, $20, $20,	
 		dc.b  $1F, $1F,	$20, $20, $20, $20, $20, $20, $20, $20,	$20, $20, $20, $20, $20, $20; 384
 		dc.b  $20, $20,	$20, $20, $20, $20, $20, $20, $20, $20,	$20, $20, $20, $20, $20, $20; 400
 ; ===========================================================================
-		nop
+		nop			; filler
 ;----------------------------------------------------
 ; Object 14 - HTZ see-saw
 ;----------------------------------------------------
@@ -28486,7 +28470,7 @@ Map_Obj14:	incbin	"mappings/sprite/obj14.bin"
 Map_Obj14b:	incbin	"mappings/sprite/obj14b.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 
 j_ObjectMoveAndFall:				; CODE XREF: ROM:00014F36p
 					; ROM:00014F48p ...
@@ -28587,7 +28571,7 @@ Obj16_NoMove:				; DATA XREF: ROM:0001519Co
 Map_Obj16:	incbin	"mappings/sprite/obj16.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 
 loc_152A4:				; CODE XREF: ROM:00015180j
 		jmp	DisplaySprite
@@ -32304,7 +32288,7 @@ byte_18561:	dc.b   7,  1,  2,$FF,  0; 0 ; DATA XREF: ROM:0001855Co
 Map_Obj55:	incbin	"mappings/sprite/obj55.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 
 loc_185D4:				; CODE XREF: ROM:000183C0j
 					; ROM:loc_18452j ...
@@ -32364,7 +32348,7 @@ loc_18660:				; CODE XREF: ROM:0001862Ej
 Map_Obj8A:	incbin	"mappings/sprite/obj8A.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 
 j_ModifySpriteAttr_2P_4:		; CODE XREF: ROM:00018610p
 					; ROM:00018636p
@@ -33631,7 +33615,7 @@ Touch_E1:				; CODE XREF: TouchResponse+338j
 		rts
 ; END OF FUNCTION CHUNK	FOR TouchResponse
 ; ===========================================================================
-		nop
+		nop			; filler
 
 j_Sonic_ResetOnFloor:			; CODE XREF: HurtSonic+34p
 					; KillSonic+12p
@@ -33651,7 +33635,7 @@ S1SS_ShowLayout:			; CODE XREF: ROM:0000518Ep
 		bsr.w	sub_19F02
 		move.w	d5,-(sp)
 		lea	(Level_Layout).w,a1
-		move.b	($FFFFF780).w,d0
+		move.b	(SS_Angle).w,d0
 		andi.b	#$FC,d0
 		jsr	(CalcSine).l
 		move.w	d0,d4
@@ -33774,7 +33758,7 @@ loc_19CBA:				; CODE XREF: S1SS_ShowLayout+130j
 sub_19CC2:				; CODE XREF: S1SS_ShowLayoutp
 		lea	(Chunk_Table+$400C).l,a1
 		moveq	#0,d0
-		move.b	($FFFFF780).w,d0
+		move.b	(SS_Angle).w,d0
 		lsr.b	#2,d0
 		andi.w	#$F,d0
 		moveq	#$23,d1	; '#'
@@ -34128,7 +34112,7 @@ loc_1A0E8:				; CODE XREF: S1SS_Load+1Ej
 		movea.l	S1SS_LayoutIndex(pc,d0.w),a0
 		lea	(Chunk_Table+$4000).l,a1
 		move.w	#0,d0
-		jsr	(EnigmaDec).l
+		jsr	(EniDec).l
 		lea	(Chunk_Table).l,a1
 		move.w	#$FFF,d0
 
@@ -34355,7 +34339,7 @@ byte_1A3B0:	dc.b 1			; DATA XREF: ROM:0001A394o
 					; ROM:0001A398o ...
 		dc.b $F8,  5,  0, $C,$F8; 0
 ; ===========================================================================
-		nop
+		nop                     ; filler
 ;----------------------------------------------------
 ; Object 09 - Sonic in Sonic 1 special stage
 ;----------------------------------------------------
@@ -34433,9 +34417,9 @@ Obj09_Display:				; CODE XREF: ROM:0001A464j
 		bsr.w	Obj09_ChkItems2
 		jsr	ObjectMove
 		bsr.w	S1SS_FixCamera
-		move.w	($FFFFF780).w,d0
-		add.w	($FFFFF782).w,d0
-		move.w	d0,($FFFFF780).w
+		move.w	(SS_Angle).w,d0
+		add.w	(SS_RotationSpeed).w,d0
+		move.w	d0,(SS_Angle).w
 		jsr	Sonic_Animate
 		rts
 
@@ -34479,7 +34463,7 @@ loc_1A4DC:				; CODE XREF: Obj09_Move+3Ej
 
 loc_1A4E0:				; CODE XREF: Obj09_Move+20j
 					; Obj09_Move+26j ...
-		move.b	($FFFFF780).w,d0
+		move.b	(SS_Angle).w,d0
 		addi.b	#$20,d0	; ' '
 		andi.b	#$C0,d0
 		neg.b	d0
@@ -34574,7 +34558,7 @@ Obj09_Jump:				; CODE XREF: ROM:Obj09_OnWallp
 		move.b	(Ctrl_1_Press_Logical).w,d0
 		andi.b	#$70,d0	; 'p'
 		beq.s	locret_1A5D0
-		move.b	($FFFFF780).w,d0
+		move.b	(SS_Angle).w,d0
 		andi.b	#$FC,d0
 		neg.b	d0
 		subi.b	#$40,d0	; '@'
@@ -34641,23 +34625,23 @@ locret_1A616:				; CODE XREF: S1SS_FixCamera+20j
 ; ===========================================================================
 
 Obj09_ExitStage:				; DATA XREF: ROM:0001A3D8o
-		addi.w	#$40,($FFFFF782).w ; '@'
-		cmpi.w	#$1800,($FFFFF782).w
+		addi.w	#$40,(SS_RotationSpeed).w ; '@'
+		cmpi.w	#$1800,(SS_RotationSpeed).w
 		bne.s	loc_1A62C
 		move.b	#GMid_Level,(Game_Mode).w
 
 loc_1A62C:				; CODE XREF: ROM:0001A624j
-		cmpi.w	#$3000,($FFFFF782).w
+		cmpi.w	#$3000,(SS_RotationSpeed).w
 		blt.s	loc_1A64A
-		move.w	#0,($FFFFF782).w
-		move.w	#$4000,($FFFFF780).w
+		move.w	#0,(SS_RotationSpeed).w
+		move.w	#$4000,(SS_Angle).w
 		addq.b	#2,routine(a0)
 		move.w	#$3C,objoff_38(a0) ; '<'
 
 loc_1A64A:				; CODE XREF: ROM:0001A632j
-		move.w	($FFFFF780).w,d0
-		add.w	($FFFFF782).w,d0
-		move.w	d0,($FFFFF780).w
+		move.w	(SS_Angle).w,d0
+		add.w	(SS_RotationSpeed).w,d0
+		move.w	d0,(SS_Angle).w
 		jsr	Sonic_Animate
 		jsr	LoadSonicDynPLC
 		bsr.w	S1SS_FixCamera
@@ -34682,7 +34666,7 @@ Obj09_Fall:				; CODE XREF: ROM:0001A460p
 					; ROM:0001A46Ep
 		move.l	y_pos(a0),d2
 		move.l	x_pos(a0),d3
-		move.b	($FFFFF780).w,d0
+		move.b	(SS_Angle).w,d0
 		andi.b	#$FC,d0
 		jsr	(CalcSine).l
 		move.w	x_vel(a0),d4
@@ -35010,9 +34994,9 @@ loc_1A954:				; CODE XREF: OBj09_ChkItems2+7Ej
 
 ; loc_1A95E:
 Obj09_GOAL:				; CODE XREF: OBj09_ChkItems2+24j
-		cmpi.b	#$27,d0	; is this a goal item?
+		cmpi.b	#$27,d0	; is this a "GOAL"?
 		bne.s	Obj09_UPblock
-		addq.b	#2,routine(a0) ; 
+		addq.b	#2,routine(a0) ;
 		move.w	#$A8,d0	; '¨'
 		jsr	(PlaySound_Special).l
 		rts
@@ -35020,14 +35004,14 @@ Obj09_GOAL:				; CODE XREF: OBj09_ChkItems2+24j
 
 ; loc_1A974:
 Obj09_UPblock:				; CODE XREF: OBj09_ChkItems2+9Cj
-		cmpi.b	#$29,d0	; ')'
+		cmpi.b	#$29,d0	; is this an "UP" block?
 		bne.s	Obj09_DOWNblock
 		tst.b	$36(a0)
 		bne.w	locret_1AA58
 		move.b	#$1E,objoff_36(a0)
 		btst	#6,($FFFFF783).w
 		beq.s	loc_1A99E
-		asl	($FFFFF782).w
+		asl	(SS_RotationSpeed).w	; increase rotation speed
 		movea.l	objoff_32(a0),a1
 		subq.l	#1,a1
 		move.b	#$2A,(a1) ; '*'
@@ -35039,14 +35023,14 @@ loc_1A99E:				; CODE XREF: OBj09_ChkItems2+C8j
 
 ; loc_1A9A8:
 Obj09_DOWNblock:				; CODE XREF: OBj09_ChkItems2+B2j
-		cmpi.b	#$2A,d0	; '*'
+		cmpi.b	#$2A,d0	; is this a "DOWN" block?
 		bne.s	Obj09_Rblock
 		tst.b	$36(a0)
 		bne.w	locret_1AA58
 		move.b	#$1E,objoff_36(a0)
 		btst	#6,($FFFFF783).w
 		bne.s	loc_1A9D2
-		asr	($FFFFF782).w
+		asr	(SS_RotationSpeed).w	; decrease rotation speed
 		movea.l	objoff_32(a0),a1
 		subq.l	#1,a1
 		move.b	#$29,(a1) ; ')'
@@ -35070,7 +35054,7 @@ Obj09_Rblock:				; CODE XREF: OBj09_ChkItems2+E6j
 		move.l	d0,mappings(a2)
 
 loc_1AA04:				; CODE XREF: OBj09_ChkItems2+12Ej
-		neg.w	($FFFFF782).w 	; reverse stage rotation
+		neg.w	(SS_RotationSpeed).w 	; reverse stage rotation
 		move.w	#$A9,d0	; '©'
 		jmp	(PlaySound_Special).l
 ; ===========================================================================
@@ -35096,10 +35080,10 @@ Obj09_Glass:				; CODE XREF: OBj09_ChkItems2+150j
 		subq.l	#1,a1
 		move.l	a1,mappings(a2)
 		move.b	(a1),d0
-		addq.b	#1,d0
-		cmpi.b	#$30,d0	; '0'
-		bls.s	loc_1AA4A
-		clr.b	d0
+		addq.b	#1,d0		; change the glass type when touched
+		cmpi.b	#$30,d0		; is the glass block type the last one?
+		bls.s	loc_1AA4A	; if the glass is still present, branch
+		clr.b	d0              ; clear the object
 
 loc_1AA4A:				; CODE XREF: OBj09_ChkItems2+180j
 		move.b	d0,mappings(a2)
@@ -35156,7 +35140,7 @@ DynArtCue_Index:dc.w Dynamic_NullGHZ-DynArtCue_Index,AnimCue_EHZ-DynArtCue_Index
 		dc.w Dynamic_Normal-DynArtCue_Index,AnimCue_HPZ-DynArtCue_Index
 		dc.w Dynamic_Normal-DynArtCue_Index,AnimCue_EHZ-DynArtCue_Index
 		dc.w Dynamic_Null-DynArtCue_Index,AnimCue_Unk-DynArtCue_Index
-		dc.w Dynamic_Null-DynArtCue_Index,AnimCue_Unk-DynArtCue_Index	; This goes up to $0F even though there's only $06 stages in this entire game.
+		dc.w Dynamic_Null-DynArtCue_Index,AnimCue_Unk-DynArtCue_Index	; This goes up to $0F even though there's only 6 stages in this entire game.(not counting the special stage)
 		dc.w Dynamic_Normal-DynArtCue_Index,AnimCue_HPZ-DynArtCue_Index
 		dc.w Dynamic_Null-DynArtCue_Index,AnimCue_Unk-DynArtCue_Index
 		dc.w Dynamic_Null-DynArtCue_Index,AnimCue_Unk-DynArtCue_Index
@@ -35528,7 +35512,7 @@ Map16Delta_CPZ1:dc.w $1710,  $77,$62E8,$62E9,$62EA,$62EB,$62EC,$62ED,$62EE,$62EF
 		dc.w $42EF,    0,    0,$42F0,	 0,$42F2,$42F1,$42F4,$42F3,$42F6,$42F5,	   0,$42F7,    0,    0,$42F8; 96
 		dc.w	 0,$42FA,$42F9,$42FC,$42FB,$42FE,$42FD,	   0,$42FF,    0; 112
 ; ===========================================================================
-		nop
+		nop			; filler
 ;----------------------------------------------------
 ; Object 21 - SCORE, TIME, RINGS
 ;----------------------------------------------------
@@ -36112,7 +36096,7 @@ Art_HUD:	incbin	"art/uncompressed/HUD.bin"
 Art_LivesNums:	incbin	"art/uncompressed/Lives counter.bin"
 		even
 ; ===========================================================================
-		nop
+		nop			; filler
 
 j_ModifySpriteAttr_2P_8:		; CODE XREF: ROM:0001B058p
 		jmp	ModifySpriteAttr_2P

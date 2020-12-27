@@ -60,6 +60,15 @@ palid_LZ4SonWat:	equ (ptr_Pal_LZ4SonWat-PalPointers)/8	; $10
 palid_SSResult:		equ (ptr_Pal_SSResult-PalPointers)/8	; $11
 palid_Continue:		equ (ptr_Pal_Continue-PalPointers)/8	; $12
 palid_Ending:		equ (ptr_Pal_Ending-PalPointers)/8	; $13
+; Palette colors
+cBlack:		equ $000		; black
+cWhite:		equ $EEE		; white
+cBlue:		equ $E00		; blue
+cGreen:		equ $0E0		; green
+cRed:		equ $00E		; red
+cYellow:	equ cGreen+cRed		; yellow
+cAqua:		equ cGreen+cBlue	; aqua
+cMagenta:	equ cBlue+cRed		; magenta
 
 ; ---------------------------------------------------------------------------
 ; Object Status Table offsets (for everything between Object_RAM and Primary_Collision)
@@ -158,15 +167,12 @@ objoff_3C = $3C
 objoff_3D = $3D
 objoff_3E = $3E
 objoff_3F = $3F
-
 ; ---------------------------------------------------------------------------
 ; property of all objects:
 next_object  = 		$40 ; the size of an object
-
 ; ---------------------------------------------------------------------------
 ; RAM Variables
 RAM_Start:			equ	$FFFF0000		; 4 bytes
-
 ; ---------------------------------------------------------------------------
 ; Level variables
 Chunk_Table:			equ	RAM_Start		; $8000 bytes
@@ -184,7 +190,6 @@ Time_minute:			equ 	Time+1			; time - minutes ($FFFFFE23, listed like this in ca
 Time_seconds:			equ 	Time_minute+1		; time - seconds ($FFFFFE24, listed like this in case of RAM shifting)
 Time_centisecond:		equ 	Time_seconds+1		; time - centiseconds ($FFFFFE25, listed like this in case of RAM shifting)
 Score:				equ 	Time_centisecond+1	; 4 bytes - score ($FFFFFE26, listed like this in case of RAM shifting)
-
 ; ---------------------------------------------------------------------------
 ; Object variables
 Sprite_Table_Input:		equ	$FFFFAC00		; $400 bytes
@@ -193,7 +198,6 @@ Object_RAM:			equ	$FFFFB000 		; through $FFFFD5FF, each object takes up $40 byte
 MainCharacter:			equ	Object_RAM 		; Usually where the Sonic object is located - $FFFFB000, listed like this in case of RAM shifting
 Sidekick:			equ	Object_RAM+$40 		; Usually where the Tails object is located - $FFFFB040, listed like this in case of RAM shifting
 Tails_Tails:			equ	Sidekick+$40		; Usually where Tails' tail object is located - $FFFFB080, listed like this in case of RAM shifting
-
 ; ---------------------------------------------------------------------------
 ; Camera variables
 Camera_RAM:			equ	$FFFFEE00		; 4 bytes
@@ -264,7 +268,6 @@ Dynamic_Resize_Routine:		equ	$FFFFEEDF		; 1 byte
 unk_EEE0:			equ	$FFFFEEE0		; 2 bytes - referenced by an unused position recording routine...
 Camera_X_pos_copy:		equ	$FFFFEEF0		; 4 bytes
 Camera_X_pos_coarse:		equ 	$FFFFF7DA               ; 2 bytes - (Camera_X_pos - 128) / 256
-
 ; ---------------------------------------------------------------------------
 ; Misc variables
 Block_cache:			equ	$FFFFEF00		; $80 bytes
@@ -275,13 +278,17 @@ Game_paused:			equ	$FFFFF63A		; 2 bytes
 DMA_data_thunk:			equ	$FFFFF640		; 2 bytes
 Hint_flag:			equ	$FFFFF644		; 2 bytes
 Do_Updates_in_H_int:		equ	$FFFFF64F		; 1 byte
+unk_FFEA:			equ	$FFFFFFEA		; 2 bytes - only cleared at the title screen
 unk_F662:			equ	$FFFFF662		; 2 bytes - unused but cleared on the SEGA screen
 Level_started_flag:		equ	$FFFFF711		; 1 byte - used to determine if the HUD should display or not
 Screen_redraw_flag:		equ	$FFFFF720		; 1 byte
 Shield_flag:			equ 	$FFFFFE2C		; 1 byte - shield status (00 = no; 01 = yes)
 Invinc_flag:			equ 	$FFFFFE2D		; 1 byte - invinciblity status (00 = no; 01 = yes)
 Shoes_flag:			equ 	$FFFFFE2E		; 1 byte - speed shoes status (00 = no; 01 = yes)
-
+; ---------------------------------------------------------------------------
+; Special Stage variables
+SS_RotationSpeed:		equ 	$FFFFF782		; 2 bytes - determines how fast the stage rotates
+SS_Angle:			equ 	$FFFFF780		; 2 bytes - determines the angle of the stage
 ; ---------------------------------------------------------------------------
 ; Water variables
 AmountOfAir:			equ 	$FFFFFE14		; 2 bytes - air remaining while underwater
@@ -292,20 +299,17 @@ Water_on:			equ	TargetWaterHeight+2	; 1 byte - $FFFFF64C, listed like this in ca
 Water_routine:			equ	Water_on+1		; 1 byte - $FFFFF64D, listed like this in case of RAM shifting
 Water_move:			equ 	Water_routine+1         ; 1 byte - $FFFFF64E, listed like this in case of RAM shifting
 Water_flag:			equ	$FFFFF730		; 1 byte
-
 ; ---------------------------------------------------------------------------
 ; Some of Sonic's variables
 Sonic_top_speed:		equ	$FFFFF760		; 2 bytes
 Sonic_acceleration:		equ	Sonic_top_speed+2	; 2 bytes - $FFFFF762, listed like this in case of RAM shifting
 Sonic_deceleration:		equ	Sonic_acceleration+2	; 2 bytes - $FFFFF764, listed like this in case of RAM shifting
 Sonic_LastLoadedDPLC:		equ	Sonic_deceleration+2	; 2 bytes - $FFFFF766, listed like this in case of RAM shifting
-
 ; ---------------------------------------------------------------------------
 ; Tails' CPU variables
 Tails_control_counter:		equ	$FFFFF702 ; 2 bytes - counter for how long until the CPU takes control
 unk_F706:			equ	$FFFFF706 ; 2 bytes - only referenced in unused lines
 Tails_CPU_routine:		equ	$FFFFF708 ; 2 bytes - used to determine what routine the CPU goes to
-
 ; ---------------------------------------------------------------------------
 ; Object placement variables
 Sprite_Table:			equ	$FFFFF800		; $200 bytes
@@ -318,12 +322,10 @@ Obj_load_addr_left:		equ	Obj_load_addr_right+4	; 4 bytes
 Obj_load_addr_right_P2:		equ	Obj_load_addr_left+4	; 4 bytes
 Obj_load_addr_left_P2:		equ	Obj_load_addr_right_P2+4; 4 bytes
 Object_State:			equ 	$FFFFFC00		; $200 bytes - object state list
-
 ; ---------------------------------------------------------------------------
 ; Demo variables
 Demo_button_index:		equ	$FFFFF790		; 2 bytes
 Demo_press_counter:		equ	$FFFFF792		; 1 byte
-
 ; ---------------------------------------------------------------------------
 ; Misc variables
 Boss_defeated_flag:		equ	$FFFFF7A7		; 1 byte
@@ -334,7 +336,6 @@ WindTunnel_holding_flag:	equ	$FFFFF7C9		; 1 byte
 Sonic_sliding:			equ	$FFFFF7CA		; 1 byte
 Sonic_EnteredBigRing:		equ	$FFFFF7CD		; 1 byte
 Chain_Bonus_counter:		equ	$FFFFF7D0		; 2 bytes
-
 ; ---------------------------------------------------------------------------
 ; Debug variables
 LevelSelCheat_Flag:		equ	$FFFFFFE0		; 1 byte
@@ -349,7 +350,6 @@ Debug_placement_mode:		equ	Debug_object+2          ; 2 bytes - $FFFFFE08, listed
 Register_Buffer:		equ 	$FFFFFC00		; $40 bytes - stores registers d0-a7 during an error event
 SP_Buffer:			equ 	Register_Buffer+$40	; 4 bytes - stores most recent sp address ($FFFFFC40, listed like this in case of RAM shifting)
 Error_Type:			equ 	SP_Buffer+4		; 1 byte - error type - $FFFFFC44, listed like this in case of RAM shifting
-
 ; ---------------------------------------------------------------------------
 ; Joypad variables
 Ctrl_1_Logical: 		equ 	$FFFFF602 		; 2 bytes
@@ -363,18 +363,15 @@ Ctrl_2_Held: 			equ 	Ctrl_2 			; 1 byte - $FFFFF606, listed like this in case of
 Ctrl_2_Press: 			equ 	Ctrl_2+1 		; 1 byte - $FFFFF607, listed like this in case of RAM shifting
 Control_locked:			equ	$FFFFF7CC		; 1 byte
 Object_control:			equ	$FFFFF7C8		; 1 byte
-
 ; ---------------------------------------------------------------------------
 ; Vertical/horizontal blanking variables
 VDP_Command_Buffer:		equ	$FFFFDC00 		; 2 bytes - stores VDP commands to issue the next time ProcessDMAQueue is called
 VDP_Reg0_Val:			equ	$FFFFF60C 		; 2 bytes
 VDP_Command_Buffer_Slot:	equ	$FFFFDCFC 		; 4 bytes - stores the address of the next open slot for a queued VDP command
 Horiz_Scroll_Buf:		equ	$FFFFE000               ; 2 bytes
-
 Vscroll_Factor:			equ	$FFFFF616               ; 4 bytes
 Hint_counter_reserve:		equ	$FFFFF624 		; 2 bytes - Must contain a VDP command word, preferably a write to register $0A. Executed every vertical blank.
 Vint_routine:			equ	$FFFFF62A		; 1 byte
-
 ; ---------------------------------------------------------------------------
 ; Palette variables
 Water_palette_dup:		equ 	$FFFFFA00 		; $80 bytes - duplicate underwater palette, used for transitions
@@ -397,7 +394,6 @@ unk_F79A:			equ	$FFFFF79A		; 2 bytes
 unk_F79C:			equ	unk_F79A+2		; 2 bytes - $FFFFF79C, listed like this in case of RAM shifting
 unk_F79E:			equ	unk_F79C+2		; 2 bytes - $FFFFF79E, listed like this in case of RAM shifting
 SpecialStage_BGMode:		equ	unk_F79E+2		; 2 bytes - $FFFFF7A0, listed like this in case of RAM shifting
-
 ; ---------------------------------------------------------------------------
 ; Misc variables
 System_Stack:			equ	$FFFFFE00
@@ -408,7 +404,6 @@ Two_player_mode:		equ	$FFFFFFE8
 Demo_mode_flag:			equ	$FFFFFFF0
 Graphics_Flags:			equ	$FFFFFFF8
 Checksum_fourcc:		equ	$FFFFFFFC		; writes "init" here
-
 ; ---------------------------------------------------------------------------
 ; Sound Driver RAM variables; starts at $FFFFF000 and ends at $FFFFF5BF.
 Size_of_SegaPCM:		equ 	$6978   		; Change this if you change the SEGA PCM sample.
@@ -417,13 +412,11 @@ QueueToPlay:			equ	9			; if NOT set to $80, means new index was requested by 68K
 SFXToPlay:			equ	$A			; when Genesis wants to play "normal" sound, it writes it here
 SFXSpecialToPlay:		equ	$B			; when Genesis wants to play "special" sound, it writes it here
 SFXUnknownToPlay:		equ	$C			; when Genesis wants to play "unused" sound, it writes it here (unused and broken in normal gameplay)
-
 ; ---------------------------------------------------------------------------
 ; VDP addressses
 VDP_data_port:			equ	$C00000 		; (8=r/w, 16=r/w)
 VDP_control_port:		equ	$C00004 		; (8=r/w, 16=r/w)
 PSG_input:			equ	$C00011
-
 ; ---------------------------------------------------------------------------
 ; VRAM and tile art base addresses.
 ; VRAM Reserved regions.
@@ -436,7 +429,6 @@ VRAM_Sprite_Attribute_Table = 		$F800			; Extends until $FA7F
 VRAM_Sprite_Attribute_Table_Size = 	$0280			; 640 bytes
 VRAM_Horiz_Scroll_Table = 		$FC00			; Extends until $FF7F
 VRAM_Horiz_Scroll_Table_Size = 		$0380			; 224 lines * 2 bytes per entry * 2 PNTs
-
 ; ---------------------------------------------------------------------------
 ; Art tile stuff
 flip_x =      				(1<<11)
@@ -453,7 +445,7 @@ palette_mask =      			$6000
 tile_maskn=      			$07FF
 nontile_mask =      			$F800
 drawing_mask =      			$7FFF
-
+; ---------------------------------------------------------------------------
 ; Joypad input
 btnStart: 			equ 	%10000000 ; Start button ($80)
 btnA: 				equ 	%01000000 ; A ($40)
@@ -473,7 +465,6 @@ bitR:				equ 	3
 bitL:				equ 	2
 bitDn:				equ 	1
 bitUp:				equ 	0
-
 ; ---------------------------------------------------------------------------
 ; Z80 addresses
 Z80_RAM:			equ 	$A00000			; start of Z80 RAM
