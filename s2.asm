@@ -23,6 +23,9 @@ removeJmpTos = 0|allOptimizations
 OptimiseSound = 0|allOptimizations
 ;	| If 1, optimize sound queuing
 ;
+removeFillers = 0|allOptimizations
+;	| If 1, many unnecessary fillers are removed
+;
 
 ; >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ; Start of ROM
@@ -3578,7 +3581,10 @@ Pal_S1Continue:	incbin	"art/palettes/SpecialStageContinue.bin"
 Pal_S1Ending:	incbin	"art/palettes/Sonic 1 - Ending.bin"
 		even
 ; ===========================================================================
+  if removeFillers = 0
 		nop			; filler
+	endif
+
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -3701,7 +3707,9 @@ loc_2FAA:				; CODE XREF: CalcAngle+Ej
 AngleData:      incbin	"collision/Angles.bin"
 		even
 ; ===========================================================================
+  if removeFillers = 0
 		nop			; filler
+	endif
 
 SegaScreen:				; CODE XREF: ROM:GameModeArrayj
 		sfx	bgm_Stop,0,1,1 ; stop music
@@ -3765,7 +3773,9 @@ Sega_GoToTitleScreen:			; CODE XREF: ROM:000031CCj
 		move.b	#GMid_TS,(Game_Mode).w
 		rts
 ; ===========================================================================
-		align 2		; filler, could be replaced with even
+  if removeFillers = 0
+		align 2		; filler
+	endif
 ; ===========================================================================
 
 TitleScreen:				; CODE XREF: ROM:000003A0j
@@ -4434,7 +4444,9 @@ loc_3AFC:				; CODE XREF: UnknownSub_4+12j
 ; End of function UnknownSub_4
 
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ; ===========================================================================
 ; Same as Sonic 1
 MusicList:
@@ -5689,7 +5701,10 @@ j_AniArt_Load:
 		jmp	AniArt_Load
 		endif
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
+
 
 ; ---------------------------------------------------------------------------
 ; Special Stage (leftover from Sonic 1 - most of it's data is missing)
@@ -6171,7 +6186,9 @@ byte_5709:	dc.b   8,  2,  4,$FF,  2,  3,  8,$FF,  4,  2,  2,  3,  8,$FD,  4,  2;
 					; DATA XREF: S1SS_BgAnimate+36o
 		dc.b   2,  3,  2,$FF,  0; 16
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -10725,7 +10742,9 @@ Map_Obj11_HPZ:	incbin	"mappings/sprite/obj11b.bin"
 Map_Obj11_EHZ:	incbin	"mappings/sprite/obj11c.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 15 - swinging platforms
 ;----------------------------------------------------
@@ -11039,7 +11058,9 @@ Map_Obj15_EHZ:	incbin	"mappings/sprite/obj15c.bin"
 Map_Obj48:	incbin	"mappings/sprite/obj48.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 17 - spinning spikes from Green Hill
 ;----------------------------------------------------
@@ -11505,7 +11526,9 @@ Map_Obj18:	incbin	"mappings/sprite/obj18.bin"
 Map_Obj18_EHZ:	incbin	"mappings/sprite/obj18b.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 1A - Collapsing platforms (GHZ, HPZ)
 ;----------------------------------------------------
@@ -11975,7 +11998,9 @@ word_9340:	dc.w $C			; DATA XREF: ROM:000092FAo
 		dc.w	 5, $80C, $806,	 $10; 40
 		dc.w	 5, $808, $804,	 $20; 44
 ; ===========================================================================
-		nop				; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 1C - Bridge support (GHZ, EHZ/HTZ)
 ;----------------------------------------------------
@@ -12551,7 +12576,9 @@ word_9A92:	dc.w 1			; DATA XREF: ROM:00009A8Ao
 word_9A9C:	dc.w 1			; DATA XREF: ROM:00009A8Co
 		dc.w $F00F,  $50,  $28,$FFF0; 0
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 28 - animals
 ;----------------------------------------------------
@@ -13063,7 +13090,9 @@ word_A0BC:	dc.w 2			; DATA XREF: ROM:0000A06Eo
 		dc.w $F805,   $A,    5,$FFF0; 0
 		dc.w $F805,   $E,    7,	   0; 4
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 1F - GHZ Crabmeat
 ;----------------------------------------------------
@@ -13617,7 +13646,9 @@ word_A7CE:	dc.w 1			; DATA XREF: ROM:0000A7B6o
 word_A7D8:	dc.w 1			; DATA XREF: ROM:0000A7B8o
 		dc.w $F805,  $33,  $19,$FFF8; 0
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 25 - Rings
 ;----------------------------------------------------
@@ -14099,7 +14130,9 @@ word_AE34:	dc.w 4			; DATA XREF: ROM:0000AD64o
 		dc.w	$F,$1044,$1022,$FFE0; 8
 		dc.w	$F,$1844,$1822,	   0; 12
 ; ===========================================================================
-		nop				; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 26 - monitor
 ;----------------------------------------------------
@@ -15742,7 +15775,9 @@ word_C656:	dc.w 1			; DATA XREF: ROM:0000C620o
 		dc.w $F805,$200C,$2006,$FFF8; 0
 word_C660:	dc.w 0			; DATA XREF: ROM:0000C622o
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 36 - Spikes
 ;----------------------------------------------------
@@ -16125,7 +16160,9 @@ Obj3C_FragSpdLeft:dc.w $FA00,$FA00	  ; 0 ;	DATA XREF: ROM:0000C968o
 Map_Obj3C:	incbin	"mappings/sprite/obj3C.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -17536,7 +17573,9 @@ loc_D862:				; CODE XREF: ROM:0000D842j
 		moveq	#1,d0
 		rts
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 
 ; ===========================================================================
 ; ----------------------------------------------------------------------------
@@ -19993,7 +20032,9 @@ byte_F1B3:	dc.b  $F,  0,$FF	; 0 ; DATA XREF: ROM:0000F192o
 Map_Obj0D:	incbin	"mappings/sprite/obj0D.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 40 - GHZ Motobug
 ;----------------------------------------------------
@@ -22792,7 +22833,9 @@ locret_10C34:
 ; End of function LoadSonicDynPLC
 
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ; START	OF FUNCTION CHUNK FOR Sonic_LevelBoundaries
 
 j_KillSonic:				; CODE XREF: Sonic_LevelBoundaries+48j
@@ -22800,7 +22843,9 @@ j_KillSonic:				; CODE XREF: Sonic_LevelBoundaries+48j
 		jmp	KillSonic
 ; END OF FUNCTION CHUNK	FOR Sonic_LevelBoundaries
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 02 - Tails
 ;----------------------------------------------------
@@ -24771,7 +24816,9 @@ byte_11E48:	dc.b   3,$51,$52,$53,$54,$FF; 0	; DATA XREF: ROM:00011E24o
 byte_11E4E:	dc.b   3,$55,$56,$57,$58,$FF; 0	; DATA XREF: ROM:00011E26o
 byte_11E54:	dc.b   2,$81,$82,$83,$84,$FF; 0	; DATA XREF: ROM:00011E28o
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ; START	OF FUNCTION CHUNK FOR Tails_LevelBoundaries
 
 KillTails:				; CODE XREF: Tails_LevelBoundaries+48j
@@ -24779,7 +24826,9 @@ KillTails:				; CODE XREF: Tails_LevelBoundaries+48j
 		jmp	KillSonic
 ; END OF FUNCTION CHUNK	FOR Tails_LevelBoundaries
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 0A - drowning bubbles and countdown numbers
 ;----------------------------------------------------
@@ -26629,7 +26678,9 @@ ObjHitWallLeft:
 locret_134C4:				; CODE XREF: ROM:000134BEj
 		rts
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 79 - lamppost
 ;----------------------------------------------------
@@ -26888,7 +26939,9 @@ loc_13844:				; CODE XREF: ROM:0001382Aj
 Map_Obj7D:	incbin	"mappings/sprite/obj7D.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 47 - Bumper (from Spring Yard)
 ;----------------------------------------------------
@@ -26993,7 +27046,9 @@ byte_1398B:	dc.b   3,  1,  2,  1,  2,$FD,  0; 0 ; DATA XREF: ROM:00013986o
 Map_S1Obj47:	incbin	"mappings/sprite/S1obj47.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+	  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 64 - Bubbles from Labyrinth
 ;----------------------------------------------------
@@ -27270,7 +27325,9 @@ byte_13CE9:	dc.b  $F,$13,$14,$15,$FF; 0 ; DATA XREF: ROM:00013CCEo
 Map_Obj0A_Bubbles:incbin	"mappings/sprite/obj0A.bin"
 		even
 ; ===========================================================================
-		nop				; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 03 - collision	index switcher (in loops)
 ;----------------------------------------------------
@@ -27614,7 +27671,9 @@ byte_14296:	dc.b   7,  4,  3,  2,  1,  0,$FE,  1; 0	; DATA XREF: ROM:0001428Co
 Map_Obj0B:	incbin	"mappings/sprite/obj0B.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 
 Obj0C:					; DATA XREF: ROM:Obj_Indexo
 		moveq	#0,d0
@@ -27706,13 +27765,17 @@ loc_143B2:				; CODE XREF: ROM:0001438Aj
 Map_Obj0C:	incbin	"mappings/sprite/obj0C.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 
 j_CalcSine:				; CODE XREF: ROM:00014374p
 					; ROM:loc_143A0p
 		jmp	(CalcSine).l
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 12 - Master Emerald from HPZ
 ;----------------------------------------------------
@@ -27753,7 +27816,9 @@ Obj12_Display:				; DATA XREF: ROM:000143ECo
 Map_Obj12:	incbin	"mappings/sprite/obj12.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 13 - HPZ waterfall
 ;----------------------------------------------------
@@ -28088,7 +28153,9 @@ Obj06_PlayerDeltaYArray:dc.b  $20, $20,	$20, $20, $20, $20, $20, $20, $20, $20,	
 		dc.b  $1F, $1F,	$20, $20, $20, $20, $20, $20, $20, $20,	$20, $20, $20, $20, $20, $20; 384
 		dc.b  $20, $20,	$20, $20, $20, $20, $20, $20, $20, $20,	$20, $20, $20, $20, $20, $20; 400
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 14 - HTZ see-saw
 ;----------------------------------------------------
@@ -28443,13 +28510,17 @@ Map_Obj14:	incbin	"mappings/sprite/obj14.bin"
 Map_Obj14b:	incbin	"mappings/sprite/obj14b.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 
 j_ObjectMoveAndFall:				; CODE XREF: ROM:00014F36p
 					; ROM:00014F48p ...
 		jmp	ObjectMoveAndFall
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 16 - the HTZ platform that goes down diagonally
 ;	      and stops	after a	while (in final, it falls)
@@ -28544,7 +28615,9 @@ Obj16_NoMove:				; DATA XREF: ROM:0001519Co
 Map_Obj16:	incbin	"mappings/sprite/obj16.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 
 loc_152A4:				; CODE XREF: ROM:00015180j
 		jmp	DisplaySprite
@@ -28557,7 +28630,9 @@ loc_152AA:				; CODE XREF: ROM:0001517Cj
 j_ObjectMove_0:				; CODE XREF: ROM:Obj16_Movep
 		jmp	ObjectMove
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 19 - CPZ platforms moving side	to side
 ;----------------------------------------------------
@@ -28804,7 +28879,9 @@ loc_154C6:				; CODE XREF: ROM:00015348j
 j_ObjectMove_1:				; CODE XREF: ROM:loc_153ECp
 		jmp	ObjectMove
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 04 - water surface
 ;----------------------------------------------------
@@ -28949,7 +29026,9 @@ j_ModifySpriteAttr_2P_0:		; CODE XREF: ROM:000154F8p
 					; ROM:000156B4p
 		jmp	ModifySpriteAttr_2P
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 4D - Stego
 ;----------------------------------------------------
@@ -29093,7 +29172,9 @@ byte_159DE:	dc.b  $F,  0,$FF	; 0 ; DATA XREF: ROM:000159CCo
 byte_159E1:	dc.b   2,  6,  7,$FF,  0; 0 ; DATA XREF: ROM:000159CEo
 Map_Obj4D:	incbin	"mappings/sprite/obj4D.bin"
 		even
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 
 loc_15B38:				; CODE XREF: ROM:000158F6j
 		jmp	MarkObjGone
@@ -29107,7 +29188,9 @@ j_ObjectMoveAndFall_0:				; CODE XREF: ROM:000158C0p
 					; ROM:00015926p
 		jmp	ObjectMoveAndFall
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 52 - BFish
 ;----------------------------------------------------
@@ -29278,7 +29361,9 @@ byte_15D56:	dc.b  $E,  2,  3,$FF	; 0 ; DATA XREF: ROM:00015D4Ao
 byte_15D5A:	dc.b   3,  2,  3,$FF	; 0 ; DATA XREF: ROM:00015D4Co
 Map_Obj52:	incbin	"mappings/sprite/obj52.bin"
 		even
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 
 loc_15D90:				; CODE XREF: ROM:00015C18j
 					; ROM:00015C22j ...
@@ -29293,7 +29378,9 @@ j_AnimateSprite_1:			; CODE XREF: ROM:00015C0Cp
 j_ObjectMove_2:				; CODE XREF: ROM:00015C10p
 		jmp	ObjectMove
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 4F - Dinobot badnik
 ;----------------------------------------------------
@@ -29433,7 +29520,9 @@ byte_15EB8:	dc.b   9,  1,$FF	; 0 ; DATA XREF: ROM:Ani_Obj4Fo
 byte_15EBB:	dc.b   9,  0,  1,  2,  1,$FF,  0; 0 ; DATA XREF: ROM:00015EB6o
 Map_Obj4F:	incbin	"mappings/sprite/obj4F.bin"
 		even
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 		
     if removeJmpTos = 0
 
@@ -29459,7 +29548,9 @@ j_ObjectMove_3:				; CODE XREF: ROM:loc_15E7Cp
 		
     endif
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 50 - Aquis
 ;----------------------------------------------------
@@ -30265,7 +30356,9 @@ j_ObjectMove_4:				; CODE XREF: ROM:00016034p
 					; ROM:loc_16046p ...
 		jmp	ObjectMove
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 4B - Buzz Bomber badnik
 ;----------------------------------------------------
@@ -30513,7 +30606,9 @@ byte_169E9:	dc.b   3,  5,  6,$FF	; 0 ; DATA XREF: ROM:000169DEo
 byte_169ED:	dc.b   9,  1,  1,  1,  1,  1,$FD,  0,  0; 0 ; DATA XREF: ROM:000169E0o
 Map_Obj4B:	incbin	"mappings/sprite/obj4B.bin"
 		even
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 
 loc_16A74:				; CODE XREF: ROM:000167C2j
 		jmp	DeleteObject
@@ -30546,7 +30641,9 @@ j_ObjectMove_5:				; CODE XREF: ROM:loc_167AAp
 					; ROM:000168DAj
 		jmp	ObjectMove
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 4A - Octus
 ;----------------------------------------------------
@@ -30773,7 +30870,9 @@ j_ObjectMoveAndFall_3:				; CODE XREF: ROM:loc_16AC0p
 					; ROM:00016B10p
 		jmp	ObjectMoveAndFall
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 4C - Bat badnik from HPZ
 ;----------------------------------------------------
@@ -31061,7 +31160,9 @@ byte_16FD5:	dc.b   1,  1,  6,  1,  6,  2,  7,  3,  8,  4,  9,  4,  9,  3,  8,$FE
 byte_16FE6:	dc.b   3, $A, $B, $C, $D, $E,$FF,  0; 0	; DATA XREF: ROM:00016FC0o
 Map_Obj4C:	incbin	"mappings/sprite/obj4C.bin"
 		even
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 		
     if removeJmpTos = 0
 
@@ -31077,10 +31178,11 @@ j_AnimateSprite_6:			; CODE XREF: ROM:00016DBAp
 
 j_ObjectMove_8:				; CODE XREF: ROM:00016E1Cp
 		jmp	ObjectMove
-; ===========================================================================
-		align 4
-		
 		endif
+; ===========================================================================
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 4E - Gator
 ;----------------------------------------------------
@@ -32597,7 +32699,9 @@ byte_18561:	dc.b   7,  1,  2,$FF,  0; 0 ; DATA XREF: ROM:0001855Co
 Map_Obj55:	incbin	"mappings/sprite/obj55.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 
 loc_185D4:				; CODE XREF: ROM:000183C0j
 					; ROM:loc_18452j ...
@@ -32665,7 +32769,9 @@ loc_18660:				; CODE XREF: ROM:0001862Ej
 Map_Obj8A:	incbin	"mappings/sprite/obj8A.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 
     if removeJmpTos = 0
 j_ModifySpriteAttr_2P_4:		; CODE XREF: ROM:00018610p
@@ -32673,7 +32779,9 @@ j_ModifySpriteAttr_2P_4:		; CODE XREF: ROM:00018610p
 		jmp	ModifySpriteAttr_2P
     endif
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 ;----------------------------------------------------
 ; Object 3D - GHZ Boss
 ;----------------------------------------------------
@@ -33540,7 +33648,9 @@ j_ModifySpriteAttr_2P_6:		; CODE XREF: ROM:0001953Ep
 		jmp	ModifySpriteAttr_2P
     endif
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -33954,7 +34064,9 @@ Touch_E1:				; CODE XREF: TouchResponse+338j
 		rts
 ; END OF FUNCTION CHUNK	FOR TouchResponse
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 
 j_Sonic_ResetOnFloor:			; CODE XREF: HurtSonic+34p
 					; KillSonic+12p
@@ -34677,7 +34789,9 @@ byte_1A3B0:	dc.b 1			; DATA XREF: ROM:0001A394o
 					; ROM:0001A398o ...
 		dc.b $F8,  5,  0, $C,$F8; 0
 ; ===========================================================================
-		nop                     ; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 09 - Sonic in Sonic 1 special stage
 ;----------------------------------------------------
@@ -35442,7 +35556,9 @@ Obj10:					; DATA XREF: ROM:Obj_Indexo
 j_ModifySpriteAttr_2P_7:		; CODE XREF: ROM:0001A3FAp
 		jmp	ModifySpriteAttr_2P
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4			; filler
+	endif
 
 
 ;----------------------------------------------------------------------------
@@ -35844,7 +35960,9 @@ Map16Delta_CPZ1:dc.w $1710,  $77,$62E8,$62E9,$62EA,$62EB,$62EC,$62ED,$62EE,$62EF
 		dc.w $42EF,    0,    0,$42F0,	 0,$42F2,$42F1,$42F4,$42F3,$42F6,$42F5,	   0,$42F7,    0,    0,$42F8; 96
 		dc.w	 0,$42FA,$42F9,$42FC,$42FB,$42FE,$42FD,	   0,$42FF,    0; 112
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
 ;----------------------------------------------------
 ; Object 21 - SCORE, TIME, RINGS
 ;----------------------------------------------------
@@ -36430,13 +36548,17 @@ Art_HUD:	incbin	"art/uncompressed/HUD.bin"
 Art_LivesNums:	incbin	"art/uncompressed/Lives counter.bin"
 		even
 ; ===========================================================================
-		nop			; filler
+  if removeFillers = 0
+		nop	; filler
+	endif
     if removeJmpTos = 0
 j_ModifySpriteAttr_2P_8:		; CODE XREF: ROM:0001B058p
 		jmp	ModifySpriteAttr_2P
 		endif
 ; ===========================================================================
-		align 4
+  if removeFillers = 0
+		align 4	; filler
+	endif
 
 DebugMode:				; CODE XREF: ROM:0000FA02j
 					; ROM:0001A3C2j
@@ -36868,7 +36990,10 @@ Debug_HPZ:	dc.w $F			; DATA XREF: ROM:0001BCF4o
 j_ModifySpriteAttr_2P_1:
 		jmp	ModifySpriteAttr_2P
 ; ===========================================================================
-		align 4
+
+  if removeFillers = 0
+		align 4			; filler
+	endif
 
 ; ---------------------------------------------------------------------------
 ; "MAIN LEVEL LOAD BLOCK" (after Nemesis)

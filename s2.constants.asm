@@ -458,6 +458,7 @@ Horiz_Scroll_Buf:		equ	$FFFFE000               ; 2 bytes
 Vscroll_Factor:			equ	$FFFFF616               ; 4 bytes
 Hint_counter_reserve:		equ	$FFFFF624 		; 2 bytes - Must contain a VDP command word, preferably a write to register $0A. Executed every vertical blank.
 Vint_routine:			equ	$FFFFF62A		; 1 byte
+HScrolltablebuffer:		equ 	$FFFFCC00 		; scrolling table data (actually $380 bytes, but $400 is reserved for it)
 ; ---------------------------------------------------------------------------
 ; Palette variables
 Water_palette_dup:		equ 	$FFFFFA00 		; $80 bytes - duplicate underwater palette, used for transitions
