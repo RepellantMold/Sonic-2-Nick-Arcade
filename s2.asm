@@ -5,11 +5,21 @@
 ; Xerowhirl - The awesome 2007 Sonic 2 disassembly, which the Github disassembly is based on
 ; drx - For dumping/disassembling this in 2006 (which this disassembly is based off of)
 ; ehw - Noting that the leftover crap at the end are Toe Jam & Earl REV00 data
-; RepellantMold - Getting more rips of everything in general and attempting to comment more on the code
-; (using Hivebrain/Github's Sonic 1/SuperEgg's Sonic 2 Simon Wai disassembly for labels/constants)
+; RepellantMold - Being a huge help in making this disassembly complete
+; (using Hivebrain/Github's Sonic 1/SuperEgg's Sonic 2 Simon Wai disassembly for hints)
 
 		include	"s2.constants.asm"
 		include "macros.asm"
+
+allOptimizations = 0
+;	| If 1, enables all optimizations
+;
+skipChecksumCheck = 0|allOptimizations
+;	| If 1, disables the unnecessary (and slow) bootup checksum calculation
+;
+removeJmpTos = 0|allOptimizations
+;	| If 1, many unnecessary JmpTos are removed, slightly improving performance
+;
 
 ; >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ; Start of ROM
@@ -42,12 +52,19 @@ Checksum:	dc.w $AFC7		; ROM Checksum
 ROMEnd:		dc.l $7FFFF		; ROM end location (512 KB)
 		dc.l RAM_Start		; RAM start location ($FFFF0000)
 		dc.l $FFFFFF		; RAM end location   ($FFFFFFFF)
-		dc.l $20202020          ; SRAM information
-		dc.l $20202020          ; (No SRAM)
+EnableSRAM:	equ 0	; change to 1 to enable SRAM
+BackupSRAM:	equ 1
+AddressSRAM:	equ 3	; 0 = odd+even; 2 = even only; 3 = odd only
+SRAMSupport:	if EnableSRAM=1
+		dc.b $52, $41, $A0+(BackupSRAM<<6)+(AddressSRAM<<3), $20
+		else
 		dc.l $20202020
-		dc.l $20202020
+		endc
+		dc.l $20202020		; SRAM start ($200001)
+		dc.l $20202020		; SRAM end ($20xxxx)
 		dc.b "                                                "	; Notes
 		dc.b "JUE             "	; Reigon
+EndOfHeader:
 ; ===========================================================================
 
 ErrorTrap:
@@ -189,6 +206,7 @@ GameProgram:
 		beq.w	AlreadyInit
 
 ChecksumCheck:
+  if skipChecksumCheck = 0
 		movea.l	#ErrorTrap,a0
 		movea.l	#ROMEnd,a1
 		move.l	(a1),d0
@@ -203,6 +221,7 @@ ChksumChkLoop:
 		cmp.w	(a1),d1
 		nop			; checksum routine has been 'nopped' out
 		nop
+  endif
 		lea	(System_Stack).w,a6
 		moveq	#0,d7
 		move.w	#$7F,d6
@@ -241,6 +260,7 @@ ptr_TS:		bra.w	TitleScreen
 ptr_Demo:	bra.w	Level
 ptr_Level:	bra.w	Level
 ptr_S1SpecStg:	bra.w	SpecialStage
+  if skipChecksumCheck = 0
 ;----------------------------------------------------
 ; Checksum error, useless since the branch to this
 ; routine was replaced with NOP's.
@@ -257,6 +277,7 @@ ChksumErr_RedFill:			; CODE XREF: ROM:000003C8j
 
 ChksumErr_InfLoop:			; CODE XREF: ROM:ChksumErr_InfLoopj
 		bra.s	ChksumErr_InfLoop               ; infinite loop
+  endif
 ; ===========================================================================
 
 BusError:				; DATA XREF: ROM:00000000o
@@ -448,7 +469,7 @@ Error_WaitForC:				; CODE XREF: ROM:ErrorMsg_Waitp
 ; ===========================================================================
 ;----------------------------------------------------
 ; Almost identical to Sonic 1, but it uses a different
-; color, used all the way up to Beta 8
+; palette line, used all the way up to Beta 8
 ;----------------------------------------------------
 Art_Text:	incbin	"art/uncompressed/Main font.bin"
 		even
@@ -781,7 +802,7 @@ loc_F08:
 ; loc_F88:
 Vint_UnusedE:
 		bsr.w	Do_ControllerPal
-		addq.b	#1,($FFFFF628).w
+		addq.b	#1,(unk_F628).w
 		move.b	#$E,(Vint_routine).w
 		rts
 ; ===========================================================================
@@ -4484,7 +4505,7 @@ loc_3BC0:
 loc_3BD0:
 		move.l	d0,(a1)+
 		dbf	d1,loc_3BD0
-		lea	($FFFFF628).w,a1
+		lea	(unk_F628).w,a1
 		moveq	#0,d0
 		move.w	#$15,d1
 
@@ -4646,7 +4667,11 @@ loc_3DD0:
 		jsr	RingsManager
 		jsr	ObjectsLoad
 		jsr	BuildSprites
+		if removeJmpTos = 0
 		bsr.w	j_AniArt_Load
+		else
+                jsr	AniArt_Load
+                endif
 		moveq	#0,d0
 		tst.b	($FFFFFE30).w
 		bne.s	loc_3E00
@@ -4760,7 +4785,11 @@ loc_3F50:
 loc_3F54:
 		bsr.w	ChangeWaterSurfacePos
 		jsr	RingsManager
+		if removeJmpTos = 0
 		bsr.w	j_AniArt_Load
+		else
+                jsr	AniArt_Load
+                endif
 		bsr.w	PalCycle_Load
 		bsr.w	RunPLC
 		bsr.w	OscillateNumDo
@@ -5656,9 +5685,11 @@ Demo_S1GHZ:     incbin	"demoinputs/GHZ.bin"
 Demo_S1SS:      incbin	"demoinputs/SS.bin"
 		even
 ; ===========================================================================
+  		if removeJmpTos = 0
 ; j_DynamicArtCues:
 j_AniArt_Load:
 		jmp	AniArt_Load
+		endif
 ; ===========================================================================
 		align 4
 
@@ -29346,7 +29377,11 @@ Obj4F_Init:				; DATA XREF: ROM:Obj4F_Indexo
 		move.b	#$10,y_radius(a0)
 		move.b	#6,x_radius(a0)
 		move.b	#$C,collision_flags(a0)
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMoveAndFall_1
+    else
+  		jsr	ObjectMoveAndFall
+    endif
 		jsr	ObjHitFloor
 		tst.w	d1
 		bpl.s	locret_15E0C
@@ -29367,13 +29402,21 @@ Obj4F_Main:				; DATA XREF: ROM:00015DB4o
 		move.w	Obj4F_SubIndex(pc,d0.w),d1
 		jsr	Obj4F_SubIndex(pc,d1.w)
 		lea	(Ani_Obj4F).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_2
+    else
+  		jsr	AnimateSprite
+    endif
 		move.w	x_pos(a0),d0
 		andi.w	#$FF80,d0
 		sub.w	(Camera_X_pos_coarse).w,d0
 		cmpi.w	#$280,d0
-		bhi.w	loc_15E3E
+		bhi.w	loc_15E3E  
+    if removeJmpTos = 0
 		bra.w	loc_15EE8
+    else
+  		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_15E3E:				; CODE XREF: ROM:00015E36j
@@ -29384,7 +29427,11 @@ loc_15E3E:				; CODE XREF: ROM:00015E36j
 		bclr	#7,art_tile(a2,d0.w)
 
 loc_15E50:				; CODE XREF: ROM:00015E48j
+    if removeJmpTos = 0
 		bra.w	j_DeleteObject
+    else
+  		jmp	DeleteObject
+    endif
 ; ===========================================================================
 Obj4F_SubIndex:	dc.w loc_15E58-Obj4F_SubIndex ;	DATA XREF: ROM:Obj4F_SubIndexo
 					; ROM:00015E56o
@@ -29406,8 +29453,12 @@ locret_15E7A:				; CODE XREF: ROM:00015E5Cj
 		rts
 ; ===========================================================================
 
-loc_15E7C:				; DATA XREF: ROM:00015E56o
+loc_15E7C:				; DATA XREF: ROM:00015E56o   
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMove_3
+    else
+  		jsr	ObjectMove
+    endif
 		jsr	ObjHitFloor
 		cmpi.w	#$FFF8,d1
 		blt.s	loc_15E98
@@ -29427,7 +29478,11 @@ loc_15E98:				; CODE XREF: ROM:00015E8Aj
 ; ===========================================================================
 
 Obj4F_Delete:				; DATA XREF: ROM:00015DB6o
+    if removeJmpTos = 0
 		bra.w	j_DeleteObject
+    else
+  		jmp	DeleteObject
+    endif
 ; ===========================================================================
 Ani_Obj4F:	dc.w byte_15EB8-Ani_Obj4F ; DATA XREF: ROM:00015E1Co
 					; ROM:Ani_Obj4Fo ...
@@ -29437,6 +29492,8 @@ byte_15EBB:	dc.b   9,  0,  1,  2,  1,$FF,  0; 0 ; DATA XREF: ROM:00015EB6o
 Map_Obj4F:	incbin	"mappings/sprite/obj4F.bin"
 		even
 		align 4
+		
+    if removeJmpTos = 0
 
 loc_15EE8:				; CODE XREF: ROM:00015E3Aj
 		jmp	DisplaySprite
@@ -29457,6 +29514,8 @@ j_ObjectMoveAndFall_1:				; CODE XREF: ROM:00015DEAp
 
 j_ObjectMove_3:				; CODE XREF: ROM:loc_15E7Cp
 		jmp	ObjectMove
+		
+    endif
 ; ===========================================================================
 		align 4
 ;----------------------------------------------------
@@ -29499,7 +29558,11 @@ Obj50_Init:				; DATA XREF: ROM:Obj50_Indexo
 		move.w	d0,objoff_32(a0)
 		move.w	d0,objoff_34(a0)
 		move.w	y_pos(a0),objoff_2A(a0)
+	if removeJmpTos = 0
 		bsr.w	j_SingleObjectLoad
+    else
+  		jsr	SingleObjectLoad
+    endif
 		bne.s	loc_15FDA
 		move.b	#$50,id(a1) ; 'P'
 		move.b	#4,routine(a1)
@@ -29520,14 +29583,22 @@ Obj50_Init:				; DATA XREF: ROM:Obj50_Indexo
 loc_15FDA:				; CODE XREF: ROM:00015F80j
 					; DATA XREF: ROM:00015F18o
 		lea	(Ani_Obj50).l,a1
+	if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_3
+    else
+  		jsr	AnimateSprite
+    endif
 		move.w	#$39C,(WaterHeight).w
 		moveq	#0,d0
 		move.b	routine_secondary(a0),d0
 		move.w	Obj50_SubIndex(pc,d0.w),d1
 		jsr	Obj50_SubIndex(pc,d1.w)
 		bsr.w	sub_161D8
+	    if removeJmpTos = 0
 		bra.w	loc_1677A
+    else
+  		jmp	MarkObjGone
+    endif
 ; ===========================================================================
 Obj50_SubIndex:	dc.w loc_16046-Obj50_SubIndex ;	DATA XREF: ROM:Obj50_SubIndexo
 					; ROM:00016002o ...
@@ -29544,20 +29615,34 @@ loc_16006:				; DATA XREF: ROM:00015F1Ao
 		btst	#7,status(a1)
 		bne.w	loc_1676E
 		lea	(Ani_Obj50).l,a1
+	if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_3
 		bra.w	loc_16768
+    else
+  		jsr	AnimateSprite
+  		jmp	DisplaySprite
+    endif
+
 ; ===========================================================================
 
 loc_16030:				; DATA XREF: ROM:00015F1Co
 		bsr.w	loc_162FC
 		bsr.w	j_ObjectMove_4
 		lea	(Ani_Obj50).l,a1
+	if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_3
+    else
+  		jsr	AnimateSprite
+    endif
 		bra.w	loc_1677A
 ; ===========================================================================
 
 loc_16046:				; DATA XREF: ROM:Obj50_SubIndexo
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMove_4
+    else
+  		jsr	ObjectMove
+    endif
 		bsr.w	sub_162DE
 		bsr.w	sub_16184
 		bsr.w	sub_1611C
@@ -29565,14 +29650,22 @@ loc_16046:				; DATA XREF: ROM:Obj50_SubIndexo
 ; ===========================================================================
 
 loc_16058:				; DATA XREF: ROM:00016002o
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMove_4
+    else
+  		jsr	ObjectMove
+    endif
 		bsr.w	sub_162DE
 		bsr.w	sub_161A6
 		rts
 ; ===========================================================================
 
 loc_16066:				; DATA XREF: ROM:00016004o
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMoveAndFall_2
+    else
+  		jsr	ObjectMoveAndFall
+    endif
 		bsr.w	sub_162DE
 		bsr.w	sub_16078
 		bsr.w	sub_160F4
@@ -29593,7 +29686,11 @@ locret_16084:				; CODE XREF: sub_16078+4j
 
 loc_16086:				; CODE XREF: sub_16078+Aj
 		st	objoff_2D(a0)
+    if removeJmpTos = 0
 		bsr.w	j_SingleObjectLoad
+    else
+  		jsr	SingleObjectLoad
+    endif
 		bne.s	locret_160F2
 		move.b	#$50,id(a1) ; 'P'
 		move.b	#6,routine(a1)
@@ -29762,7 +29859,11 @@ loc_16208:				; CODE XREF: sub_161D8+2Cj
 
 Obj50_Routine08:			; DATA XREF: ROM:00015F1Eo
 					; ROM:0001653At
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMoveAndFall_2
+    else
+  		jsr	ObjectMoveAndFall
+    endif
 		bsr.w	sub_16228
 		lea	(Ani_Obj50).l,a1
 		bsr.w	j_AnimateSprite_3
@@ -29811,7 +29912,11 @@ locret_1628E:				; CODE XREF: ROM:00016256j
 
 loc_16290:				; CODE XREF: ROM:0001627Aj
 		lea	(Ani_Obj50).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_3
+    else
+  		jsr	AnimateSprite
+    endif
 		bra.w	loc_16768
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
@@ -29895,7 +30000,11 @@ loc_16372:				; CODE XREF: ROM:00016352j
 loc_16378:				; CODE XREF: ROM:0001630Aj
 					; ROM:00016362j ...
 		dbf	d3,loc_16306
+    if removeJmpTos = 0
 		bsr.w	j_SingleObjectLoad
+    else
+  		jsr	SingleObjectLoad
+    endif
 		bne.s	loc_1639A
 		move.b	id(a0),id(a1)
 		move.b	#$A,routine(a1)
@@ -29971,7 +30080,11 @@ loc_1653E:				; DATA XREF: ROM:off_16532o
 
 loc_1659C:				; DATA XREF: ROM:00016534o
 		lea	Ani_Obj50(pc),a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_3
+    else
+  		jsr	AnimateSprite
+    endif
 		move.w	#$39C,(WaterHeight).w
 		moveq	#0,d0
 		move.b	routine_secondary(a0),d0
@@ -29986,14 +30099,22 @@ off_165BC:	dc.w loc_165D4-off_165BC ; DATA	XREF: ROM:off_165BCo
 
 loc_165C0:				; DATA XREF: ROM:00016536o
 		bsr.w	loc_162FC
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMove_4
+    else
+  		jsr	ObjectMove
+    endif
 		lea	Ani_Obj50(pc),a1
 		bsr.w	j_AnimateSprite_3
 		bra.w	loc_1677A
 ; ===========================================================================
 
 loc_165D4:				; DATA XREF: ROM:off_165BCo
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMove_4
+    else
+  		jsr	ObjectMove
+    endif
 		bsr.w	sub_162DE
 		bsr.w	loc_16626
 		bsr.w	loc_16708
@@ -30002,7 +30123,11 @@ loc_165D4:				; DATA XREF: ROM:off_165BCo
 ; ===========================================================================
 
 loc_165EA:				; DATA XREF: ROM:000165BEo
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMove_4
+    else
+  		jsr	ObjectMove
+    endif
 		bsr.w	sub_162DE
 		bsr.w	loc_16626
 		bsr.w	loc_16708
@@ -30083,7 +30208,11 @@ locret_1669C:				; CODE XREF: ROM:0001667Cj
 ; ===========================================================================
 
 loc_1669E:				; CODE XREF: ROM:0001660Ej
+    if removeJmpTos = 0
 		bsr.w	j_SingleObjectLoad
+    else
+  		jsr	SingleObjectLoad
+    endif
 		bne.s	locret_16706
 		move.b	#$51,id(a1) ; 'Q'
 		move.b	#4,routine(a1)
@@ -30213,10 +30342,19 @@ Obj4B_Index:	dc.w Obj4B_Init-Obj4B_Index ; DATA XREF: ROM:Obj4B_Indexo
 ; ===========================================================================
 
 loc_167AA:				; DATA XREF: ROM:000167A8o
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMove_5
+    else
+  		jsr	ObjectMove
+    endif
 		lea	(Ani_Obj4B).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_4
 		bra.w	loc_16A8C
+    else
+  		jsr	AnimateSprite
+		jmp	loc_CEC6
+    endif
 ; ===========================================================================
 
 loc_167BC:				; DATA XREF: ROM:000167A6o
@@ -30234,14 +30372,23 @@ loc_167CE:				; CODE XREF: ROM:000167CAj
 		move.b	status(a1),status(a0)
 		move.b	1(a1),render_flags(a0)
 		lea	(Ani_Obj4B).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_4
 		bra.w	loc_16A8C
+    else
+  		jsr	AnimateSprite
+		jmp	loc_CEC6
+    endif
 ; ===========================================================================
 
 Obj4B_Init:				; DATA XREF: ROM:Obj4B_Indexo
 		move.l	#Map_Obj4B,mappings(a0)
 		move.w	#$3E6,art_tile(a0)
+    if removeJmpTos = 0
 		bsr.w	j_ModifySpriteAttr_2P_2
+    else
+  		jsr	ModifySpriteAttr_2P
+    endif
 		ori.b	#4,render_flags(a0)
 		move.b	#$A,collision_flags(a0)
 		move.b	#4,priority(a0)
@@ -30250,13 +30397,21 @@ Obj4B_Init:				; DATA XREF: ROM:Obj4B_Indexo
 		move.b	#$18,x_radius(a0)
 		move.b	#3,priority(a0)
 		addq.b	#2,routine(a0)
+    if removeJmpTos = 0
 		bsr.w	j_S1SingleObjectLoad2_0
+    else
+  		jsr	S1SingleObjectLoad2
+    endif
 		bne.s	locret_1689E
 		move.b	#$4B,id(a1) ; 'K'
 		move.b	#4,routine(a1)
 		move.l	#Map_Obj4B,mappings(a1)
 		move.w	#$3E6,art_tile(a1)
+    if removeJmpTos = 0
 		bsr.w	j_ModifyA1SpriteAttr_2P
+    else
+  		jsr	ModifyA1SpriteAttr_2P
+    endif
 		move.b	#4,priority(a1)
 		move.b	#$10,width_pixels(a1)
 		move.b	status(a0),status(a1)
@@ -30282,8 +30437,13 @@ Obj4B_Main:				; DATA XREF: ROM:000167A4o
 		move.w	Obj4B_SubIndex(pc,d0.w),d1
 		jsr	Obj4B_SubIndex(pc,d1.w)
 		lea	(Ani_Obj4B).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_4
 		bra.w	loc_16A8C
+    else
+  		jsr	AnimateSprite
+  		jmp	loc_CEC6
+    endif
 ; ===========================================================================
 Obj4B_SubIndex:	dc.w loc_168C0-Obj4B_SubIndex ;	DATA XREF: ROM:Obj4B_SubIndexo
 					; ROM:000168BEo
@@ -30377,7 +30537,11 @@ loc_1696A:				; CODE XREF: ROM:00016960j
 		move.b	#6,routine(a1)
 		move.l	#Map_Obj4B,mappings(a1)
 		move.w	#$3E6,art_tile(a1)
+    if removeJmpTos = 0
 		bsr.w	j_ModifyA1SpriteAttr_2P
+    else
+  		jsr	ModifyA1SpriteAttr_2P
+    endif
 		move.b	#4,priority(a1)
 		move.b	#$98,collision_flags(a1)
 		move.b	#$10,width_pixels(a1)
@@ -30465,16 +30629,29 @@ loc_16AB6:				; DATA XREF: ROM:00016AB4o
 ; ===========================================================================
 
 loc_16AC0:				; CODE XREF: ROM:00016ABCj
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMoveAndFall_3
+    else
+		jsr	ObjectMoveAndFall
+    endif
 		lea	(Ani_Obj4A).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_5
 		bra.w	loc_16D3C
+    else
+  		jsr	AnimateSprite
+		jmp	MarkObjGone
+    endif
 ; ===========================================================================
 
 loc_16AD2:				; DATA XREF: ROM:00016AB2o
 		subq.w	#1,$2C(a0)
 		beq.w	loc_16D36
+    if removeJmpTos = 0
 		bra.w	loc_16D30
+    else
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_16ADE:				; DATA XREF: ROM:Obj4A_Indexo
@@ -30486,7 +30663,11 @@ loc_16ADE:				; DATA XREF: ROM:Obj4A_Indexo
 		move.b	#$10,width_pixels(a0)
 		move.b	#$10,y_radius(a0)
 		move.b	#8,x_radius(a0)
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMoveAndFall_3
+    else
+  		jsr	ObjectMoveAndFall
+    endif
 		jsr	ObjHitFloor
 		tst.w	d1
 		bpl.s	loc_16B3C
@@ -30510,8 +30691,13 @@ loc_16B44:				; DATA XREF: ROM:00016AB0o
 		move.w	Obj4A_SubIndex(pc,d0.w),d1
 		jsr	Obj4A_SubIndex(pc,d1.w)
 		lea	(Ani_Obj4A).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_5
 		bra.w	loc_16D3C
+    else
+  		jsr	AnimateSprite
+		jmp	MarkObjGone
+    endif
 ; ===========================================================================
 Obj4A_SubIndex:	dc.w Obj4A_Init-Obj4A_SubIndex ; DATA XREF: ROM:Obj4A_SubIndexo
 					; ROM:00016B62o ...
@@ -30606,7 +30792,11 @@ loc_16C7C:				; DATA XREF: ROM:00016B66o
 
 loc_16C8A:				; CODE XREF: ROM:00016C86j
 		add.w	d0,x_pos(a0)
+    if removeJmpTos = 0
 		bra.w	loc_16D3C
+    else
+		jmp	MarkObjGone
+    endif
 ; ===========================================================================
 Ani_Obj4A:	dc.w byte_16C98-Ani_Obj4A ; DATA XREF: ROM:00016AC4o
 					; ROM:00016B52o ...
@@ -30679,8 +30869,13 @@ loc_16DA2:				; DATA XREF: ROM:00016D60o
 		jsr	Obj4C_SubIndex(pc,d1.w)
 		bsr.w	sub_16DC8
 		lea	(Ani_Obj4C).l,a1
-		bsr.w	j_AnimateSprite_6
+    if removeJmpTos = 0
+       		bsr.w	j_AnimateSprite_6
 		bra.w	loc_171C4
+    else
+    		jsr     AnimateSprite
+		jmp	MarkObjGone
+    endif
 ; ===========================================================================
 Obj4C_SubIndex:	dc.w loc_16F2E-Obj4C_SubIndex ;	DATA XREF: ROM:Obj4C_SubIndexo
 					; ROM:00016DC4o ...
@@ -30727,10 +30922,19 @@ loc_16E10:				; DATA XREF: ROM:00016D62o
 		bsr.w	sub_16F0E
 		bsr.w	sub_16EB0
 		bsr.w	sub_16E30
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMove_8
+    else
+    		jsr     ObjectMove
+    endif
 		lea	(Ani_Obj4C).l,a1
-		bsr.w	j_AnimateSprite_6
+    if removeJmpTos = 0
+       		bsr.w	j_AnimateSprite_6
 		bra.w	loc_171C4
+    else
+    		jsr     AnimateSprite
+		jmp	MarkObjGone
+    endif
 ; ===========================================================================
 		rts
 
@@ -30916,6 +31120,8 @@ byte_16FE6:	dc.b   3, $A, $B, $C, $D, $E,$FF,  0; 0	; DATA XREF: ROM:00016FC0o
 Map_Obj4C:	incbin	"mappings/sprite/obj4C.bin"
 		even
 		align 4
+		
+    if removeJmpTos = 0
 
 loc_171C4:				; CODE XREF: ROM:00016DBEj
 					; ROM:00016E2Aj
@@ -30931,6 +31137,8 @@ j_ObjectMove_8:				; CODE XREF: ROM:00016E1Cp
 		jmp	ObjectMove
 ; ===========================================================================
 		align 4
+		
+		endif
 ;----------------------------------------------------
 ; Object 4E - Gator
 ;----------------------------------------------------
@@ -30955,7 +31163,11 @@ Obj4E_Init:				; DATA XREF: ROM:Obj4E_Indexo
 		move.b	#$10,width_pixels(a0)
 		move.b	#$10,y_radius(a0)
 		move.b	#8,x_radius(a0)
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMoveAndFall_4
+    else
+		jsr	ObjectMoveAndFall
+    endif
 		jsr	ObjHitFloor
 		tst.w	d1
 		bpl.s	locret_17238
@@ -30973,8 +31185,13 @@ Obj4E_Main:				; DATA XREF: ROM:000171E8o
 		move.w	Obj4E_SubIndex(pc,d0.w),d1
 		jsr	Obj4E_SubIndex(pc,d1.w)
 		lea	(Ani_Obj4E).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_7
 		bra.w	loc_174B8
+    else
+		jsr	AnimateSprite
+		jmp	MarkObjGone
+    endif
 ; ===========================================================================
 Obj4E_SubIndex:	dc.w loc_1725A-Obj4E_SubIndex ;	DATA XREF: ROM:Obj4E_SubIndexo
 					; ROM:00017258o
@@ -30998,7 +31215,11 @@ locret_1727C:				; CODE XREF: ROM:0001725Ej
 
 loc_1727E:				; DATA XREF: ROM:00017258o
 		bsr.w	sub_172B6
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMove_6
+    else
+		jsr	ObjectMove
+    endif
 		jsr	ObjHitFloor
 		cmpi.w	#$FFF8,d1
 		blt.s	loc_1729E
@@ -31058,7 +31279,7 @@ byte_172FF:	dc.b   3,  6, $A,  8,  9,  7, $B,$FF,  0; 0 ; DATA XREF: ROM:000172F
 Map_Obj4E:	incbin	"mappings/sprite/obj4E.bin"
 		even
 ; ===========================================================================
-
+                if removeJmpTos = 0
 loc_174B8:				; CODE XREF: ROM:00017252j
 		jmp	MarkObjGone
 ; ===========================================================================
@@ -31073,16 +31294,19 @@ j_ObjectMoveAndFall_4:				; CODE XREF: ROM:0001721Cp
 
 j_ObjectMove_6:				; CODE XREF: ROM:00017282p
 		jmp	ObjectMove
+		endif
 ; ===========================================================================
 
 Obj53:					; DATA XREF: ROM:Obj_Indexo
 		moveq	#0,d0
-
-loc_174D2:
 		move.b	routine(a0),d0
 		move.w	Obj53_Index(pc,d0.w),d1
 		jsr	Obj53_Index(pc,d1.w)
+    if removeJmpTos = 0
 		bra.w	loc_175B8
+    else
+		jmp	MarkObjGone
+    endif
 ; ===========================================================================
 Obj53_Index:	dc.w Obj53_Init-Obj53_Index ; DATA XREF: ROM:Obj53_Indexo
 					; ROM:000174E4o
@@ -31093,7 +31317,11 @@ Obj53_Init:				; DATA XREF: ROM:Obj53_Indexo
 		addq.b	#2,routine(a0)
 		move.l	#Map_Obj53,mappings(a0)
 		move.w	#$41C,art_tile(a0)
+    if removeJmpTos = 0
 		bsr.w	j_ModifySpriteAttr_2P
+    else
+		jsr	ModifySpriteAttr_2P
+    endif
 		move.b	#4,render_flags(a0)
 		move.b	#4,priority(a0)
 		move.b	#9,collision_flags(a0)
@@ -31103,8 +31331,13 @@ Obj53_Init:				; DATA XREF: ROM:Obj53_Indexo
 
 Obj53_Main:				; DATA XREF: ROM:000174E4o
 		lea	(Ani_Obj53).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite
 		bsr.w	j_ObjectMove
+    else
+		jsr	AnimateSprite
+		jsr	ObjectMove
+    endif
 		addi.w	#$18,y_vel(a0)
 		move.w	objoff_30(a0),d0
 		cmp.w	y_pos(a0),d0
@@ -31137,6 +31370,7 @@ Map_Obj53:	incbin	"mappings/sprite/obj53.bin"
 		even
 ; ===========================================================================
 
+    if removeJmpTos = 0
 loc_175B8:				; CODE XREF: ROM:000174DEj
 		jmp	MarkObjGone
 ; ===========================================================================
@@ -31151,6 +31385,7 @@ j_ModifySpriteAttr_2P:			; CODE XREF: ROM:000174F8p
 
 j_ObjectMove:				; CODE XREF: ROM:0001752Ap
 		jmp	ObjectMove
+		endif
 ; ===========================================================================
 ;----------------------------------------------------
 ; Object 54 - Snail badnik from	EHZ
@@ -31173,20 +31408,32 @@ Obj54_Index:	dc.w Obj54_Init-Obj54_Index ; DATA XREF: ROM:Obj54_Indexo
 Obj54_Init:				; DATA XREF: ROM:Obj54_Indexo
 		move.l	#Map_Obj54,mappings(a0)
 		move.w	#$402,art_tile(a0)
+    if removeJmpTos = 0
 		bsr.w	j_ModifySpriteAttr_2P_3
+    else
+		jsr	ModifySpriteAttr_2P
+    endif
 		ori.b	#4,render_flags(a0)
 		move.b	#$A,collision_flags(a0)
 		move.b	#4,priority(a0)
 		move.b	#$10,width_pixels(a0)
 		move.b	#$10,y_radius(a0)
 		move.b	#$E,x_radius(a0)
+    if removeJmpTos = 0
 		bsr.w	j_S1SingleObjectLoad2_1
+    else
+		jsr	S1SingleObjectLoad2
+    endif
 		bne.s	loc_17670
 		move.b	#$54,id(a1) ; 'T'
 		move.b	#6,routine(a1)
 		move.l	#Map_Obj54,mappings(a1)
 		move.w	#$2402,art_tile(a1)
+    if removeJmpTos = 0
 		bsr.w	j_ModifyA1SpriteAttr_2P_0
+    else
+		jsr	ModifyA1SpriteAttr_2P
+    endif
 		move.b	#3,priority(a1)
 		move.b	#$10,width_pixels(a1)
 		move.b	status(a0),status(a1)
@@ -31210,7 +31457,11 @@ loc_17682:				; CODE XREF: ROM:0001767Ej
 
 loc_17688:				; DATA XREF: ROM:000175E0o
 		bsr.w	sub_176D0
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMove_7
+    else
+		jsr	ObjectMove
+    endif
 		jsr	ObjHitFloor
 		cmpi.w	#$FFF8,d1
 		blt.s	loc_176B4
@@ -31218,8 +31469,13 @@ loc_17688:				; DATA XREF: ROM:000175E0o
 		bge.s	loc_176B4
 		add.w	d1,y_pos(a0)
 		lea	(Ani_Obj54).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_8
 		bra.w	loc_1786C
+    else
+		jsr	DisplaySprite
+		jmp	loc_CEC6
+    endif
 ; ===========================================================================
 
 loc_176B4:				; CODE XREF: ROM:0001769Aj
@@ -31228,8 +31484,13 @@ loc_176B4:				; CODE XREF: ROM:0001769Aj
 		move.w	#$14,objoff_30(a0)
 		st	objoff_34(a0)
 		lea	(Ani_Obj54).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_8
 		bra.w	loc_1786C
+    else
+		jsr	DisplaySprite
+		jmp	loc_CEC6
+    endif
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -31312,15 +31573,24 @@ loc_17772:				; DATA XREF: ROM:000175E6o
 loc_177A2:				; CODE XREF: ROM:0001779Ej
 		add.w	d0,x_pos(a0)
 		lea	(Ani_Obj4B).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_8
 		bra.w	loc_1786C
+    else
+		jsr	DisplaySprite
+		jmp	loc_CEC6
+    endif
 ; ===========================================================================
 
 loc_177B4:				; DATA XREF: ROM:000175E2o
 		subi.w	#1,objoff_30(a0)
 		bpl.w	loc_1786C
 		neg.w	x_vel(a0)
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMoveAndFall_5
+    else
+		jsr	ObjectMoveAndFall
+    endif
 		move.w	x_vel(a0),d0
 		asr.w	#2,d0
 		move.w	d0,x_vel(a0)
@@ -31329,7 +31599,11 @@ loc_177B4:				; DATA XREF: ROM:000175E2o
 		subq.b	#2,routine(a0)
 		sf	objoff_34(a0)
 		sf	$35(a0)
+    if removeJmpTos = 0
 		bra.w	loc_1786C
+    else
+		jmp	loc_CEC6
+    endif
 ; ===========================================================================
 
 loc_177EC:				; DATA XREF: ROM:000175E4o
@@ -31340,7 +31614,11 @@ loc_177EC:				; DATA XREF: ROM:000175E4o
 		move.w	y_pos(a1),y_pos(a0)
 		move.b	status(a1),status(a0)
 		move.b	1(a1),render_flags(a0)
+    if removeJmpTos = 0
 		bra.w	loc_1786C
+    else
+		jmp	loc_CEC6
+    endif
 ; ===========================================================================
 Ani_Obj54:	dc.w byte_17818-Ani_Obj54 ; DATA XREF: ROM:000176A6o
 					; ROM:000176C2o ...
@@ -31411,13 +31689,21 @@ loc_1789E:				; DATA XREF: ROM:off_17892o
 		cmpi.w	#$29D0,x_pos(a0)
 		ble.s	loc_178B6
 		subi.w	#1,x_pos(a0)
+    if removeJmpTos = 0
 		bra.w	loc_181A8
+    else
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_178B6:				; CODE XREF: ROM:000178AAj
 		move.w	#$29D0,x_pos(a0)
 		addq.b	#2,routine_secondary(a0)
+    if removeJmpTos = 0
 		bra.w	loc_181A8
+    else
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_178C4:				; DATA XREF: ROM:off_17892o
@@ -31435,14 +31721,22 @@ loc_178D6:				; DATA XREF: ROM:off_178D2o
 		cmpi.w	#$41E,y_pos(a0)
 		bge.s	loc_178E8
 		addi.w	#1,y_pos(a0)
+    if removeJmpTos = 0
 		bra.w	loc_181A8
+    else
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_178E8:				; CODE XREF: ROM:000178DCj
 		addq.b	#2,objoff_2C(a0)
 		bset	#0,objoff_2D(a0)
 		move.w	#$3C,objoff_2A(a0) ; '<'
+    if removeJmpTos = 0
 		bra.w	loc_181A8
+    else
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_178FC:				; DATA XREF: ROM:000178D4o
@@ -31452,7 +31746,11 @@ loc_178FC:				; DATA XREF: ROM:000178D4o
 		addq.b	#2,routine_secondary(a0)
 		move.b	#$F,collision_flags(a0)
 		bset	#1,objoff_2D(a0)
+    if removeJmpTos = 0
 		bra.w	loc_181A8
+    else
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_17920:				; DATA XREF: ROM:off_17892o
@@ -31469,7 +31767,11 @@ loc_17920:				; DATA XREF: ROM:off_17892o
 		asl.l	#8,d0
 		add.l	d0,d2
 		move.l	d2,x_pos(a0)
+    if removeJmpTos = 0
 		bra.w	loc_181A8
+    else
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_17952:				; DATA XREF: ROM:off_17892o
@@ -31490,7 +31792,11 @@ loc_1797C:				; DATA XREF: ROM:off_17892o
 		bpl.w	loc_181A8
 		addq.b	#2,routine_secondary(a0)
 		move.b	#0,objoff_2C(a0)
+    if removeJmpTos = 0
 		bra.w	loc_181A8
+    else
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_17996:				; DATA XREF: ROM:off_17892o
@@ -31498,7 +31804,11 @@ loc_17996:				; DATA XREF: ROM:off_17892o
 		move.b	objoff_2C(a0),d0
 		move.w	off_179A8(pc,d0.w),d1
 		jsr	off_179A8(pc,d1.w)
+    if removeJmpTos = 0
 		bra.w	loc_181A8
+    else
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 off_179A8:	dc.w loc_179AE-off_179A8 ; DATA	XREF: ROM:off_179A8o
 					; ROM:000179AAo ...
@@ -31648,8 +31958,13 @@ loc_17B06:				; DATA XREF: ROM:00017B04o
 		bpl.w	loc_181A8
 		move.b	#0,routine(a0)
 		lea	(Ani_Obj58).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_9
 		bra.w	loc_181A8
+    else
+    		jsr	AnimateSprite
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_17B2A:				; DATA XREF: ROM:off_17AFCo
@@ -31679,8 +31994,13 @@ loc_17B60:				; CODE XREF: ROM:00017B4Ej
 		move.b	status(a1),status(a0)
 		move.b	1(a1),render_flags(a0)
 		lea	(Ani_Obj58).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_9
 		bra.w	loc_181A8
+    else
+    		jsr	AnimateSprite
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_17B86:				; DATA XREF: ROM:00017B3Ao
@@ -31689,13 +32009,22 @@ loc_17B86:				; DATA XREF: ROM:00017B3Ao
 		cmpi.w	#$FFF0,objoff_2A(a0)
 		ble.w	loc_181AE
 		addi.w	#1,y_pos(a0)
+    if removeJmpTos = 0
 		bra.w	loc_181A8
+    else
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_17BA2:				; CODE XREF: ROM:00017B8Cj
 		lea	(Ani_Obj58).l,a1
-		bsr.w	j_AnimateSprite_9
+    if removeJmpTos = 0
+       		bsr.w	j_AnimateSprite_9
 		bra.w	loc_181A8
+    else
+    		jsr     AnimateSprite
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_17BB0:				; DATA XREF: ROM:00017AFEo
@@ -31711,13 +32040,21 @@ loc_17BB0:				; DATA XREF: ROM:00017AFEo
 		addi.w	#8,y_pos(a0)
 		move.b	status(a1),status(a0)
 		move.b	1(a1),render_flags(a0)
+    if removeJmpTos = 0
 		bra.w	loc_181A8
+    else
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_17BF2:				; CODE XREF: ROM:00017BCCj
 		move.b	#8,mapping_frame(a0)
 		move.b	#0,priority(a0)
+    if removeJmpTos = 0
 		bra.w	loc_181A8
+    else
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_17C02:				; DATA XREF: ROM:00017B00o
@@ -31740,7 +32077,11 @@ loc_17C18:				; DATA XREF: ROM:off_17C10o
 		btst	#1,objoff_2D(a1)
 		beq.w	loc_181A8
 		addq.b	#2,routine_secondary(a0)
+    if removeJmpTos = 0
 		bra.w	loc_181A8
+    else
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_17C36:				; DATA XREF: ROM:00017C12o
@@ -31755,7 +32096,11 @@ loc_17C36:				; DATA XREF: ROM:00017C12o
 
 loc_17C58:				; CODE XREF: ROM:00017C52j
 		bsr.w	sub_17A6A
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMoveAndFall_6
+    else
+		jsr	ObjectMoveAndFall
+    endif
 		jsr	ObjHitFloor
 		tst.w	d1
 		bpl.s	loc_17C6E
@@ -31771,8 +32116,13 @@ loc_17C6E:				; CODE XREF: ROM:00017C68j
 
 loc_17C88:				; CODE XREF: ROM:00017C7Aj
 		lea	(Ani_Obj58a).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_9
 		bra.w	loc_181A8
+    else
+		jsr	AnimateSprite
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_17C96:				; DATA XREF: ROM:00017C14o
@@ -31784,13 +32134,21 @@ loc_17C96:				; DATA XREF: ROM:00017C14o
 		cmpi.b	#1,priority(a0)
 		beq.w	loc_181A8
 		neg.w	x_vel(a0)
+    if removeJmpTos = 0
 		bra.w	loc_181A8
+    else
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_17CC2:				; DATA XREF: ROM:00017C16o
 		subq.w	#1,objoff_2A(a0)
 		bpl.w	loc_181A8
+    if removeJmpTos = 0
 		bsr.w	j_ObjectMoveAndFall_6
+    else
+		jsr	ObjectMoveAndFall
+    endif
 		bsr.w	ObjHitFloor
 		tst.w	d1
 		bpl.s	loc_17CE0
@@ -31824,8 +32182,13 @@ loc_17CE4:				; DATA XREF: ROM:00017B02o
 loc_17D38:				; CODE XREF: ROM:00017D34j
 		add.w	d0,x_pos(a0)
 		lea	(Ani_Obj58a).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_9
 		bra.w	loc_181A8
+    else
+		jsr	AnimateSprite
+		jmp	DisplaySprite
+    endif
 ; ===========================================================================
 
 loc_17D4A:				; CODE XREF: ROM:00017CF6j
@@ -31837,8 +32200,13 @@ loc_17D4A:				; CODE XREF: ROM:00017CF6j
 loc_17D58:				; CODE XREF: ROM:00017D54j
 		add.w	d0,x_pos(a0)
 		lea	(Ani_Obj58a).l,a1
+    if removeJmpTos = 0
 		bsr.w	j_AnimateSprite_9
 		bra.w	loc_181A8
+    else
+		jsr	AnimateSprite
+		jmp	DisplaySprite
+    endif
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
 
@@ -32320,7 +32688,11 @@ loc_185F2:				; DATA XREF: ROM:off_185EEo
 		move.w	#$F0,x_pos+2(a0) ; 'ð'
 		move.l	#Map_Obj8A,mappings(a0)
 		move.w	#$5A0,art_tile(a0)
+    if removeJmpTos = 0
 		bsr.w	j_ModifySpriteAttr_2P_4
+    else
+		jsr	ModifySpriteAttr_2P
+    endif
 		move.w	($FFFFFFF4).w,d0		; load credits index number
 		move.b	d0,mapping_frame(a0)		; display the correct frame
 		move.b	#0,render_flags(a0)
@@ -32328,7 +32700,11 @@ loc_185F2:				; DATA XREF: ROM:off_185EEo
 		cmpi.b	#GMid_TS,(Game_Mode).w          ; is the game mode on the title screen?
 		bne.s	loc_18660			; if not, display it
 		move.w	#$300,art_tile(a0)
+    if removeJmpTos = 0
 		bsr.w	j_ModifySpriteAttr_2P_4
+    else
+		jsr	ModifySpriteAttr_2P
+    endif
 		move.b	#$A,mapping_frame(a0)		; display "SONIC TEAM PRESENTS"
 		tst.b	(S1JapaneseCredits_Flag).w	; is the japanese credits flag on?
 		beq.s	loc_18660			; if not, just display the sprite
@@ -32350,9 +32726,11 @@ Map_Obj8A:	incbin	"mappings/sprite/obj8A.bin"
 ; ===========================================================================
 		nop			; filler
 
+    if removeJmpTos = 0
 j_ModifySpriteAttr_2P_4:		; CODE XREF: ROM:00018610p
 					; ROM:00018636p
 		jmp	ModifySpriteAttr_2P
+    endif
 ; ===========================================================================
 		align 4
 ;----------------------------------------------------
@@ -32393,7 +32771,11 @@ loc_18D2A:				; CODE XREF: ROM:00018D20j
 		move.w	y_pos(a0),y_pos(a1)
 		move.l	#Map_Eggman,mappings(a1)
 		move.w	#$400,art_tile(a1)
+    if removeJmpTos = 0
 		bsr.w	j_ModifyA1SpriteAttr_2P_1
+    else
+		jsr	ModifySpriteAttr_2P
+    endif
 		move.b	#4,render_flags(a1)
 		move.b	#$20,width_pixels(a1) ; ' '
 		move.b	#3,priority(a1)
@@ -32790,7 +33172,11 @@ Obj48_Init:				; DATA XREF: ROM:Obj48_Indexo
 		move.w	#$FE00,objoff_3E(a0)
 		move.l	#Map_BossItems,mappings(a0)
 		move.w	#$46C,art_tile(a0)
+    if removeJmpTos = 0
 		bsr.w	j_ModifySpriteAttr_2P_5
+    else
+		jsr	ModifySpriteAttr_2P
+    endif
 		lea	subtype(a0),a2
 		move.b	#0,(a2)+
 		moveq	#5,d1
@@ -32807,7 +33193,11 @@ loc_1912E:				; CODE XREF: ROM:00019190j
 		move.b	#6,routine(a1)
 		move.l	#$852E,mappings(a1)
 		move.w	#$380,art_tile(a1)
+    if removeJmpTos = 0
 		bsr.w	j_ModifyA1SpriteAttr_2P_1
+    else
+		jsr	ModifySpriteAttr_2P
+    endif
 		move.b	#1,mapping_frame(a1)
 		addq.b	#1,subtype(a0)
 
@@ -32827,7 +33217,11 @@ loc_19194:				; CODE XREF: ROM:00019134j
 		move.b	#8,routine(a1)
 		move.l	#$85CA,mappings(a1)
 		move.w	#$43AA,art_tile(a1)
+    if removeJmpTos = 0
 		bsr.w	j_ModifyA1SpriteAttr_2P_1
+    else
+		jsr	ModifySpriteAttr_2P
+    endif
 		move.b	#1,mapping_frame(a1)
 		move.b	#5,priority(a1)
 		move.b	#$81,collision_flags(a1)
@@ -32971,7 +33365,7 @@ Map_Eggman:	incbin	"mappings/sprite/Eggman.bin"
 Map_BossItems:	incbin	"mappings/sprite/Boss Items.bin"
 		even
 ; ===========================================================================
-
+      if removeJmpTos = 0
 j_ModifyA1SpriteAttr_2P_1:		; CODE XREF: ROM:00018D4Ep
 					; ROM:0001915Cp ...
 		jmp	ModifyA1SpriteAttr_2P
@@ -32979,6 +33373,7 @@ j_ModifyA1SpriteAttr_2P_1:		; CODE XREF: ROM:00018D4Ep
 
 j_ModifySpriteAttr_2P_5:		; CODE XREF: ROM:0001911Cp
 		jmp	ModifySpriteAttr_2P
+		endif
 ; ===========================================================================
 ;----------------------------------------------------
 ; Object 3E - prison capsule
@@ -33018,7 +33413,11 @@ Obj3E_Var:	dc.b   2,$20,  4,  0	; 0
 Obj3E_Init:				; DATA XREF: ROM:Obj3E_Indexo
 		move.l	#Map_Obj3E,mappings(a0)
 		move.w	#$49D,art_tile(a0)
+    if removeJmpTos = 0
 		bsr.w	j_ModifySpriteAttr_2P_6
+    else
+		jsr	ModifySpriteAttr_2P
+    endif
 		move.b	#4,render_flags(a0)
 		move.w	y_pos(a0),objoff_30(a0)
 		moveq	#0,d0
@@ -33197,9 +33596,10 @@ byte_19730:	dc.b   2,  1,  3,$FF	; 0 ; DATA XREF: ROM:Ani_Obj3Eo
 Map_Obj3E:	incbin	"mappings/sprite/obj3E.bin"
 		even
 ; ===========================================================================
-
+    if removeJmpTos = 0
 j_ModifySpriteAttr_2P_6:		; CODE XREF: ROM:0001953Ep
 		jmp	ModifySpriteAttr_2P
+    endif
 ; ===========================================================================
 		align 4
 
@@ -33822,9 +34222,9 @@ loc_19D82:				; CODE XREF: sub_19CC2+AEj
 		add.w	d0,d0
 		lea	(a0,d0.w),a0
 		move.w	(a0),(a1)
-		move.w	2(a0),x_pos(a1)
-		move.w	4(a0),x_vel(a1)
-		move.w	6(a0),priority(a1)
+		move.w	art_tile(a0),x_pos(a1)
+		move.w	mappings(a0),x_vel(a1)
+		move.w	mappings+2(a0),priority(a1)
 		move.w	x_pos(a0),collision_flags(a1)
 		move.w	x_pos+2(a0),subtype(a1)
 		move.w	y_pos(a0),objoff_30(a1)
@@ -33832,9 +34232,9 @@ loc_19D82:				; CODE XREF: sub_19CC2+AEj
 		adda.w	#$20,a0	; ' '
 		adda.w	#$48,a1	; 'H'
 		move.w	(a0),(a1)
-		move.w	2(a0),x_pos(a1)
-		move.w	4(a0),x_vel(a1)
-		move.w	6(a0),priority(a1)
+		move.w	art_tile(a0),x_pos(a1)
+		move.w	mappings(a0),x_vel(a1)
+		move.w	mappings+2(a0),priority(a1)
 		move.w	x_pos(a0),collision_flags(a1)
 		move.w	x_pos+2(a0),subtype(a1)
 		move.w	y_pos(a0),objoff_30(a1)
@@ -33842,9 +34242,9 @@ loc_19D82:				; CODE XREF: sub_19CC2+AEj
 		adda.w	#$20,a0	; ' '
 		adda.w	#$48,a1	; 'H'
 		move.w	(a0),(a1)
-		move.w	2(a0),x_pos(a1)
-		move.w	4(a0),x_vel(a1)
-		move.w	6(a0),priority(a1)
+		move.w	art_tile(a0),x_pos(a1)
+		move.w	mappings(a0),x_vel(a1)
+		move.w	mappings+2(a0),priority(a1)
 		move.w	x_pos(a0),collision_flags(a1)
 		move.w	x_pos+2(a0),subtype(a1)
 		move.w	y_pos(a0),objoff_30(a1)
@@ -34370,7 +34770,11 @@ Obj09_Main:				; DATA XREF: ROM:Obj09_Indexo
 		move.b	#7,x_radius(a0)
 		move.l	#Map_Sonic,mappings(a0)
 		move.w	#$780,art_tile(a0)
+    if removeJmpTos = 0
 		bsr.w	j_ModifySpriteAttr_2P_7
+    else
+		jsr	ModifySpriteAttr_2P
+    endif
 		move.b	#4,render_flags(a0)
 		move.b	#0,priority(a0)
 		move.b	#2,anim(a0)
@@ -35534,7 +35938,11 @@ Obj21_Init:				; DATA XREF: ROM:Obj21_Indexo
 		move.w	#$108,x_pos+2(a0)
 		move.l	#Map_Obj21,mappings(a0)
 		move.w	#$6CA,art_tile(a0)
+    if removeJmpTos = 0
 		bsr.w	j_ModifySpriteAttr_2P_8
+    else
+		jsr	ModifySpriteAttr_2P
+    endif
 		move.b	#0,render_flags(a0)
 		move.b	#0,priority(a0)
 
@@ -35686,8 +36094,7 @@ loc_1B2F0:				; CODE XREF: HudUpdate+A8j
 locret_1B318:				; CODE XREF: HudUpdate+B6j
 		rts
 ; ===========================================================================
-
-	    				; This isn't used, due to the timer jumping back to 9:00 when it reaches 9:59
+  				; This isn't used, due to the timer jumping back to 9:00 when it reaches 9:59
 		clr.b	($FFFFFE1E).w
 		lea	(MainCharacter).w,a0
 		movea.l	a0,a2
@@ -36097,9 +36504,10 @@ Art_LivesNums:	incbin	"art/uncompressed/Lives counter.bin"
 		even
 ; ===========================================================================
 		nop			; filler
-
+    if removeJmpTos = 0
 j_ModifySpriteAttr_2P_8:		; CODE XREF: ROM:0001B058p
 		jmp	ModifySpriteAttr_2P
+		endif
 ; ===========================================================================
 		align 4
 
@@ -36319,8 +36727,12 @@ Debug_ShowItem:				; CODE XREF: ROM:loc_1BB24p
 		move.l	(a2,d0.w),mappings(a0)
 		move.w	6(a2,d0.w),art_tile(a0)
 		move.b	5(a2,d0.w),mapping_frame(a0)
+    if removeJmpTos = 0
 		bsr.w	j_ModifySpriteAttr_2P_1
 		rts
+    else
+		jmp	ModifySpriteAttr_2P
+    endif
 ; End of function Debug_ShowItem
 
 ; ===========================================================================

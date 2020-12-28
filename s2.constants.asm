@@ -280,6 +280,7 @@ Hint_flag:			equ	$FFFFF644		; 2 bytes
 Do_Updates_in_H_int:		equ	$FFFFF64F		; 1 byte
 unk_FFEA:			equ	$FFFFFFEA		; 2 bytes - only cleared at the title screen
 unk_F662:			equ	$FFFFF662		; 2 bytes - unused but cleared on the SEGA screen
+unk_F628:			equ	$FFFFF628		; 1 byte - only used in unused VBlank routine $E
 Level_started_flag:		equ	$FFFFF711		; 1 byte - used to determine if the HUD should display or not
 Screen_redraw_flag:		equ	$FFFFF720		; 1 byte
 Shield_flag:			equ 	$FFFFFE2C		; 1 byte - shield status (00 = no; 01 = yes)
