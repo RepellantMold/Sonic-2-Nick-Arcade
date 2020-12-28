@@ -20,6 +20,9 @@ skipChecksumCheck = 0|allOptimizations
 removeJmpTos = 0|allOptimizations
 ;	| If 1, many unnecessary JmpTos are removed, slightly improving performance
 ;
+OptimiseSound = 0|allOptimizations
+;	| If 1, optimize sound queuing
+;
 
 ; >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 ; Start of ROM
@@ -3701,8 +3704,7 @@ AngleData:      incbin	"collision/Angles.bin"
 		nop			; filler
 
 SegaScreen:				; CODE XREF: ROM:GameModeArrayj
-		move.b	#$E4,d0
-		bsr.w	PlaySound_Special
+		sfx	bgm_Stop,0,1,1 ; stop music
 		bsr.w	ClearPLC
 		bsr.w	Pal_FadeFrom
 		lea	(VDP_control_port).l,a6
@@ -3746,8 +3748,7 @@ Sega_WaitPalette:			; CODE XREF: ROM:000031A4j
 		bsr.w	DelayProgram
 		bsr.w	PalCycle_Sega
 		bne.s	Sega_WaitPalette
-		move.b	#$E1,d0
-		bsr.w	PlaySound_Special
+		sfx	sfx_Sega,0,1,1	; play "SEGA" sound
 		move.b	#$14,(Vint_routine).w
 		bsr.w	DelayProgram
 		move.w	#$1E,($FFFFF614).w
@@ -3768,8 +3769,7 @@ Sega_GoToTitleScreen:			; CODE XREF: ROM:000031CCj
 ; ===========================================================================
 
 TitleScreen:				; CODE XREF: ROM:000003A0j
-		move.b	#$E4,d0
-		bsr.w	PlaySound_Special
+		sfx	bgm_Stop,0,1,1 ; stop music
 		bsr.w	ClearPLC
 		bsr.w	Pal_FadeFrom
 		disable_ints
@@ -3876,8 +3876,7 @@ loc_32C4:				; CODE XREF: ROM:000032C6j
 		bsr.w	ShowVDPGraphics
 		moveq	#palid_Title,d0
 		bsr.w	PalLoad1
-		move.b	#$8A,d0
-		bsr.w	PlaySound_Special
+		sfx	bgm_Title,0,1,1	; play title screen music
 		move.b	#0,(Debug_mode_flag).w
 		move.w	#0,(Two_player_mode).w
 		move.w	#$178,($FFFFF614).w
@@ -3944,8 +3943,7 @@ LevelSelectCheat:			; CODE XREF: ROM:0000341Ej
 Title_Cheat_PlayRing:			; CODE XREF: ROM:0000344Ej
 					; ROM:00003454j
 		move.b	#1,(a0,d1.w)
-		move.b	#$B5,d0
-		bsr.w	PlaySound_Special
+		sfx	sfx_Ring,0,1,1	; play ring sound when code is entered
 		bra.s	Title_Cheat_CountC
 ; ===========================================================================
 
@@ -4039,8 +4037,7 @@ loc_354C:				; CODE XREF: ROM:00003532j
 
 loc_355A:				; CODE XREF: ROM:00003538j
 		move.b	#$1C,(Game_Mode).w	; this one just makes the screen turn into a horizontal
-		move.b	#$91,d0			; strip of lines with the credits music playing
-		bsr.w	PlaySound_Special
+		sfx	bgm_Credits,0,1,1
 		move.w	#0,($FFFFFFF4).w
 		rts
 ; ===========================================================================
@@ -4087,8 +4084,7 @@ PlayLevel:				; CODE XREF: ROM:000034A2j
 		move.l	d0,($FFFFFE5C).w
 		move.b	d0,($FFFFFE18).w
 		move.l	#$1388,($FFFFFFC0).w
-		move.b	#$E0,d0
-		bsr.w	PlaySound_Special
+		sfx	bgm_Fade,0,1,1 ; fade out music
 		rts
 ; ===========================================================================
   		; Up, Down, Down, Down, Down, Up
@@ -4117,8 +4113,7 @@ RunDemo:				; CODE XREF: ROM:0000364Cj
 		bne.w	Title_CheckLvlSel
 		tst.w	($FFFFF614).w
 		bne.w	loc_3630
-		move.b	#$E0,d0
-		bsr.w	PlaySound_Special
+		sfx	bgm_Fade,0,1,1
 		move.w	($FFFFFFF2).w,d0
 		andi.w	#7,d0
 		add.w	d0,d0
@@ -4442,7 +4437,14 @@ loc_3AFC:				; CODE XREF: UnknownSub_4+12j
 		nop			; filler
 ; ===========================================================================
 ; Same as Sonic 1
-MusicList:      incbin	"misc/Music Playlist 1.bin"
+MusicList:
+	  	dc.b bgm_GHZ	; GHZ
+		dc.b bgm_LZ	; LZ
+		dc.b bgm_MZ	; CPZ
+		dc.b bgm_SLZ	; EHZ
+		dc.b bgm_SYZ	; HPZ
+		dc.b bgm_SBZ	; HTZ
+		dc.b bgm_FZ	; Ending
 		even
 ; ===========================================================================
 
@@ -4450,8 +4452,7 @@ Level:
 		bset	#7,(Game_Mode).w
 		tst.w	(Demo_mode_flag).w
 		bmi.s	loc_3B38
-		move.b	#$E0,d0
-		bsr.w	PlaySound_Special
+		sfx	bgm_Fade,0,1,1 ; fade out music
 
 loc_3B38:
 		bsr.w	ClearPLC
@@ -5053,8 +5054,7 @@ DynWater_HPZ3:				; DATA XREF: ROM:DynWater_Indexo
 		move.w	#$4C8,d1
 		move.b	#$4B,(Level_Layout+$206).w
 		move.b	#1,(Water_routine).w
-		move.w	#$B7,d0	; '∑'
-		bsr.w	PlaySound_Special
+		sfx	sfx_Rumbling,0,1,0
 
 loc_41E8:				; CODE XREF: ROM:000041BEj
 					; ROM:000041C6j ...
@@ -5188,8 +5188,7 @@ loc_42EE:				; CODE XREF: ROM:0000438Ej
 		move.b	($FFFFFE0F).w,d0
 		andi.b	#$3F,d0	; '?'
 		bne.s	loc_4326
-		move.w	#$D0,d0	; '–'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Waterfall,0,1,0
 
 loc_4326:				; CODE XREF: ROM:0000431Aj
 		tst.b	(WindTunnel_holding_flag).w
@@ -5296,8 +5295,7 @@ loc_4430:				; CODE XREF: ROM:00004428j
 		move.b	($FFFFFE0F).w,d0
 		andi.b	#$1F,d0
 		bne.s	locret_4454
-		move.w	#$D0,d0	; '–'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Waterfall,0,1,0
 
 locret_4454:				; CODE XREF: ROM:00004448j
 		rts
@@ -5699,8 +5697,7 @@ j_AniArt_Load:
 
 ; GameMode10:
 SpecialStage:				; CODE XREF: ROM:000003ACj
-		move.w	#$CA,d0	; ' '
-		bsr.w	PlaySound_Special
+		sfx	sfx_EnterSS,0,1,0
 		bsr.w	Pal_MakeFlash
 		disable_ints
 		lea	(VDP_control_port).l,a6
@@ -5770,8 +5767,7 @@ SS_ClrNemRam:				; CODE XREF: ROM:000050CEj
 		bsr.w	PalCycle_S1SS
 		clr.w	(SS_Angle).w		; clear the angle of the special stage so it's upright
 		move.w	#$40,(SS_RotationSpeed).w ; set the rotation speed
-		move.w	#$89,d0	; 'â'
-		bsr.w	PlaySound
+		music	bgm_SS,0,1,0
 		move.w	#0,(Demo_button_index).w
 		lea	(Demo_Index).l,a1
 		moveq	#6,d0
@@ -5865,8 +5861,7 @@ loc_5214:				; CODE XREF: ROM:00005208j
 		move.w	(Ring_amount).w,d0
 		mulu.w	#$A,d0
 		move.w	d0,($FFFFF7D4).w
-		move.w	#$8E,d0
-		jsr	(PlaySound_Special).l
+		sfx	bgm_GotThrough,0,1,0
 		lea	(Object_RAM).w,a1
 		moveq	#0,d0
 		move.w	#$7FF,d1
@@ -5888,8 +5883,7 @@ loc_529C:				; CODE XREF: ROM:000052BEj
 		beq.s	loc_529C
 		tst.l	($FFFFF680).w
 		bne.s	loc_529C
-		move.w	#$CA,d0	; ' '
-		bsr.w	PlaySound_Special
+		sfx	sfx_EnterSS,0,1,0
 		bsr.w	Pal_MakeFlash
 		rts
 ; ===========================================================================
@@ -9588,8 +9582,7 @@ loc_7672:
 		move.w	#$280,y_pos(a1)
 
 loc_7692:
-		move.w	#$8C,d0
-		bsr.w	PlaySound
+		music	bgm_Boss,0,1,0
 		move.b	#1,(Current_Boss_ID).w
 		addq.b	#2,(Dynamic_Resize_Routine).w
 		moveq	#PLCID_Boss,d0
@@ -9629,8 +9622,7 @@ DynResize_LZ3:
 		cmpi.b	#7,(a1)
 		beq.s	loc_76EA
 		move.b	#7,(a1)
-		move.w	#$B7,d0
-		bsr.w	PlaySound_Special
+		sfx	sfx_Rumbling,0,1,0
 
 loc_76EA:
 		tst.b	(Dynamic_Resize_Routine).w
@@ -9644,8 +9636,7 @@ loc_76EA:
 		move.b	#$77,id(a1)	; load Obj77 (LZ boss in Sonic 1, blank slot here)
 
 loc_770C:
-		move.w	#$8C,d0
-		bsr.w	PlaySound
+		music	bgm_Boss,0,1,0
 		move.b	#1,(Current_Boss_ID).w
 		addq.b	#2,(Dynamic_Resize_Routine).w
 		moveq	#PLCID_Boss,d0
@@ -9879,8 +9870,7 @@ DynResize_EHZ2_01:
 		move.w	#$426,y_pos(a1)
 
 loc_7946:
-		move.w	#$8C,d0
-		bsr.w	PlaySound
+		music	bgm_Boss,0,1,0
 		move.b	#1,(Current_Boss_ID).w
 		moveq	#PLCID_Boss,d0
 		bra.w	LoadPLC
@@ -9944,8 +9934,7 @@ loc_79AA:
 		move.b	#$7A,(a1)	; load Obj7A (SLZ boss in Sonic 1, blank slot here)
 
 loc_79BC:
-		move.w	#$8C,d0
-		bsr.w	PlaySound
+		music	bgm_Boss,0,1,0
 		move.b	#1,(Current_Boss_ID).w
 		addq.b	#2,(Dynamic_Resize_Routine).w
 		moveq	#PLCID_Boss,d0
@@ -10025,8 +10014,7 @@ loc_7A48:
 		addq.b	#2,(Dynamic_Resize_Routine).w
 
 loc_7A64:
-		move.w	#$8C,d0
-		bsr.w	PlaySound
+		music	bgm_Boss,0,1,0
 		move.b	#1,(Current_Boss_ID).w
 		moveq	#PLCID_Boss,d0
 		bra.w	LoadPLC
@@ -11794,8 +11782,7 @@ loc_8EE0:				; CODE XREF: ROM:00008EDAj
 
 loc_8EE4:				; CODE XREF: ROM:00008E9Aj
 		bsr.w	DisplaySprite
-		move.w	#$B9,d0	; 'π'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_Collapse,0,1,0
 ; ===========================================================================
 byte_8EF2:	dc.b $1C,$18,$14,$10	; 0 ; DATA XREF: ROM:loc_8E58o
 		dc.b $1A,$16,$12, $E	; 4
@@ -12394,8 +12381,7 @@ loc_981A:				; DATA XREF: ROM:Obj24_Indexo
 		move.b	#$C,width_pixels(a0)
 		move.b	#9,anim_frame_duration(a0)
 		move.b	#0,mapping_frame(a0)
-		move.w	#$A5,d0	; '•'
-		jsr	(PlaySound_Special).l
+  		sfx	sfx_A5,0,0,0
 
 loc_985E:				; DATA XREF: ROM:00009818o
 		subq.b	#1,anim_frame_duration(a0)
@@ -12445,8 +12431,7 @@ loc_98B2:				; CODE XREF: ROM:00009898j
 		move.b	#$C,width_pixels(a0)
 		move.b	#7,anim_frame_duration(a0)
 		move.b	#0,mapping_frame(a0)
-		move.w	#$C1,d0	; '¡'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_BreakItem,0,0,0
 
 loc_98F6:				; DATA XREF: ROM:0000988Eo
 					; ROM:00009924o
@@ -12487,8 +12472,7 @@ loc_9926:				; DATA XREF: ROM:Obj3F_Indexo
 		move.b	#$C,width_pixels(a0)
 		move.b	#7,anim_frame_duration(a0)
 		move.b	#0,mapping_frame(a0)
-		move.w	#$C4,d0	; '='
-		jmp	(PlaySound_Special).l
+		sfx	sfx_Bomb,0,0,0
 ; ===========================================================================
 Ani_S1Obj1E:	dc.w byte_996C-Ani_S1Obj1E ; DATA XREF:	ROM:loc_96C2o
 					; ROM:Ani_S1Obj1Eo
@@ -13832,8 +13816,7 @@ loc_A9DE:				; CODE XREF: ROM:0000A952j
 		move.w	#0,(Ring_amount).w
 		move.b	#$80,($FFFFFE1D).w
 		move.b	#0,($FFFFFE1B).w
-		move.w	#$C6,d0	; '∆'
-		jsr	(PlaySound_Special).l
+  		sfx	sfx_RingLoss,0,0,0
 
 loc_A9FA:				; DATA XREF: ROM:0000A92Eo
 		move.b	($FFFFFEC7).w,mapping_frame(a0)
@@ -13947,8 +13930,7 @@ loc_AAF4:				; DATA XREF: ROM:0000AA84o
 
 loc_AB2C:				; CODE XREF: ROM:0000AB02j
 					; ROM:0000AB24j
-		move.w	#$C3,d0	; '√'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_GiantRing,0,0,0
 		bra.s	loc_AAD6
 ; ===========================================================================
 
@@ -14372,15 +14354,13 @@ Monitor_SonicLife:			; CODE XREF: ROM:0000B11Aj
 					; DATA XREF: ...
 		addq.b	#1,($FFFFFE12).w
 		addq.b	#1,($FFFFFE1C).w
-		move.w	#$88,d0	; 'à'
-		jmp	(PlaySound).l
+		music	bgm_ExtraLife,1,0,0
 ; ===========================================================================
 
 Monitor_TailsLife:			; DATA XREF: ROM:0000B0CAo
 		addq.b	#1,($FFFFFE12).w; basically a duplicate of above
 		addq.b	#1,($FFFFFE1C).w
-		move.w	#$88,d0	; 'à'
-		jmp	(PlaySound).l
+		music	bgm_ExtraLife,1,0,0
 ; ===========================================================================
 
 Monitor_Rings:				; DATA XREF: ROM:0000B0CEo
@@ -14397,8 +14377,7 @@ Monitor_Rings:				; DATA XREF: ROM:0000B0CEo
 
 loc_B130:				; CODE XREF: ROM:0000B112j
 					; ROM:0000B124j
-		move.w	#$B5,d0	; 'µ'
-		jmp	(PlaySound).l
+		music	sfx_Ring,1,0,0
 ; ===========================================================================
 
 Monitor_Shoes:				; DATA XREF: ROM:0000B0D0o
@@ -14407,15 +14386,13 @@ Monitor_Shoes:				; DATA XREF: ROM:0000B0D0o
 		move.w	#$C00,(Sonic_top_speed).w
 		move.w	#$18,(Sonic_acceleration).w
 		move.w	#$80,(Sonic_deceleration).w ; 'Ä'
-		move.w	#$E2,d0	; '‚'
-		jmp	(PlaySound).l
+		music	bgm_Speedup,1,0,0
 ; ===========================================================================
 
 Monitor_Shield:				; DATA XREF: ROM:0000B0D2o
 		move.b	#1,(Shield_flag).w
 		move.b	#$38,($FFFFB180).w ; '8'
-		move.w	#$AF,d0	; 'Ø'
-		jmp	(PlaySound).l
+		music	sfx_Shield,1,0,0
 ; ===========================================================================
 
 Monitor_Invincibility:			; DATA XREF: ROM:0000B0D4o
@@ -14427,8 +14404,7 @@ Monitor_Invincibility:			; DATA XREF: ROM:0000B0D4o
 		bne.s	locret_B1A8
 		cmpi.w	#$C,(AmountOfAir).w
 		bls.s	locret_B1A8
-		move.w	#$87,d0	; 'á'
-		jmp	(PlaySound).l
+		music	bgm_Invincible,1,0,0
 ; ===========================================================================
 
 locret_B1A8:				; CODE XREF: ROM:0000B194j
@@ -15160,8 +15136,7 @@ loc_BC30:				; CODE XREF: ROM:0000BC24j
 loc_BC40:				; CODE XREF: ROM:0000BC34j
 		tst.w	d0
 		bne.s	loc_BC66
-		move.w	#$C5,d0	; '≈'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Cash,0,0,0
 		addq.b	#2,routine(a0)
 		cmpi.w	#$501,(Current_ZoneAndAct).w
 		bne.s	loc_BC5E
@@ -15179,8 +15154,7 @@ loc_BC66:				; CODE XREF: ROM:0000BC42j
 		move.b	($FFFFFE0F).w,d0
 		andi.b	#3,d0
 		bne.s	locret_BC64
-		move.w	#$CD,d0	; 'Õ'
-		jmp	(PlaySound_Special).l
+  		sfx	sfx_Cash,1,0,0
 ; ===========================================================================
 
 loc_BC80:				; DATA XREF: ROM:0000BB5Ao
@@ -15251,8 +15225,7 @@ loc_BD1E:				; CODE XREF: ROM:0000BD02j
 		bne.w	DeleteObject
 		addq.b	#2,routine(a0)
 		clr.b	(Control_locked).w
-		move.w	#$8D,d0	; 'ç'
-		jmp	(PlaySound).l
+		music	bgm_FZ,1,0,0
 ; ===========================================================================
 		addq.w	#2,(Camera_Max_X_pos).w
 		cmpi.w	#$2100,(Camera_Max_X_pos).w
@@ -15385,13 +15358,11 @@ loc_BE6A:				; DATA XREF: ROM:0000BD96o
 		move.b	($FFFFFE0F).w,d0
 		andi.b	#3,d0
 		bne.s	locret_BEC2
-		move.w	#$CD,d0	; 'Õ'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_Switch,1,0,0
 ; ===========================================================================
 
 loc_BE9C:				; CODE XREF: ROM:0000BE78j
-		move.w	#$C5,d0	; '≈'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Cash,0,0,0
 		addq.b	#2,routine(a0)
 		move.w	#$B4,anim_frame_duration(a0) ; '¥'
 		cmpi.w	#$32,(Ring_amount).w ; '2'
@@ -15413,8 +15384,7 @@ loc_BEC4:				; DATA XREF: ROM:0000BD9Ao
 loc_BECE:				; DATA XREF: ROM:0000BD9Eo
 		move.b	#4,($FFFFB6DA).w
 		move.b	#$14,($FFFFB6E4).w
-		move.w	#$BF,d0	; 'ø'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Continue,0,0,0
 		addq.b	#2,routine(a0)
 		move.w	#$168,anim_frame_duration(a0)
 		bra.w	DisplaySprite
@@ -15935,8 +15905,7 @@ sub_C7C8:				; CODE XREF: ROM:loc_C7A0p
 		bne.s	locret_C828
 		tst.b	render_flags(a0)
 		bpl.s	locret_C828
-		move.w	#$B6,d0	; '∂'
-		jsr	(PlaySound_Special).l
+  		sfx	sfx_SpikesMove,0,0,0
 		bra.s	locret_C828
 ; ===========================================================================
 
@@ -16133,8 +16102,7 @@ loc_CA18:				; CODE XREF: sub_C99E+66j
 		dbf	d1,loc_C9C2
 
 loc_CA1C:				; CODE XREF: sub_C99E+28j
-		move.w	#$CB,d0	; 'À'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_WallSmash,1,0,0
 ; End of function sub_C99E
 
 ; ===========================================================================
@@ -18993,8 +18961,7 @@ loc_E3D8:				; CODE XREF: sub_E34E+7Cj
 		move.b	#$F,objoff_3F(a1)
 
 loc_E3EA:				; CODE XREF: sub_E34E+8Ej
-		move.w	#$CC,d0	; 'Ã'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_Spring,1,0,0
 ; End of function sub_E34E
 
 ; ===========================================================================
@@ -19110,8 +19077,7 @@ loc_E530:				; CODE XREF: sub_E474+AEj
 		bclr	#5,status(a0)
 		bclr	#6,status(a0)
 		bclr	#5,status(a1)
-		move.w	#$CC,d0	; 'Ã'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_Spring,1,0,0
 ; End of function sub_E474
 
 
@@ -19265,8 +19231,7 @@ loc_E6D6:				; CODE XREF: sub_E64E+7Aj
 		bset	#1,status(a1)
 		bclr	#3,status(a1)
 		move.b	#2,routine(a1)
-		move.w	#$CC,d0	; 'Ã'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_Spring,1,0,0
 ; End of function sub_E64E
 
 ; ===========================================================================
@@ -19371,8 +19336,7 @@ loc_E80C:				; CODE XREF: sub_E73E+C0j
 		move.b	#$F,objoff_3F(a1)
 
 loc_E81E:				; CODE XREF: sub_E73E+D2j
-		move.w	#$CC,d0	; 'Ã'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_Spring,1,0,0
 ; End of function sub_E73E
 
 ; ===========================================================================
@@ -19459,8 +19423,7 @@ loc_E918:				; CODE XREF: sub_E870+9Aj
 		move.b	#$F,objoff_3F(a1)
 
 loc_E92A:				; CODE XREF: sub_E870+ACj
-		move.w	#$CC,d0	; 'Ã'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_Spring,1,0,0
 ; End of function sub_E870
 
 ; ===========================================================================
@@ -19888,8 +19851,7 @@ loc_EFFE:				; DATA XREF: ROM:0000EFCEo
 		bcs.s	locret_F026
 		cmpi.w	#$20,d0	; ' '
 		bcc.s	locret_F026
-		move.w	#$CF,d0	; 'œ'
-		jsr	(PlaySound).l
+		music	sfx_Signpost,0,0,0
 		clr.b	($FFFFFE1E).w
 		move.w	(Camera_Max_X_pos).w,(Camera_Min_X_pos).w
 		addq.b	#2,routine(a0)
@@ -19998,8 +19960,7 @@ loc_F140:				; CODE XREF: GotThroughAct+42j
 		move.w	(Ring_amount).w,d0
 		mulu.w	#$A,d0
 		move.w	d0,($FFFFF7D4).w
-		move.w	#$8E,d0	; 'é'
-		jsr	(PlaySound_Special).l
+		sfx	bgm_GotThrough,0,0,0
 
 locret_F15E:				; CODE XREF: ROM:0000F0C8j
 					; ROM:0000F0F4j ...
@@ -20996,7 +20957,12 @@ Obj01_Modes:	dc.w Obj01_MdNormal-Obj01_Modes
 		dc.w Obj01_MdJump2-Obj01_Modes
 ; Identical to the seccond music playlist when
 ; the invincibility wears off in Sonic 1
-MusicList_Sonic:incbin "misc/Music playlist 2.bin"
+MusicList_Sonic:dc.b bgm_GHZ	; GHZ
+		dc.b bgm_LZ	; LZ
+		dc.b bgm_MZ	; CPZ
+		dc.b bgm_SLZ	; EHZ
+		dc.b bgm_SYZ	; HPZ
+		dc.b bgm_SBZ	; HTZ
                 even
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
@@ -21051,8 +21017,7 @@ loc_FB7A:
 		move.w	#$C,(Sonic_acceleration).w
 		move.w	#$80,(Sonic_deceleration).w
 		move.b	#0,(Shoes_flag).w		; turn off the shoes
-		move.w	#$E3,d0                         ; set music speed to normal
-		jmp	(PlaySound).l
+		music	bgm_Slowdown,1,0,0		; set music speed to normal
 ; ===========================================================================
 
 locret_FBAE:
@@ -21128,8 +21093,7 @@ Obj01_InLevelWithWater:			; CODE XREF: Sonic_Water+4j
 		asr	y_vel(a0)
 		beq.s	locret_FC0A
 		move.b	#8,($FFFFB300).w
-		move.w	#$AA,d0	; '™'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_Splash,1,0,0
 ; ===========================================================================
 
 Obj01_NotInWater:			; CODE XREF: Sonic_Water+10j
@@ -21147,8 +21111,7 @@ Obj01_NotInWater:			; CODE XREF: Sonic_Water+10j
 		move.w	#$F000,y_vel(a0)
 
 loc_FC98:				; CODE XREF: Sonic_Water+8Cj
-		move.w	#$AA,d0	; '™'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_Splash,1,0,0
 ; End of function Sonic_Water
 
 ; ===========================================================================
@@ -21407,8 +21370,7 @@ Sonic_WallRecoil_Right:			; CODE XREF: Sonic_Move+1D2j
 		move.w	#0,inertia(a0)
 		move.b	#$A,anim(a0)
 		move.b	#1,routine_secondary(a0)
-		move.w	#$A3,d0	; '£'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Death,0,0,0
 		rts
 ; End of function Sonic_Move
 
@@ -21456,8 +21418,7 @@ loc_FF78:				; CODE XREF: Sonic_MoveLeft+36j
 		blt.s	locret_FFA6
 		move.b	#$D,anim(a0)
 		bclr	#0,status(a0)
-		move.w	#$A4,d0	; '§'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Skid,0,0,0
 
 locret_FFA6:				; CODE XREF: Sonic_MoveLeft+4Cj
 					; Sonic_MoveLeft+52j
@@ -21505,10 +21466,7 @@ loc_FFDE:				; CODE XREF: Sonic_MoveRight+30j
 
 loc_FFFC:
 		bset	#0,status(a0)
-		move.w	#$A4,d0	; '§'
-
-loc_10006:
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Skid,0,0,0
 
 locret_1000C:				; CODE XREF: Sonic_MoveRight+46j
 					; Sonic_MoveRight+4Cj
@@ -21810,8 +21768,7 @@ Obj01_DoRoll:				; CODE XREF: Sonic_Roll+2Ej
 		move.b	#7,x_radius(a0)
 		move.b	#2,anim(a0)
 		addq.w	#5,y_pos(a0)
-		move.w	#$BE,d0	; 'æ'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Roll,0,0,0
 		tst.w	inertia(a0)
 		bne.s	locret_10276
 		move.w	#$200,inertia(a0)
@@ -21856,8 +21813,7 @@ loc_102AA:				; CODE XREF: Sonic_Jump+2Cj
 		addq.l	#4,sp
 		move.b	#1,objoff_3C(a0)
 		clr.b	stick_to_convex(a0)
-		move.w	#$A0,d0	; '†'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Jump,0,0,0
 		move.b	#$13,y_radius(a0)
 		move.b	#9,x_radius(a0)
 		btst	#2,status(a0)
@@ -21926,8 +21882,7 @@ Sonic_Spindash:				; CODE XREF: ROM:Obj01_MdNormalp
 		andi.b	#$70,d0	; 'p'
 		beq.w	locret_10394
 		move.b	#9,anim(a0)
-		move.w	#$BE,d0	; 'æ'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Roll,0,0,0
 		addq.l	#4,sp
 		move.b	#1,spindash_flag(a0)
 
@@ -22476,8 +22431,7 @@ Sonic_GameOver:				; CODE XREF: ROM:Obj01_Deathp
 		clr.b	($FFFFFE1A).w
 
 loc_10876:				; CODE XREF: Sonic_GameOver+80j
-		move.w	#$8F,d0	; 'è'
-		jsr	(PlaySound).l
+		music	bgm_GameOver,0,0,0
 		moveq	#PLCID_GameOver,d0
 		jmp	(LoadPLC).l
 ; ===========================================================================
@@ -22914,7 +22868,12 @@ Obj02_Modes:	dc.w Obj02_MdNormal-Obj02_Modes	; DATA XREF: ROM:Obj02_Modeso
 		dc.w Obj02_MdRoll-Obj02_Modes
 		dc.w Obj02_MdJump2-Obj02_Modes
 ; This is the same as Sonic's
-MusicList_Tails:incbin "misc/Music playlist 2.bin"
+MusicList_Tails:dc.b bgm_GHZ	; GHZ
+		dc.b bgm_LZ	; LZ
+		dc.b bgm_MZ	; CPZ
+		dc.b bgm_SLZ	; EHZ
+		dc.b bgm_SYZ	; HPZ
+		dc.b bgm_SBZ	; HTZ
                 even
 
 ; ||||||||||||||| S U B R O U T I N E |||||||||||||||||||||||||||||||||||||||
@@ -22968,8 +22927,7 @@ loc_10D68:				; CODE XREF: Tails_Display+18j
 		move.w	#$C,(Sonic_acceleration).w
 		move.w	#$80,(Sonic_deceleration).w ; 'Ä'
 		move.b	#0,(Shoes_flag).w
-		move.w	#$E3,d0	; '„'
-		jmp	(PlaySound).l
+		music	bgm_Slowdown,1,0,0
 ; ===========================================================================
 
 locret_10D9C:				; CODE XREF: Tails_Display+5Cj
@@ -23356,8 +23314,7 @@ loc_110F2:				; CODE XREF: Tails_MoveLeft+36j
 		blt.s	locret_11120
 		move.b	#$D,anim(a0)
 		bclr	#0,status(a0)
-		move.w	#$A4,d0	; '§'
-		jsr	(PlaySound_Special).l
+  		sfx	sfx_Skid,0,0,0
 
 locret_11120:				; CODE XREF: Tails_MoveLeft+4Cj
 					; Tails_MoveLeft+52j
@@ -23403,8 +23360,7 @@ loc_11158:				; CODE XREF: Tails_MoveRight+30j
 		bgt.s	locret_11186
 		move.b	#$D,anim(a0)
 		bset	#0,status(a0)
-		move.w	#$A4,d0	; '§'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Skid,0,0,0
 
 locret_11186:				; CODE XREF: Tails_MoveRight+46j
 					; Tails_MoveRight+4Cj
@@ -23706,8 +23662,7 @@ loc_113BE:				; CODE XREF: Tails_Roll+2Ej
 		move.b	#7,x_radius(a0)
 		move.b	#2,anim(a0)
 		addq.w	#5,y_pos(a0)
-		move.w	#$BE,d0	; 'æ'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Roll,0,0,0
 		tst.w	inertia(a0)
 		bne.s	locret_113F0
 		move.w	#$200,inertia(a0)
@@ -23756,8 +23711,7 @@ loc_11424:				; CODE XREF: Tails_Jump+2Cj
 		addq.l	#4,sp
 		move.b	#1,jumping(a0)
 		clr.b	stick_to_convex(a0)
-		move.w	#$A0,d0	; '†'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Jump,0,0,0
 		move.b	#$F,y_radius(a0)
 		move.b	#9,x_radius(a0)
 		btst	#2,status(a0)
@@ -23826,8 +23780,7 @@ Tails_Spindash:				; CODE XREF: ROM:Obj02_MdNormalp
 		andi.b	#btnABC,d0	; 'p'
 		beq.w	locret_1150E
 		move.b	#9,anim(a0)
-		move.w	#$BE,d0	; 'æ'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Roll,0,0,0
 		addq.l	#4,sp
 		move.b	#1,spindash_flag(a0)
 
@@ -25022,8 +24975,7 @@ Obj0A_Countdown:			; CODE XREF: ROM:00011EC8j
 		cmpi.w	#$C,d0
 		bhi.s	loc_12170
 		bne.s	loc_12152
-		move.w	#$92,d0	; 'í'
-		jsr	(PlaySound).l
+		music	bgm_Drowning,0,0,0
 
 loc_12152:				; CODE XREF: ROM:00012146j
 		subq.b	#1,objoff_32(a0)
@@ -25035,8 +24987,7 @@ loc_12152:				; CODE XREF: ROM:00012146j
 
 loc_12166:				; CODE XREF: ROM:00012132j
 					; ROM:00012138j ...
-		move.w	#$C2,d0	; '¬'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Warning,0,0,0
 
 loc_12170:				; CODE XREF: ROM:00012144j
 					; ROM:00012156j ...
@@ -25044,8 +24995,7 @@ loc_12170:				; CODE XREF: ROM:00012144j
 		bcc.w	loc_121FA
 		bsr.w	ResumeMusic
 		move.b	#$81,(Object_control).w
-		move.w	#$B2,d0	; '≤'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Drown,0,0,0
 		move.b	#$A,objoff_34(a0)
 		move.w	#1,$36(a0)
 		move.w	#$78,objoff_2C(a0) ; 'x'
@@ -25352,8 +25302,7 @@ S1Obj4A_RmvSonic:			; DATA XREF: ROM:000124C8o
 		tst.b	(MainCharacter).w
 		beq.s	loc_1253E
 		move.b	#0,(MainCharacter).w
-		move.w	#$A8,d0	; '®'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_SSGoal,0,0,0
 
 loc_1253E:				; CODE XREF: ROM:00012526j
 					; ROM:0001252Cj
@@ -26756,8 +26705,7 @@ Obj79_HitLamp:				; CODE XREF: ROM:00013566j
 		addi.w	#$40,d0	; '@'
 		cmpi.w	#$68,d0	; 'h'
 		bcc.s	locret_135CA
-		move.w	#$A1,d0	; '°'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Lamppost,0,0,0
 		addq.b	#2,routine(a0)
 		bsr.w	Lamppost_StoreInfo
 		lea	(Object_State).w,a2
@@ -26896,8 +26844,7 @@ Obj7D_Main:				; DATA XREF: ROM:Obj7D_Indexo
 		move.b	#$10,width_pixels(a0)
 		move.b	subtype(a0),mapping_frame(a0)
 		move.w	#$77,objoff_30(a0) ; 'w'
-		move.w	#$C9,d0	; '…'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Bonus,0,0,0
 		moveq	#0,d0
 		move.b	subtype(a0),d0
 		add.w	d0,d0
@@ -27006,8 +26953,7 @@ S1Obj47_Bump:				; CODE XREF: ROM:000138C8p
 		bclr	#5,status(a1)
 		clr.b	jumping(a1)
 		move.b	#1,anim(a0)
-		move.w	#$B4,d0	; '¥'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Bumper,0,0,0
 		lea	(Object_State).w,a2
 		moveq	#0,d0
 		move.b	respawn_index(a0),d0
@@ -27125,8 +27071,7 @@ loc_13A7E:				; CODE XREF: ROM:00013A6Ej
 		bsr.w	S1Obj64_ChkSonic
 		beq.s	loc_13B0A
 		bsr.w	ResumeMusic
-		move.w	#$AD,d0	; '≠'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Bubble,0,0,0
 		lea	(MainCharacter).w,a1
 		clr.w	x_vel(a1)
 		clr.w	y_vel(a1)
@@ -27454,8 +27399,7 @@ loc_13F92:				; CODE XREF: ROM:00013F58j
 					; ROM:00013F60j ...
 		tst.w	(Debug_mode_flag).w
 		beq.s	loc_13FA2
-		move.w	#$A1,d0	; '°'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Lamppost,0,0,0
 
 loc_13FA2:				; CODE XREF: ROM:00013F24j
 					; ROM:00013F96j
@@ -27555,8 +27499,7 @@ loc_14094:				; CODE XREF: ROM:0001405Aj
 					; ROM:00014062j ...
 		tst.w	(Debug_mode_flag).w
 		beq.s	loc_140A4
-		move.w	#$A1,d0	; '°'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_Lamppost,0,0,0
 
 loc_140A4:				; CODE XREF: ROM:00014026j
 					; ROM:00014098j
@@ -28475,8 +28418,7 @@ sub_14FC4:				; CODE XREF: ROM:00014FA6p
 		clr.b	jumping(a2)
 		move.b	#$10,anim(a2)
 		move.b	#2,routine(a2)
-		move.w	#$CC,d0	; 'Ã'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_Spring,1,0,0
 ; End of function sub_14FC4
 
 ; ===========================================================================
@@ -31903,8 +31845,7 @@ sub_17A8C:				; CODE XREF: ROM:loc_17920p
 		tst.b	objoff_3E(a0)
 		bne.s	loc_17AB6
 		move.b	#$20,objoff_3E(a0) ; ' '
-		move.w	#$AC,d0	; '¨'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_HitBoss,0,0,0
 
 loc_17AB6:				; CODE XREF: sub_17A8C+18j
 		lea	($FFFFFB22).w,a1
@@ -32838,8 +32779,7 @@ loc_18DE4:				; CODE XREF: ROM:00018DD8j
 		tst.b	objoff_3E(a0)
 		bne.s	loc_18E2C
 		move.b	#$20,objoff_3E(a0) ; ' '
-		move.w	#$AC,d0	; '¨'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_HitBoss,0,0,0
 
 loc_18E2C:				; CODE XREF: ROM:00018E1Aj
 		lea	($FFFFFB22).w,a1
@@ -33029,8 +32969,7 @@ loc_18FD8:				; CODE XREF: ROM:00018FC6j
 
 loc_18FE0:				; CODE XREF: ROM:00018FC8j
 		clr.w	y_vel(a0)
-		move.w	#$81,d0	; 'Å'
-		jsr	(PlaySound).l
+		music	bgm_GHZ,0,0,0
 
 loc_18FEE:				; CODE XREF: ROM:00018FB8j
 					; ROM:00018FBEj ...
@@ -34432,8 +34371,7 @@ loc_1A006:				; DATA XREF: ROM:00019F32o
 		clr.l	(a0)
 		clr.l	mappings(a0)
 		move.b	#4,(MainCharacter+routine).w
-		move.w	#$A8,d0	; '®'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_SSGoal,0,0,0
 
 locret_1A03E:				; CODE XREF: ROM:0001A00Aj
 					; ROM:0001A026j
@@ -34974,8 +34912,7 @@ Obj09_Jump:				; CODE XREF: ROM:Obj09_OnWallp
 		asr.l	#8,d0
 		move.w	d0,y_vel(a0)
 		bset	#1,status(a0)
-		move.w	#$A0,d0	; '†'
-		jsr	(PlaySound_Special).l
+  		sfx	sfx_Jump,0,0,0
 
 locret_1A5D0:				; CODE XREF: Obj09_Jump+8j
 		rts
@@ -35228,8 +35165,7 @@ Obj09_GetCont:                          ; CODE XREF: Obj09_ChkItems+44j
 		bset	#0,($FFFFFE1B).w
 		bne.s	Obj09_NoCont
 		addq.b	#1,($FFFFFE18).w ; add 1 to the continues counter
-		move.w	#$BF,d0	; play the sound
-		jsr	(PlaySound).l
+		music	sfx_Continue,0,0,0
 
 ; loc_1A7FC:
 Obj09_NoCont:				; CODE XREF: Obj09_ChkItems+5Aj
@@ -35251,8 +35187,7 @@ Obj09_Chk1Up:				; CODE XREF: Obj09_ChkItems+3Ej
 Obj09_Get1Up:				; CODE XREF: Obj09_ChkItems+80j
 		addq.b	#1,($FFFFFE12).w	; add 1 to the number of lives
 		addq.b	#1,($FFFFFE1C).w        ; add 1 to the lives counter
-		move.w	#$88,d0	; 'à'
-		jsr	(PlaySound).l
+		music	bgm_ExtraLife,0,0,0
 		moveq	#0,d4
 		rts
 ; ===========================================================================
@@ -35281,8 +35216,7 @@ Obj09_GetEmer:				; CODE XREF: Obj09_ChkItems+B0j
 
 ; loc_1A862:
 Obj09_NoEmer:				; CODE XREF: Obj09_ChkItems+C0j
-		move.w	#$93,d0	; 'ì'
-		jsr	(PlaySound_Special).l
+  		sfx	bgm_Emerald,0,0,0
 		moveq	#0,d4
 		rts
 ; ===========================================================================
@@ -35392,8 +35326,7 @@ Obj09_ChkBumper:				; CODE XREF: OBj09_ChkItems2+4j
 		move.l	d0,mappings(a2)
 
 loc_1A954:				; CODE XREF: OBj09_ChkItems2+7Ej
-		move.w	#$B4,d0	; '¥'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_Bumper,1,0,0
 ; ===========================================================================
 
 ; loc_1A95E:
@@ -35401,8 +35334,7 @@ Obj09_GOAL:				; CODE XREF: OBj09_ChkItems2+24j
 		cmpi.b	#$27,d0	; is this a "GOAL"?
 		bne.s	Obj09_UPblock
 		addq.b	#2,routine(a0) ;
-		move.w	#$A8,d0	; '®'
-		jsr	(PlaySound_Special).l
+		sfx	sfx_SSGoal,0,0,0
 		rts
 ; ===========================================================================
 
@@ -35421,8 +35353,7 @@ Obj09_UPblock:				; CODE XREF: OBj09_ChkItems2+9Cj
 		move.b	#$2A,(a1) ; '*'
 
 loc_1A99E:				; CODE XREF: OBj09_ChkItems2+C8j
-		move.w	#$A9,d0	; '©'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_SSItem,1,0,0
 ; ===========================================================================
 
 ; loc_1A9A8:
@@ -35440,8 +35371,7 @@ Obj09_DOWNblock:				; CODE XREF: OBj09_ChkItems2+B2j
 		move.b	#$29,(a1) ; ')'
 
 loc_1A9D2:				; CODE XREF: OBj09_ChkItems2+FCj
-		move.w	#$A9,d0	; '©'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_SSItem,1,0,0
 ; ===========================================================================
 ; loc_1A9DC:
 Obj09_Rblock:				; CODE XREF: OBj09_ChkItems2+E6j
@@ -35459,8 +35389,7 @@ Obj09_Rblock:				; CODE XREF: OBj09_ChkItems2+E6j
 
 loc_1AA04:				; CODE XREF: OBj09_ChkItems2+12Ej
 		neg.w	(SS_RotationSpeed).w 	; reverse stage rotation
-		move.w	#$A9,d0	; '©'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_SSItem,1,0,0
 ; ===========================================================================
 
 ; loc_1AA12:
@@ -35493,8 +35422,7 @@ loc_1AA4A:				; CODE XREF: OBj09_ChkItems2+180j
 		move.b	d0,mappings(a2)
 
 loc_1AA4E:				; CODE XREF: OBj09_ChkItems2+168j
-		move.w	#$BA,d0	; '∫'
-		jmp	(PlaySound_Special).l
+		sfx	sfx_SSGlass,1,0,0
 ; ===========================================================================
 
 locret_1AA58:				; CODE XREF: OBj09_ChkItems2+B8j
@@ -36001,8 +35929,7 @@ loc_1B214:				; CODE XREF: AddPoints+14j
 		bmi.s	locret_1B23C
 		addq.b	#1,($FFFFFE12).w
 		addq.b	#1,($FFFFFE1C).w
-		move.w	#$88,d0	; 'à'
-		jmp	(PlaySound).l
+		music	bgm_ExtraLife,1,0,0
 ; ===========================================================================
 
 locret_1B23C:				; CODE XREF: AddPoints+1Ej

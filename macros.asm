@@ -63,21 +63,6 @@ locVRAM:	macro loc,controlport
 		endm
 
 ; ---------------------------------------------------------------------------
-; DMA copy data from 68K (ROM/RAM) to the VRAM
-; input: source, length, destination
-; ---------------------------------------------------------------------------
-
-writeVRAM:	macro
-		lea	(VDP_control_port).l,a5
-		move.l	#$94000000+(((\2>>1)&$FF00)<<8)+$9300+((\2>>1)&$FF),(a5)
-		move.l	#$96000000+(((\1>>1)&$FF00)<<8)+$9500+((\1>>1)&$FF),(a5)
-		move.w	#$9700+((((\1>>1)&$FF0000)>>16)&$7F),(a5)
-		move.w	#$4000+(\3&$3FFF),(a5)
-		move.w	#$80+((\3&$C000)>>14),(DMA_data_thunk).w
-		move.w	(DMA_data_thunk).w,(a5)
-		endm
-
-; ---------------------------------------------------------------------------
 ; DMA copy data from 68K (ROM/RAM) to the CRAM
 ; input: source, length, destination
 ; ---------------------------------------------------------------------------
@@ -103,4 +88,65 @@ copyTilemap:	macro source,loc,width,height
 		moveq	#width,d1
 		moveq	#height,d2
 		bsr.w	ShowVDPGraphics
+		endm
+		
+; ---------------------------------------------------------------------------
+; play a sound effect or music track
+; input: track, terminate routine, branch or jump, move operand size
+; ---------------------------------------------------------------------------
+
+music:		macro track,terminate,branch,byte
+		  if OptimiseSound=1
+			move.b	#track,(SoundDriver_RAM+SFXToPlay).l
+		    if terminate=1
+			rts
+		    endc
+		  else
+	 	    if byte=1
+			move.b	#track,d0
+		    else
+			move.w	#track,d0
+		    endc
+		    if branch=1
+		      if terminate=0
+			bsr.w	PlaySound
+		      else
+			bra.w	PlaySound
+		      endc
+		    else
+		      if terminate=0
+			jsr	(PlaySound).l
+		      else
+			jmp	(PlaySound).l
+		      endc
+		    endc
+		  endc
+		endm
+
+sfx:		macro track,terminate,branch,byte
+		  if OptimiseSound=1
+			move.b	#track,(SoundDriver_RAM+SFXSpecialToPlay).l
+		    if terminate=1
+			rts
+		    endc
+		  else
+	 	    if byte=1
+			move.b	#track,d0
+		    else
+			move.w	#track,d0
+		    endc
+		    if branch=1
+		      if terminate=0
+			bsr.w	PlaySound_Special
+		      else
+			bra.w	PlaySound_Special
+		      endc
+		    else
+		      if terminate=0
+			jsr	(PlaySound_Special).l
+		      else
+			jmp	(PlaySound_Special).l
+		      endc
+		    endc
+		  endc
 		endm

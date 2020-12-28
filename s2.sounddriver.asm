@@ -1,5 +1,5 @@
 Go_SoundTypes:	dc.l SoundTypes
-Go_SoundD0:	dc.l SoundD0Index
+Go_SoundD0:	dc.l SpecSoundIndex
 Go_MusicIndex:	dc.l MusicIndex
 Go_SoundIndex:	dc.l SoundIndex
 Go_SpedTempo:	dc.l SpedUpTempoTable
@@ -26,25 +26,26 @@ SpedUpTempoTable:	dc.b   7,$72,$73,$26,$15,  8,$FF,  5
 ; ---------------------------------------------------------------------------
 ; Music	Pointers
 ; ---------------------------------------------------------------------------
-MusicIndex:	dc.l Mus_GHZ
-		dc.l Mus_LZ
-		dc.l Mus_MZ
-		dc.l Mus_SLZ
-		dc.l Mus_SYZ
-		dc.l Mus_SBZ
-		dc.l Mus_Inv
-		dc.l Mus_ExtraLife
-		dc.l Mus_SS
-		dc.l Mus_Title
-		dc.l Mus_Ending
-		dc.l Mus_Boss
-		dc.l Mus_FZ
-		dc.l Mus_SonicGotThrough
-		dc.l Mus_GameOver
-		dc.l Mus_Continue
-		dc.l Mus_Credits
-		dc.l Mus_Drowning
-		dc.l Mus_Emerald
+MusicIndex:
+ptr_mus81: 	dc.l Mus_GHZ
+ptr_mus82:	dc.l Mus_LZ
+ptr_mus83:	dc.l Mus_MZ
+ptr_mus84:	dc.l Mus_SLZ
+ptr_mus85:	dc.l Mus_SYZ
+ptr_mus86:	dc.l Mus_SBZ
+ptr_mus87:	dc.l Mus_Inv
+ptr_mus88:	dc.l Mus_ExtraLife
+ptr_mus89:	dc.l Mus_SS
+ptr_mus8A:	dc.l Mus_Title
+ptr_mus8B:	dc.l Mus_Ending
+ptr_mus8C:	dc.l Mus_Boss
+ptr_mus8D:	dc.l Mus_FZ
+ptr_mus8E:	dc.l Mus_SonicGotThrough
+ptr_mus8F:	dc.l Mus_GameOver
+ptr_mus90:	dc.l Mus_Continue
+ptr_mus91:	dc.l Mus_Credits
+ptr_mus92:	dc.l Mus_Drowning
+ptr_mus93:	dc.l Mus_Emerald
 ; ---------------------------------------------------------------------------
 ; Type of sound	being played ($90 = music; $70 = normal	sound effect)
 ; ---------------------------------------------------------------------------
@@ -612,11 +613,11 @@ PlaySound_Commands:
 ; ===========================================================================
 ; loc_71F98:
 CommandIndex:
-		bra.w	FadeOutMusic		; fade out music and sound effects
-		bra.w	PlaySegaSound		; Seeegaaa! chant
-		bra.w	SpeedUpMusic		; speed up music
-		bra.w	SlowDownMusic		; slow down music
-		bra.w	StopSoundAndMusic	; stop all music and sounds
+ptr_flgE0:	bra.w	FadeOutMusic		; fade out music and sound effects
+ptr_flgE1:	bra.w	PlaySegaSound		; Seeegaaa! chant
+ptr_flgE2:	bra.w	SpeedUpMusic		; speed up music
+ptr_flgE3:	bra.w	SlowDownMusic		; slow down music
+ptr_flgE4:	bra.w	StopSoundAndMusic	; stop all music and sounds
 ; ===========================================================================
 ; ---------------------------------------------------------------------------
 ; Play "Say-gaa" PCM sound
@@ -2337,15 +2338,62 @@ Mus_Emerald:	incbin	"sound/music/Emerald.bin"
 ; ---------------------------------------------------------------------------
 ; Sound	effect pointers
 ; ---------------------------------------------------------------------------
-SoundIndex:	dc.l SoundA0, SoundA1, SoundA2,	SoundA3, SoundA4, SoundA5
-		dc.l SoundA6, SoundA7, SoundA8,	SoundA9, SoundAA, SoundAB
-		dc.l SoundAC, SoundAD, SoundAE,	SoundAF, SoundB0, SoundB1
-		dc.l SoundB2, SoundB3, SoundB4,	SoundB5, SoundB6, SoundB7
-		dc.l SoundB8, SoundB9, SoundBA,	SoundBB, SoundBC, SoundBD
-		dc.l SoundBE, SoundBF, SoundC0,	SoundC1, SoundC2, SoundC3
-		dc.l SoundC4, SoundC5, SoundC6,	SoundC7, SoundC8, SoundC9
-		dc.l SoundCA, SoundCB, SoundCC,	SoundCD, SoundCE, SoundCF
-SoundD0Index:	dc.l SoundD0
+SoundIndex:
+ptr_sndA0:	dc.l SoundA0
+ptr_sndA1:	dc.l SoundA1
+ptr_sndA2:	dc.l SoundA2
+ptr_sndA3:	dc.l SoundA3
+ptr_sndA4:	dc.l SoundA4
+ptr_sndA5:	dc.l SoundA5
+ptr_sndA6:	dc.l SoundA6
+ptr_sndA7:	dc.l SoundA7
+ptr_sndA8:	dc.l SoundA8
+ptr_sndA9:	dc.l SoundA9
+ptr_sndAA:	dc.l SoundAA
+ptr_sndAB:	dc.l SoundAB
+ptr_sndAC:	dc.l SoundAC
+ptr_sndAD:	dc.l SoundAD
+ptr_sndAE:	dc.l SoundAE
+ptr_sndAF:	dc.l SoundAF
+ptr_sndB0:	dc.l SoundB0
+ptr_sndB1:	dc.l SoundB1
+ptr_sndB2:	dc.l SoundB2
+ptr_sndB3:	dc.l SoundB3
+ptr_sndB4:	dc.l SoundB4
+ptr_sndB5:	dc.l SoundB5
+ptr_sndB6:	dc.l SoundB6
+ptr_sndB7:	dc.l SoundB7
+ptr_sndB8:	dc.l SoundB8
+ptr_sndB9:	dc.l SoundB9
+ptr_sndBA:	dc.l SoundBA
+ptr_sndBB:	dc.l SoundBB
+ptr_sndBC:	dc.l SoundBC
+ptr_sndBD:	dc.l SoundBD
+ptr_sndBE:	dc.l SoundBE
+ptr_sndBF:	dc.l SoundBF
+ptr_sndC0:	dc.l SoundC0
+ptr_sndC1:	dc.l SoundC1
+ptr_sndC2:	dc.l SoundC2
+ptr_sndC3:	dc.l SoundC3
+ptr_sndC4:	dc.l SoundC4
+ptr_sndC5:	dc.l SoundC5
+ptr_sndC6:	dc.l SoundC6
+ptr_sndC7:	dc.l SoundC7
+ptr_sndC8:	dc.l SoundC8
+ptr_sndC9:	dc.l SoundC9
+ptr_sndCA:	dc.l SoundCA
+ptr_sndCB:	dc.l SoundCB
+ptr_sndCC:	dc.l SoundCC
+ptr_sndCD:	dc.l SoundCD
+ptr_sndCE:	dc.l SoundCE
+ptr_sndCF:	dc.l SoundCF
+ptr_sndend:
+; ---------------------------------------------------------------------------
+; Special sound effect pointers
+; ---------------------------------------------------------------------------
+SpecSoundIndex:
+ptr_sndD0:	dc.l SoundD0
+ptr_specend
 SoundA0:	incbin	"sound/sfx/SndA0 - Jump.bin"
 		even
 SoundA1:	incbin	"sound/sfx/SndA1 - Lamppost.bin"
